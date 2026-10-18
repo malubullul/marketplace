@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Produk — Pasar Nusantara</title>
+  <meta name="description" content="Detail produk lengkap dengan spesifikasi, ulasan, dan harga terbaik.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="container">
+    <div class="top-bar-kiri">
+      <span>🚚 Gratis Ongkir pembelian di atas Rp200.000</span>
+    </div>
+    <div class="top-bar-kanan">
+      <a href="#">Lacak Pesanan</a>
+      <a href="#">Pusat Bantuan</a>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="container header-dalam">
+    <a href="index.html" class="logo">
+      <div class="logo-ikon">P</div>
+      Pasar Nusantara
+    </a>
+    <div class="search-wrapper">
+      <input type="text" class="search-input" id="search-input" placeholder="Cari produk, merek, dan lainnya..." autocomplete="off">
+      <button class="search-btn" id="search-btn">🔍</button>
+    </div>
+    <div class="header-aksi">
+      <a href="index.html" class="header-btn-aksi"><span class="ikon">🏠</span><span>Beranda</span></a>
+      <a href="keranjang.html" class="header-btn-aksi">
+        <span class="ikon">🛒</span>
+        <span class="badge-keranjang">0</span>
+        <span>Keranjang</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- NAV KATEGORI -->
+<nav class="nav-kategori">
+  <div class="container">
+    <a href="produk.html" class="nav-link">Semua</a>
+    <a href="produk.html?kategori=elektronik" class="nav-link">Elektronik</a>
+    <a href="produk.html?kategori=fashion" class="nav-link">Fashion</a>
+    <a href="produk.html?kategori=rumah" class="nav-link">Rumah & Taman</a>
+    <a href="produk.html?kategori=kecantikan" class="nav-link">Kecantikan</a>
+    <a href="produk.html?kategori=olahraga" class="nav-link">Olahraga</a>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div style="background: var(--abu-muda); border-bottom: 1px solid var(--abu-border)">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="index.html">Beranda</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="produk.html" id="bc-kategori">Produk</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-aktif" id="bc-nama">Loading...</span>
+    </nav>
+  </div>
+</div>
+
+<!-- DETAIL PRODUK -->
+<div class="container">
+  <div class="detail-layout" id="detail-wrapper">
+    <!-- Diisi JS -->
+    <div style="grid-column:1/-1; text-align:center; padding:80px; color:var(--abu-teks)">
+      <div style="font-size:40px; margin-bottom:12px">🔄</div>
+      <p>Memuat produk...</p>
+    </div>
+  </div>
+
+  <!-- PRODUK TERKAIT -->
+  <div style="padding-bottom:60px">
+    <div class="section-header" style="margin-top:0; padding-top:20px; border-top:2px solid var(--abu-border)">
+      <h2 class="section-judul">Produk Serupa</h2>
+      <a href="produk.html" class="lihat-semua">Lihat semua →</a>
+    </div>
+    <div class="grid-produk" id="grid-serupa"></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo" style="color:white;margin-bottom:12px"><div class="logo-ikon">P</div>Pasar Nusantara</div>
+        <p>Marketplace terpercaya untuk produk berkualitas di seluruh Indonesia.</p>
+        <div class="footer-sosmed">
+          <a href="#" class="sosmed-btn">f</a>
+          <a href="#" class="sosmed-btn">📷</a>
+          <a href="#" class="sosmed-btn">𝕏</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-judul">Belanja</div>
+        <ul>
+          <li><a href="produk.html">Semua Kategori</a></li>
+          <li><a href="produk.html?sort=diskon">Top Deals</a></li>
+          <li><a href="produk.html?sort=terlaris">Terlaris</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-judul">Bantuan</div>
+        <ul>
+          <li><a href="#">Pusat Bantuan</a></li>
+          <li><a href="#">Lacak Pesanan</a></li>
+          <li><a href="#">Pengembalian</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-judul">Tentang</div>
+        <ul>
+          <li><a href="#">Tentang Kami</a></li>
+          <li><a href="#">Karir</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-judul">Unduh Aplikasi</div>
+        <div class="footer-app">
+          <a href="#" class="app-btn">
+            <span class="app-ikon">▶</span>
+            <div class="app-btn-teks"><small>Tersedia di</small><strong>Google Play</strong></div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bawah">
+      <span>© 2024 Pasar Nusantara. Semua hak dilindungi.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/app.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

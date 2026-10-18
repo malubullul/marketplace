@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar Produk — Pasar Nusantara</title>
+  <meta name="description" content="Temukan ribuan produk berkualitas dengan harga terbaik di Pasar Nusantara.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="container">
+    <div class="top-bar-kiri">
+      <span>🚚 Gratis Ongkir pembelian di atas Rp200.000</span>
+      <span>↩️ Garansi 30 hari</span>
+    </div>
+    <div class="top-bar-kanan">
+      <a href="#">Lacak Pesanan</a>
+      <a href="#">Pusat Bantuan</a>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="container header-dalam">
+    <a href="index.html" class="logo">
+      <div class="logo-ikon">P</div>
+      Pasar Nusantara
+    </a>
+    <div class="search-wrapper">
+      <input type="text" class="search-input" id="search-input" placeholder="Cari produk, merek, dan lainnya..." autocomplete="off">
+      <button class="search-btn" id="search-btn">🔍</button>
+    </div>
+    <div class="header-aksi">
+      <a href="index.html" class="header-btn-aksi"><span class="ikon">🏠</span><span>Beranda</span></a>
+      <a href="keranjang.html" class="header-btn-aksi">
+        <span class="ikon">🛒</span>
+        <span class="badge-keranjang">0</span>
+        <span>Keranjang</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- NAV KATEGORI -->
+<nav class="nav-kategori">
+  <div class="container">
+    <a href="produk.html" class="nav-link" id="nav-semua">Semua</a>
+    <a href="produk.html?kategori=elektronik" class="nav-link">Elektronik</a>
+    <a href="produk.html?kategori=fashion" class="nav-link">Fashion</a>
+    <a href="produk.html?kategori=rumah" class="nav-link">Rumah & Taman</a>
+    <a href="produk.html?kategori=kecantikan" class="nav-link">Kecantikan</a>
+    <a href="produk.html?kategori=bayi" class="nav-link">Bayi & Anak</a>
+    <a href="produk.html?kategori=olahraga" class="nav-link">Olahraga</a>
+    <a href="produk.html?kategori=buku" class="nav-link">Buku</a>
+    <a href="produk.html?kategori=makanan" class="nav-link">Makanan</a>
+  </div>
+</nav>
+
+<!-- PAGE BANNER -->
+<div class="page-banner">
+  <div class="container page-banner-dalam">
+    <div>
+      <h1 id="page-judul">Semua Produk</h1>
+      <p id="page-sub">Temukan produk terbaik untuk kamu</p>
+    </div>
+    <nav class="breadcrumb" style="background:transparent; padding:0">
+      <a href="index.html" style="color:#aaa">Beranda</a>
+      <span class="breadcrumb-sep" style="color:#555">›</span>
+      <span style="color:#eee" id="breadcrumb-aktif">Produk</span>
+    </nav>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+  <div class="halaman-produk-layout" style="padding-top:28px">
+
+    <!-- SIDEBAR FILTER -->
+    <aside class="sidebar-filter">
+      <div class="filter-kartu">
+        <div class="filter-judul">
+          Filter
+          <button class="btn-reset-filter" id="btn-reset" style="width:auto;padding:4px 10px;font-size:11px;">Reset</button>
+        </div>
+
+        <!-- Filter Kategori -->
+        <div class="filter-section">
+          <div class="filter-section-judul">Kategori</div>
+          <div id="filter-kategori-list">
+            <label class="filter-checkbox-item">
+              <input type="radio" name="filter-kat" value="" checked> Semua Kategori
+            </label>
+          </div>
+        </div>
+
+        <!-- Filter Harga -->
+        <div class="filter-section">
+          <div class="filter-section-judul">Rentang Harga</div>
+          <div class="filter-range">
+            <input type="range" id="filter-harga-max" min="0" max="15000000" step="50000" value="15000000">
+            <div class="filter-range-nilai">
+              <span>Rp0</span>
+              <span id="filter-harga-max-label">Rp15.000.000</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Rating -->
+        <div class="filter-section">
+          <div class="filter-section-judul">Rating Minimum</div>
+          <div id="filter-rating-list">
+            <label class="filter-checkbox-item"><input type="radio" name="filter-rating" value="0" checked> Semua Rating</label>
+            <label class="filter-checkbox-item"><input type="radio" name="filter-rating" value="4.5"> ★ 4.5 ke atas</label>
+            <label class="filter-checkbox-item"><input type="radio" name="filter-rating" value="4"> ★ 4.0 ke atas</label>
+            <label class="filter-checkbox-item"><input type="radio" name="filter-rating" value="3"> ★ 3.0 ke atas</label>
+          </div>
+        </div>
+
+        <!-- Filter Stok -->
+        <div class="filter-section">
+          <div class="filter-section-judul">Ketersediaan</div>
+          <label class="filter-checkbox-item">
+            <input type="checkbox" id="filter-stok"> Hanya tampilkan yang ada stok
+          </label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- PRODUK AREA -->
+    <div>
+      <!-- TOOLBAR -->
+      <div class="toolbar-produk">
+        <div class="toolbar-info">Menampilkan <strong id="count-produk">0</strong> produk</div>
+        <div class="toolbar-kanan">
+          <select class="sort-select" id="sort-select">
+            <option value="default">Urutkan: Relevan</option>
+            <option value="terlaris">Terlaris</option>
+            <option value="terbaru">Terbaru</option>
+            <option value="harga-asc">Harga: Rendah → Tinggi</option>
+            <option value="harga-desc">Harga: Tinggi → Rendah</option>
+            <option value="rating">Rating Tertinggi</option>
+            <option value="diskon">Diskon Terbesar</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- GRID PRODUK -->
+      <div class="grid-produk grid-produk-3" id="grid-produk-list"></div>
+
+      <!-- EMPTY STATE -->
+      <div class="empty-state" id="empty-state" style="display:none">
+        <div class="es-ikon">🔍</div>
+        <h3>Produk tidak ditemukan</h3>
+        <p>Coba ubah filter atau kata kunci pencarian kamu</p>
+      </div>
+
+      <!-- PAGINASI -->
+      <div class="paginasi" id="paginasi"></div>
+    </div>
+  </div>
+</div>
+
+<!-- NEWSLETTER -->
+<div class="newsletter" style="margin-top:20px">
+  <div class="container">
+    <h2 class="newsletter-judul">Tetap Terhubung</h2>
+    <p class="newsletter-sub">Daftarkan email untuk mendapatkan penawaran spesial dan promo eksklusif.</p>
+    <form class="newsletter-form" id="newsletter-form">
+      <input type="email" class="newsletter-input" placeholder="Masukkan email kamu" required>
+      <button type="submit" class="btn-subscribe">Langganan</button>
+    </form>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo" style="color:white;margin-bottom:12px">
+          <div class="logo-ikon">P</div>Pasar Nusantara
+        </div>
+        <p>Marketplace terpercaya untuk produk berkualitas di seluruh Indonesia.</p>
+        <div class="footer-sosmed">
+          <a href="#" class="sosmed-btn">f</a>
+          <a href="#" class="sosmed-btn">📷</a>
+          <a href="#" class="sosmed-btn">𝕏</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-judul">Belanja</div>
+        <ul>
+          <li><a href="produk.html">Semua Kategori</a></li>
+          <li><a href="produk.html?sort=diskon">Top Deals</a></li>
+          <li><a href="produk.html?sort=terlaris">Terlaris</a></li>
+          <li><a href="produk.html?sort=terbaru">Baru Masuk</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-judul">Bantuan</div>
+        <ul>
+          <li><a href="#">Pusat Bantuan</a></li>
+          <li><a href="#">Lacak Pesanan</a></li>
+          <li><a href="#">Pengembalian</a></li>
+          <li><a href="#">Hubungi Kami</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-judul">Tentang</div>
+        <ul>
+          <li><a href="#">Tentang Kami</a></li>
+          <li><a href="#">Karir</a></li>
+          <li><a href="#">Jual di Sini</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-judul">Unduh Aplikasi</div>
+        <div class="footer-app">
+          <a href="#" class="app-btn">
+            <span class="app-ikon">▶</span>
+            <div class="app-btn-teks"><small>Tersedia di</small><strong>Google Play</strong></div>
+          </a>
+          <a href="#" class="app-btn">
+            <span class="app-ikon">🍎</span>
+            <div class="app-btn-teks"><small>Unduh di</small><strong>App Store</strong></div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bawah">
+      <span>© 2024 Pasar Nusantara. Semua hak dilindungi.</span>
+      <div class="footer-bawah-link">
+        <a href="#">Kebijakan Privasi</a>
+        <a href="#">Syarat & Ketentuan</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/app.js"></script>
+<script src="js/produk.js"></script>
+</body>
+</html>
