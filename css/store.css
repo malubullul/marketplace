@@ -1586,3 +1586,271 @@ svg {
     gap: 4px;
   }
 }
+
+/* Archive campaign: full-viewport photography with an overlaid masthead. */
+.archive-home #store-header {
+  position: relative;
+  z-index: 30;
+}
+.archive-announcement {
+  height: 28px;
+  overflow: hidden;
+  background: #080808;
+  color: #f5f4f0;
+  font-size: 11px;
+  line-height: 28px;
+}
+.archive-ticker {
+  display: flex;
+  width: max-content;
+  animation: archive-ticker 50s linear infinite;
+}
+.archive-ticker > div {
+  display: flex;
+  align-items: center;
+  gap: 54px;
+  padding-right: 54px;
+}
+.archive-ticker span {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.archive-ticker .ticker-dot {
+  color: #6c6965;
+  font-size: 9px;
+}
+@keyframes archive-ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.archive-home .archive-header {
+  position: absolute;
+  inset: 28px 0 auto;
+  background: transparent;
+  color: #f6f3eb;
+}
+.archive-home .store-header-inner {
+  height: 90px;
+  margin: 0 3.2%;
+  border: 0;
+}
+.archive-home .store-header-inner > .wordmark {
+  left: 50%;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: -2.4px;
+  text-transform: uppercase;
+}
+.archive-home .mobile-menu {
+  display: flex;
+}
+.archive-home .desktop-nav {
+  display: none;
+}
+.archive-home .desktop-nav.mobile-open {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  top: 82px;
+  left: 0;
+  right: auto;
+  width: min(300px, calc(100vw - 40px));
+  gap: 0;
+  padding: 17px 25px;
+  background: #18120ff5;
+  border: 1px solid #ffffff26;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 60px #0003;
+  z-index: 50;
+}
+.archive-home .desktop-nav a,
+.archive-home .desktop-nav button {
+  padding: 13px 0;
+  font-size: 13px;
+  width: 100%;
+  text-align: left;
+  color: #f6f3eb;
+}
+.archive-home .store-actions {
+  gap: 20px;
+}
+.archive-home .store-actions svg,
+.archive-home .mobile-menu svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.1;
+}
+.archive-home .cart-link .badge-keranjang {
+  border-color: #21140d;
+  background: #f7f3ec;
+  color: #21140d;
+}
+.archive-home .campaign {
+  display: block;
+  height: calc(100svh - 28px);
+  min-height: 580px;
+  max-width: none;
+  margin: 0;
+  background: #21140d;
+  overflow: hidden;
+  isolation: isolate;
+}
+.archive-home .campaign-photo {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  background: #21140d;
+  z-index: -2;
+}
+.archive-home .campaign-photo > img {
+  object-fit: cover;
+  object-position: center top;
+}
+.archive-home .campaign::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, #08050338 0%, transparent 23%),
+    linear-gradient(90deg, #08050340, transparent 64%),
+    linear-gradient(0deg, #08050378, transparent 52%);
+  z-index: -1;
+  pointer-events: none;
+}
+.archive-home .campaign-copy {
+  position: absolute;
+  left: 3.2%;
+  bottom: 8.5%;
+  display: block;
+  padding: 0;
+  background: transparent;
+  color: #fff;
+  max-width: min(650px, 64%);
+}
+.archive-home .campaign .eyebrow {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.2px;
+  margin-bottom: 22px;
+}
+.archive-home .campaign h1 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(26px, 2.2vw, 38px);
+  font-weight: 400;
+  line-height: 1.32;
+  letter-spacing: -0.65px;
+  margin: 0;
+}
+.archive-home .campaign .solid-link {
+  margin-top: 27px;
+  min-width: 142px;
+  justify-content: center;
+  border: 1px solid #080808;
+  background: #080808;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 400;
+  padding: 14px 28px;
+  line-height: 1.4;
+}
+.archive-home .campaign .solid-link:hover {
+  background: #f7f3ec;
+  border-color: #f7f3ec;
+  color: #18120f;
+  transform: none;
+}
+.archive-home .archive-header :focus-visible,
+.archive-home .campaign :focus-visible {
+  outline-color: #fff;
+}
+@media (min-width: 1800px) {
+  .archive-home .campaign-copy {
+    bottom: 10%;
+  }
+  .archive-home .store-header-inner {
+    height: 110px;
+  }
+  .archive-home .store-header-inner > .wordmark {
+    font-size: 48px;
+  }
+}
+@media (max-width: 760px) {
+  .archive-announcement {
+    font-size: 9px;
+  }
+  .archive-ticker > div {
+    gap: 28px;
+    padding-right: 28px;
+  }
+  .archive-home .store-header-inner {
+    height: 74px;
+    margin: 0 5%;
+  }
+  .archive-home .store-header-inner > .wordmark {
+    left: 46%;
+    font-size: 28px;
+    letter-spacing: -1.8px;
+  }
+  .archive-home .store-actions {
+    gap: 7px;
+  }
+  .archive-home .store-actions .icon-button {
+    width: 21px;
+  }
+  .archive-home .store-actions svg {
+    width: 19px;
+    height: 19px;
+  }
+  .archive-home .campaign {
+    min-height: 560px;
+  }
+  .archive-home .campaign-photo > img {
+    object-position: 68% 50%;
+  }
+  .archive-home .campaign::after {
+    background:
+      linear-gradient(180deg, #08050355, transparent 28%),
+      linear-gradient(0deg, #080503b8, transparent 65%);
+  }
+  .archive-home .campaign-copy {
+    left: 6%;
+    bottom: 7%;
+    max-width: 88%;
+  }
+  .archive-home .campaign .eyebrow {
+    font-size: 9px;
+    margin-bottom: 16px;
+  }
+  .archive-home .campaign h1 {
+    font-size: clamp(23px, 5.9vw, 31px);
+    letter-spacing: -0.45px;
+  }
+  .archive-home .campaign .solid-link {
+    margin-top: 23px;
+    font-size: 11px;
+    min-width: 135px;
+    padding: 14px 25px;
+  }
+  .archive-home .desktop-nav.mobile-open {
+    top: 70px;
+  }
+}
+@media (max-width: 360px) {
+  .archive-home .store-header-inner > .wordmark {
+    font-size: 24px;
+    left: 45%;
+  }
+  .archive-home .store-actions {
+    gap: 5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .archive-ticker {
+    animation: none;
+  }
+}

@@ -16,6 +16,32 @@ const icon = (name) =>
 const header = document.getElementById("store-header");
 if (header)
   header.innerHTML = `<div class="announcement"><span>A little upgrade for your everyday.</span><a href="produk.html?sort=terbaru">Discover the new collection <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></div><header class="store-header"><div class="store-header-inner"><button class="mobile-menu icon-button" aria-label="Buka menu" aria-expanded="false">${icon("menu")}</button><nav class="desktop-nav" aria-label="Navigasi utama"><a href="produk.html">Shop all</a><a href="produk.html?sort=terbaru">New arrivals <span class="nav-dot"></span></a><button data-dialog="about">Our story</button></nav><a class="wordmark" href="index.html" aria-label="Anredseller Beranda">Anredseller<span>•</span></a><div class="store-actions"><button class="icon-button" data-dialog="search" aria-label="Cari produk">${icon("search")}</button><button class="icon-button" data-dialog="wishlist" aria-label="Buka wishlist">${icon("heart")}</button><a class="icon-button cart-link" href="keranjang.html" aria-label="Buka keranjang">${icon("bag")}<span class="badge-keranjang">0</span></a></div></div><nav class="store-subnav" aria-label="Kategori"><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><span></span><a href="produk.html?sort=terlaris">Best sellers</a><a href="produk.html?sort=diskon" class="sale-link">The good deals <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></nav></header>`;
+if (header && document.body.classList.contains("archive-home")) {
+  const ticker = `<span>FREE SHIPPING OVER IDR 200K</span><span class="ticker-dot">•</span><span>ANREDSELLER ARCHIVE</span><span class="ticker-dot">•</span>`;
+  header.innerHTML = `
+    <div class="archive-announcement" aria-label="Gratis ongkir untuk pembelian mulai Rp200.000 — Anredseller Archive">
+      <div class="archive-ticker" aria-hidden="true"><div>${ticker.repeat(4)}</div><div>${ticker.repeat(4)}</div></div>
+    </div>
+    <header class="store-header archive-header">
+      <div class="store-header-inner">
+        <button class="mobile-menu icon-button" aria-label="Buka menu" aria-expanded="false" aria-controls="store-navigation">${icon("menu")}</button>
+        <nav class="desktop-nav" id="store-navigation" aria-label="Navigasi utama">
+          <a href="produk.html">Shop all</a>
+          <a href="produk.html?sort=terbaru">New arrivals</a>
+          <a href="produk.html?kategori=apparel">Apparel</a>
+          <a href="produk.html?kategori=sneakers">Sneakers</a>
+          <a href="produk.html?kategori=essentials">Essentials</a>
+          <button data-dialog="about">Our story</button>
+        </nav>
+        <a class="wordmark" href="index.html" aria-label="Anredseller Beranda">Anredseller</a>
+        <div class="store-actions">
+          <button class="icon-button" data-dialog="wishlist" aria-label="Buka wishlist">${icon("heart")}</button>
+          <button class="icon-button" data-dialog="search" aria-label="Cari produk">${icon("search")}</button>
+          <a class="icon-button cart-link" href="keranjang.html" aria-label="Buka keranjang">${icon("bag")}<span class="badge-keranjang">0</span></a>
+        </div>
+      </div>
+    </header>`;
+}
 const footer = document.getElementById("store-footer");
 if (footer)
   footer.innerHTML = `<footer class="store-footer"><div class="footer-top"><div><a class="wordmark" href="index.html">Anredseller<span>•</span></a><p>A good find changes your day.<br>Find yours here.</p></div><div><h3>THE COLLECTION</h3><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><a href="produk.html?sort=diskon">The good deals</a></div><div><h3>LET'S TALK</h3><button data-dialog="help">Bantuan & FAQ</button><button data-dialog="shipping">Pengiriman & pengembalian</button><button data-dialog="reseller">Program reseller</button></div><div><h3>A LITTLE ABOUT US</h3><button data-dialog="about">Our story</button><button data-dialog="privacy">Privasi</button><span class="footer-location">Based in Indonesia.<br>Curated for everywhere.</span></div></div><div class="footer-bottom"><span>© ${new Date().getFullYear()} Anredseller. All good things reserved.</span><span>Katalog demo · Pembayaran simulasi</span><span>GOOD TASTE IS ALWAYS IN SEASON. <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></span></div></footer>`;
@@ -112,5 +138,17 @@ document.querySelector(".mobile-menu")?.addEventListener("click", (e) => {
   const open = b.getAttribute("aria-expanded") !== "true";
   b.setAttribute("aria-expanded", String(open));
   document.querySelector(".desktop-nav").classList.toggle("mobile-open", open);
+});
+function closeStoreMenu() {
+  document
+    .querySelector(".mobile-menu")
+    ?.setAttribute("aria-expanded", "false");
+  document.querySelector(".desktop-nav")?.classList.remove("mobile-open");
+}
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeStoreMenu();
+});
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".store-header")) closeStoreMenu();
 });
 updateBadgeKeranjang();

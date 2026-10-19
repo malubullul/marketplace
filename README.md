@@ -1,6 +1,6 @@
 # Anredseller
 
-A responsive fashion reseller storefront concept built with HTML, CSS and vanilla JavaScript. The visual direction uses warm ivory, olive accents, editorial photography and spacious product layouts.
+A responsive fashion reseller storefront concept built with HTML, CSS and vanilla JavaScript. The homepage opens with a full-screen fashion campaign, a transparent header, a centered serif wordmark and a monochrome archive ticker. Warm ivory and olive accents carry through the catalog and shopping pages.
 
 ## Development
 
