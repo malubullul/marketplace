@@ -20,7 +20,7 @@
       <div class="container page-banner-dalam">
         <div>
           <h1>Checkout</h1>
-          <p>Coba alur pemesanan koleksi pilihanmu</p>
+          <p>Lengkapi data untuk mengirim pesanan ke toko</p>
         </div>
         <nav class="breadcrumb" style="background: transparent; padding: 0">
           <a href="index.html" style="color: #aaa">Beranda</a>
@@ -61,7 +61,7 @@
             <div class="form-section-judul">👤 Informasi Pribadi</div>
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label"
+                <label class="form-label" for="kurir"
                   >Nama Depan <span class="wajib">*</span></label
                 >
                 <input
@@ -200,15 +200,14 @@
               <div class="form-group">
                 <label class="form-label">Jasa Pengiriman</label>
                 <select class="form-select" id="kurir">
-                  <option value="jne">JNE Regular (2-3 hari)</option>
-                  <option value="jnt">J&T Express (2-3 hari)</option>
-                  <option value="sicepat">SiCepat (1-2 hari)</option>
-                  <option value="gosend">GoSend Same Day</option>
+                  <option value="manual">Dikonfirmasi oleh toko</option>
                 </select>
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label">Catatan Pengiriman (Opsional)</label>
+              <label class="form-label" for="catatan"
+                >Catatan Pengiriman (Opsional)</label
+              >
               <textarea
                 class="form-textarea"
                 id="catatan"
@@ -217,91 +216,21 @@
             </div>
           </div>
 
-          <!-- Metode Pembayaran -->
           <div class="form-section">
-            <div class="form-section-judul">💳 Metode Pembayaran</div>
-            <div class="metode-list" id="metode-list">
-              <div
-                class="metode-item aktif"
-                onclick="pilihMetode(this, 'transfer_bank')"
-                id="metode-transfer_bank"
-              >
-                <div class="metode-radio"></div>
-                <div class="metode-ikon">🏦</div>
-                <div class="metode-info">
-                  <div class="metode-nama">Transfer Bank</div>
-                  <div class="metode-sub">BCA, Mandiri, BNI, BRI</div>
-                </div>
-              </div>
-              <div
-                class="metode-item"
-                onclick="pilihMetode(this, 'gopay')"
-                id="metode-gopay"
-              >
-                <div class="metode-radio"></div>
-                <div class="metode-ikon">💚</div>
-                <div class="metode-info">
-                  <div class="metode-nama">GoPay</div>
-                  <div class="metode-sub">Bayar dengan GoPay</div>
-                </div>
-              </div>
-              <div
-                class="metode-item"
-                onclick="pilihMetode(this, 'ovo')"
-                id="metode-ovo"
-              >
-                <div class="metode-radio"></div>
-                <div class="metode-ikon">💜</div>
-                <div class="metode-info">
-                  <div class="metode-nama">OVO</div>
-                  <div class="metode-sub">Bayar dengan OVO</div>
-                </div>
-              </div>
-              <div
-                class="metode-item"
-                onclick="pilihMetode(this, 'dana')"
-                id="metode-dana"
-              >
-                <div class="metode-radio"></div>
-                <div class="metode-ikon">🔵</div>
-                <div class="metode-info">
-                  <div class="metode-nama">DANA</div>
-                  <div class="metode-sub">Bayar dengan DANA</div>
-                </div>
-              </div>
-              <div
-                class="metode-item"
-                onclick="pilihMetode(this, 'kartu_kredit')"
-                id="metode-kartu_kredit"
-              >
-                <div class="metode-radio"></div>
-                <div class="metode-ikon">💳</div>
-                <div class="metode-info">
-                  <div class="metode-nama">Kartu Kredit / Debit</div>
-                  <div class="metode-sub">Visa, Mastercard, JCB</div>
-                </div>
-              </div>
-              <div
-                class="metode-item"
-                onclick="pilihMetode(this, 'cod')"
-                id="metode-cod"
-              >
-                <div class="metode-radio"></div>
-                <div class="metode-ikon">💵</div>
-                <div class="metode-info">
-                  <div class="metode-nama">Bayar di Tempat (COD)</div>
-                  <div class="metode-sub">Tersedia untuk area tertentu</div>
-                </div>
-              </div>
-            </div>
+            <div class="form-section-judul">Konfirmasi pembayaran</div>
+            <p class="checkout-notice">
+              Pesanan akan dikirim kepada toko untuk ditinjau. Pembayaran dan
+              pengiriman dikonfirmasi terpisah oleh pemilik toko. Tidak ada
+              pembayaran otomatis dari halaman ini.
+            </p>
           </div>
-
+          <p id="checkout-error" role="alert" tabindex="-1"></p>
           <button
             class="btn-lanjut-checkout"
             id="btn-pesan"
             onclick="prosesCheckout()"
           >
-            ✅ Buat Pesanan
+            Kirim pesanan ke toko
           </button>
         </div>
 
@@ -328,7 +257,7 @@
               <span id="co-subtotal">Rp0</span>
             </div>
             <div class="ringkasan-baris">
-              <span>Ongkos Kirim</span>
+              <span>Estimasi Ongkir</span>
               <span id="co-ongkir" class="gratis">GRATIS</span>
             </div>
             <div
@@ -345,7 +274,7 @@
             </div>
 
             <div class="ringkasan-jaminan" style="margin-top: 16px">
-              Formulir demo · gunakan data contoh
+              Pesanan dikirim ke pemilik toko untuk dikonfirmasi
             </div>
 
             <div

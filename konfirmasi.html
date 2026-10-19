@@ -111,16 +111,16 @@
     <!-- KONFIRMASI -->
     <div class="konfirmasi-wrapper">
       <div class="konfirmasi-ikon">🎉</div>
-      <h1 class="konfirmasi-judul">Pesanan Berhasil!</h1>
+      <h1 class="konfirmasi-judul">Pesanan Terkirim!</h1>
       <p class="konfirmasi-sub" id="konfirmasi-sub">
         Terima kasih telah berbelanja di Anredseller.<br />
-        Konfirmasi pesanan akan dikirim ke emailmu segera.
+        Pemilik toko akan meninjau pesananmu.
       </p>
 
       <!-- Nomor Pesanan -->
       <div class="konfirmasi-nomor">
         <p>Nomor Pesanan Kamu</p>
-        <strong id="nomor-pesanan">PN-LOADING</strong>
+        <strong id="nomor-pesanan">Memuat…</strong>
       </div>
 
       <!-- Detail Pesanan -->
@@ -128,111 +128,14 @@
         <!-- Diisi JS -->
       </div>
 
-      <!-- Status Timeline -->
-      <div style="text-align: left; margin-bottom: 24px">
-        <div
-          style="
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--teks-hitam);
-            margin-bottom: 16px;
-          "
-        >
-          📦 Status Pesanan
-        </div>
-        <div class="timeline">
-          <div class="timeline-item">
-            <div class="timeline-dot">✓</div>
-            <div class="timeline-konten">
-              <div class="timeline-judul">Pesanan Diterima</div>
-              <div class="timeline-sub" id="waktu-pesan">Baru saja</div>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-dot pending">2</div>
-            <div class="timeline-konten">
-              <div class="timeline-judul" style="color: var(--abu-teks)">
-                Pembayaran Dikonfirmasi
-              </div>
-              <div class="timeline-sub">Estimasi 1-2 jam</div>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-dot pending">3</div>
-            <div class="timeline-konten">
-              <div class="timeline-judul" style="color: var(--abu-teks)">
-                Pesanan Diproses & Dikemas
-              </div>
-              <div class="timeline-sub">Estimasi 1 hari kerja</div>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-dot pending">4</div>
-            <div class="timeline-konten">
-              <div class="timeline-judul" style="color: var(--abu-teks)">
-                Dalam Pengiriman
-              </div>
-              <div class="timeline-sub">Estimasi 2-3 hari kerja</div>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-dot pending">✓</div>
-            <div class="timeline-konten">
-              <div class="timeline-judul" style="color: var(--abu-teks)">
-                Pesanan Diterima
-              </div>
-              <div class="timeline-sub">Selesai!</div>
-            </div>
-          </div>
-        </div>
+      <div class="checkout-notice">
+        Status: <strong>Menunggu konfirmasi toko</strong><br />Pesanan sudah
+        tercatat. Pembayaran dan jadwal pengiriman perlu dikonfirmasi langsung
+        dengan toko. Simpan nomor pesanan ini.
       </div>
-
-      <!-- Aksi -->
-      <div class="konfirmasi-aksi">
-        <a href="index.html" class="btn-kembali-belanja">🛍️ Lanjut Belanja</a>
-        <a
-          href="#"
-          class="btn-lacak-pesanan"
-          onclick="alert('Fitur lacak pesanan akan segera hadir!')"
-          >📦 Lacak Pesanan</a
-        >
-      </div>
-
-      <!-- Kupon Berikutnya -->
-      <div
-        style="
-          margin-top: 32px;
-          padding: 20px;
-          background: var(--aksen-muda);
-          border-radius: var(--radius-xl);
-          border: 2px dashed var(--aksen);
-        "
+      <a href="produk.html" class="btn-kembali-belanja"
+        >Lanjut melihat koleksi</a
       >
-        <div
-          style="
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--aksen);
-            margin-bottom: 4px;
-          "
-        >
-          🎁 Hadiah untuk Pembelian Berikutnya
-        </div>
-        <div
-          style="
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--teks-hitam);
-            letter-spacing: 3px;
-            margin: 6px 0;
-          "
-        >
-          HEMAT10
-        </div>
-        <div style="font-size: 12px; color: var(--teks-sedang)">
-          Gunakan kode ini untuk diskon 10% di pembelian berikutnya!
-        </div>
-      </div>
     </div>
 
     <!-- REKOMENDASI -->
@@ -253,121 +156,7 @@
     <script src="js/data.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/app.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        // Load data pesanan
-        let pesanan = {};
-        try {
-          pesanan = JSON.parse(
-            sessionStorage.getItem("pesanan_terakhir") || "{}",
-          );
-        } catch {}
-
-        if (!pesanan.nomor) {
-          // Demo mode jika tidak ada data
-          pesanan = {
-            nomor: "PN" + Date.now().toString().slice(-8) + "001",
-            tanggal: new Date().toLocaleDateString("id-ID", {
-              day: "2-digit",
-              month: "long",
-              year: "numeric",
-            }),
-            nama: "Pelanggan Anredseller",
-            email: "pelanggan@email.com",
-            alamat: "Alamat pengiriman",
-            kota: "Jakarta",
-            provinsi: "DKI Jakarta",
-            kurir: "JNE Regular (2-3 hari)",
-            metode: "transfer_bank",
-            total: 0,
-          };
-        }
-
-        document.getElementById("nomor-pesanan").textContent = pesanan.nomor;
-        document.getElementById("konfirmasi-sub").innerHTML =
-          `Terima kasih, <strong>${pesanan.nama}</strong>! Ringkasan demo untuk <strong>${pesanan.email}</strong>`;
-
-        document.getElementById("waktu-pesan").textContent =
-          new Date().toLocaleString("id-ID", {
-            dateStyle: "medium",
-            timeStyle: "short",
-          });
-
-        const metodeLabel = {
-          transfer_bank: "🏦 Transfer Bank",
-          gopay: "💚 GoPay",
-          ovo: "💜 OVO",
-          dana: "🔵 DANA",
-          kartu_kredit: "💳 Kartu Kredit/Debit",
-          cod: "💵 Bayar di Tempat (COD)",
-        };
-
-        document.getElementById("detail-pesanan").innerHTML = `
-    <div class="konfirmasi-detail-baris">
-      <span>Nama Penerima</span><span>${pesanan.nama}</span>
-    </div>
-    <div class="konfirmasi-detail-baris">
-      <span>Email</span><span>${pesanan.email}</span>
-    </div>
-    <div class="konfirmasi-detail-baris">
-      <span>Alamat Pengiriman</span>
-      <span style="text-align:right">${pesanan.alamat}, ${pesanan.kota}, ${pesanan.provinsi}</span>
-    </div>
-    <div class="konfirmasi-detail-baris">
-      <span>Jasa Pengiriman</span><span>${pesanan.kurir}</span>
-    </div>
-    <div class="konfirmasi-detail-baris">
-      <span>Metode Pembayaran</span><span>${metodeLabel[pesanan.metode] || pesanan.metode}</span>
-    </div>
-    <div class="konfirmasi-detail-baris">
-      <span>Tanggal Pesanan</span><span>${pesanan.tanggal}</span>
-    </div>
-    <div class="konfirmasi-detail-baris" style="font-size:16px;font-weight:800">
-      <span>Total Pembayaran</span>
-      <span>${pesanan.total ? formatHarga(parseInt(pesanan.total)) : "Sudah dibayar"}</span>
-    </div>
-  `;
-
-        // Render rekomendasi
-        const el = document.getElementById("grid-rekomendasi-konfirmasi");
-        const produk = PRODUK.filter((p) => p.rekomendasi || p.trending).slice(
-          0,
-          5,
-        );
-        el.innerHTML = produk.map((p, i) => renderKartuProduk(p, i)).join("");
-        updateIkonWishlist();
-
-        // Confetti animation
-        launchConfetti();
-      });
-
-      function launchConfetti() {
-        const warna = [
-          "#C8895A",
-          "#1A1916",
-          "#F59E0B",
-          "#2E7D32",
-          "#E53935",
-          "#1565C0",
-        ];
-        for (let i = 0; i < 60; i++) {
-          setTimeout(() => {
-            const piece = document.createElement("div");
-            piece.className = "confetti-piece";
-            piece.style.left = Math.random() * 100 + "vw";
-            piece.style.background =
-              warna[Math.floor(Math.random() * warna.length)];
-            piece.style.animationDuration = 2 + Math.random() * 2 + "s";
-            piece.style.animationDelay = "0s";
-            piece.style.width = 6 + Math.random() * 8 + "px";
-            piece.style.height = 6 + Math.random() * 8 + "px";
-            piece.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
-            document.body.appendChild(piece);
-            setTimeout(() => piece.remove(), 4000);
-          }, i * 50);
-        }
-      }
-    </script>
+    <script src="js/konfirmasi.js"></script>
     <script src="js/store.js"></script>
   </body>
 </html>

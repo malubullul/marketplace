@@ -1,50 +1,63 @@
 # Anredseller
 
-A responsive fashion reseller storefront concept built with HTML, CSS and vanilla JavaScript. The homepage opens with a full-screen fashion campaign, a transparent header, a centered serif wordmark and a monochrome archive ticker. Warm ivory and olive accents carry through the catalog and shopping pages.
+A fashion storefront with a separate owner dashboard, persistent product catalog, photo uploads and manual order management. The public design uses a full-screen fashion campaign, transparent navigation and an editorial serif wordmark.
 
-## Development
+## Two entrances, one store
 
-Use the existing checkout; no Node package installation or build step is required.
+| Who     | Page                      | What they can do                                                                                               |
+| ------- | ------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Owner   | `/admin` or `/admin.html` | Log in, add/edit/delete products, upload photos, save drafts or publish, manage stock and view customer orders |
+| Visitor | `/` and `/produk.html`    | Browse published products without logging in, choose size/color, use cart and submit an order                  |
+
+Published products are loaded from the server database in every browser. Drafts and order details require owner authentication. Data is not stored only in the owner's browser.
+
+## Run locally
+
+Python 3.12+ is required. Use the existing checkout.
 
 ```sh
-cd /workspace/marketplace
-python3 -m http.server 8000 --bind 127.0.0.1 --directory /workspace/marketplace
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python server.py create-admin
+.venv/bin/python server.py run
 ```
 
-## Features
+Create the owner email and password interactively in the terminal; no default credentials exist. For production use Gunicorn, HTTPS and persistent storage. See [the hosting and owner guide](docs/HOSTING.md), including the supplied Render blueprint.
 
-- Fashion-first homepage with interactive collection tabs.
-- Search, category/price/stock filters, sorting and pagination.
-- Product details, wishlist and persistent cart.
-- Checkout form validation and simulated order confirmation.
-- Mobile navigation, information dialogs and reseller program overview.
-- Local assets; no external font or image requests are needed at runtime.
+Opening HTML directly or running `python -m http.server` provides a static example preview. It cannot save admin changes, upload photos or submit real orders. GitHub Pages alone cannot host this backend.
 
-## Demo limitations
+## Implemented
 
-The products, stock, prices, shipping options and review data are illustrative. Checkout does not charge a payment method, deliver an order or send an email. Newsletter interest is stored locally and does not subscribe to an external email service. The reseller overview describes a proposed program; it does not register an account.
+- Fashion-first, responsive public storefront with categories, search, filtering and sorting.
+- Owner login, server-revoked sessions, password hashing, CSRF protection and login throttling.
+- Product editor: name, description, category, brand, price/discount, total stock, sizes, colors, materials/care and up to eight images.
+- Validated image uploads with locally stored WebP output.
+- Draft/published visibility, stale-edit conflict detection, persistent SQLite data.
+- Distinct cart lines for size/color selections.
+- Server-validated orders, authoritative prices, stock reservation and idempotent order submission.
+- Owner order view, status changes and one-time stock restoration on cancellation.
+- Existing keyboard accessibility, wishlist and responsive navigation.
 
-Before launch, replace the demo catalog with verified product details and licensed product photography, set store policies and contact information, and connect inventory, authentication, order storage, payments and email services.
+## Operational limits
 
-## Structure
+Payments, email and shipping are not automated. Orders await the owner's manual confirmation. Stock is total per product, not separate stock for each variant. No customer accounts or reseller pricing tiers are implemented. Initial example products and photography must be replaced or unpublished before launch; see [asset sources](assets/SOURCES.md).
 
-- `index.html`: editorial storefront
-- `produk.html`: searchable, filterable catalog
-- `detail.html`: product details
-- `keranjang.html`: cart
-- `checkout.html`: demonstration checkout
-- `konfirmasi.html`: demonstration order confirmation
-- `css/style.css`: shared shopping page styles
-- `css/store.css`: Anredseller visual theme and responsive layout
-- `js/store.js`: shared navigation, footer and accessible dialogs
-- `js/data.js`: example catalog and helpers
-- `js/app.js`: product cards, collection tabs and local newsletter interest
-- `assets/`: local image assets; see `assets/SOURCES.md`
+SQLite and uploaded images require a persistent disk. The supplied deployment runs one instance with one Gunicorn worker and four threads. Multiple application instances require shared database/object storage.
 
 ## Validation
 
-The implementation was exercised in Chromium with Python Playwright: collection tabs, wishlist add/remove, search, category filtering, sorting, cart persistence, checkout validation and confirmation, newsletter feedback, reseller dialog and mobile navigation. Responsive checks cover 390, 768, 1024 and 1440px. No application package or test runner is required for serving the site.
+```sh
+.venv/bin/python -m unittest discover -s tests -v
+```
 
-## UI/UX guidance
+Backend tests cover owner authorization, CSRF, session revocation, draft/public visibility, CRUD, uploads, persistence, validation, server prices, variants, stock, duplicate submission, conflicts and cancellations.
 
-See [docs/UI_GUIDE.md](docs/UI_GUIDE.md) for the approved visual direction and the UI/UX Pro Max review: mobile controls, readable product text, keyboard-operated category tabs and accessible wishlist/dialog states.
+With Python Playwright and Chromium installed, run:
+
+```sh
+python3 tests/browser_smoke.py
+```
+
+This starts a temporary store with disposable test credentials and data, uses separate owner/visitor browser contexts, and exercises photo upload → draft → publish → public product → variant cart → checkout → owner order → unpublish → logout. It does not create an account in the development or production database.
+
+See [docs/UI_GUIDE.md](docs/UI_GUIDE.md) for the approved visual direction and UI/UX Pro Max guidance.

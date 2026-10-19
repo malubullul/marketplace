@@ -62,7 +62,7 @@ if (navigation) {
 }
 const footer = document.getElementById("store-footer");
 if (footer)
-  footer.innerHTML = `<footer class="store-footer"><div class="footer-top"><div><a class="wordmark" href="index.html">Anredseller<span>•</span></a><p>A good find changes your day.<br>Find yours here.</p></div><div><h3>THE COLLECTION</h3><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><a href="produk.html?sort=diskon">The good deals</a></div><div><h3>LET'S TALK</h3><button data-dialog="help">Bantuan & FAQ</button><button data-dialog="shipping">Pengiriman & pengembalian</button><button data-dialog="reseller">Program reseller</button></div><div><h3>A LITTLE ABOUT US</h3><button data-dialog="about">Our story</button><button data-dialog="privacy">Privasi</button><span class="footer-location">Based in Indonesia.<br>Curated for everywhere.</span></div></div><div class="footer-bottom"><span>© ${new Date().getFullYear()} Anredseller. All good things reserved.</span><span>Katalog demo · Pembayaran simulasi</span><span>GOOD TASTE IS ALWAYS IN SEASON. <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></span></div></footer>`;
+  footer.innerHTML = `<footer class="store-footer"><div class="footer-top"><div><a class="wordmark" href="index.html">Anredseller<span>•</span></a><p>A good find changes your day.<br>Find yours here.</p></div><div><h3>THE COLLECTION</h3><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><a href="produk.html?sort=diskon">The good deals</a></div><div><h3>LET'S TALK</h3><button data-dialog="help">Bantuan & FAQ</button><button data-dialog="shipping">Pengiriman & pengembalian</button><button data-dialog="reseller">Program reseller</button></div><div><h3>A LITTLE ABOUT US</h3><button data-dialog="about">Our story</button><button data-dialog="privacy">Privasi</button><a href="admin.html">Area pemilik</a><span class="footer-location">Based in Indonesia.<br>Curated for everywhere.</span></div></div><div class="footer-bottom"><span>© ${new Date().getFullYear()} Anredseller. All good things reserved.</span><span>Pembayaran dikonfirmasi oleh toko</span><span>GOOD TASTE IS ALWAYS IN SEASON. <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></span></div></footer>`;
 document
   .querySelectorAll("[data-icon]")
   .forEach((el) => (el.innerHTML = icon(el.dataset.icon)));
@@ -76,22 +76,22 @@ const info = {
   about: [
     "A good find. A better everyday.",
     "Anredseller adalah konsep toko reseller untuk sneakers, apparel, dan barang pilihan sehari-hari. Kami percaya gaya personal dimulai dari pilihan yang kamu suka.",
-    "Situs ini menggunakan katalog demonstrasi. Foto dan informasi produk adalah contoh untuk pengembangan toko.",
+    "Koleksi produk dikelola oleh pemilik toko. Produk contoh perlu diganti sebelum toko mulai beroperasi.",
   ],
   help: [
     "How can we help?",
     "Cari produk melalui ikon pencarian, pilih koleksi, lalu tambahkan favoritmu ke keranjang. Pesanan dapat dicoba sampai konfirmasi.",
-    "Checkout saat ini merupakan simulasi. Tidak ada pembayaran atau pengiriman barang yang diproses.",
+    "Pesanan dikirim ke toko untuk dikonfirmasi. Pembayaran dan pengiriman belum diproses otomatis.",
   ],
   shipping: [
     "From us, to your everyday.",
     "Opsi pengiriman tersedia pada halaman checkout. Rincian ongkir dapat dilihat pada ringkasan keranjang.",
-    "Informasi kurir, retur, dan estimasi di situs ini merupakan contoh. Kebijakan toko akan ditetapkan sebelum toko beroperasi.",
+    "Pengiriman dan pembayaran dikonfirmasi langsung oleh toko. Ongkir yang tampil adalah estimasi berdasarkan tarif toko.",
   ],
   privacy: [
     "Your details, thoughtfully kept.",
-    "Wishlist, keranjang, dan minat newsletter disimpan di browser yang kamu gunakan. Data checkout demo tersimpan selama sesi browser.",
-    "Belum ada data yang dikirim ke layanan toko. Hindari memasukkan data pribadi asli saat mencoba checkout.",
+    "Wishlist dan keranjang tersimpan di browser. Data yang kamu kirim saat checkout disimpan oleh toko untuk memproses pesanan.",
+    "Email dan alamat pesanan hanya tersedia bagi pemilik toko yang sudah login.",
   ],
   reseller: [
     "Good things. Better together.",
@@ -112,7 +112,7 @@ function openStoreDialog(type) {
           list
             .map(
               (p) =>
-                `<div><a href="detail.html?id=${p.id}"><img src="${p.gambar}" alt="${p.nama}"><span>${p.nama}<small>${formatHarga(p.harga)}</small></span></a><button data-remove-wish="${p.id}" aria-label="Hapus ${p.nama}">✕</button></div>`,
+                `<div><a href="detail.html?id=${p.id}"><img src="${productImage(p.gambar)}" alt="${h(p.nama)}"><span>${h(p.nama)}<small>${formatHarga(p.harga)}</small></span></a><button data-remove-wish="${p.id}" aria-label="Hapus ${h(p.nama)}">✕</button></div>`,
             )
             .join("") +
           "</div>"

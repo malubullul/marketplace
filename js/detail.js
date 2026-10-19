@@ -6,7 +6,8 @@ let produkAktif = null;
 let jumlahDipilih = 1;
 let tabAktif = "deskripsi";
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await katalogSiap;
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
 
@@ -54,8 +55,8 @@ function renderDetail(p) {
   const thumbsHtml = p.gambarList
     .map(
       (img, i) => `
-    <div class="galeri-thumb-item ${i === 0 ? "aktif" : ""}" onclick="gantiGambar('${img}', this)">
-      <img src="${img}" alt="${p.nama} ${i + 1}" loading="lazy">
+    <div class="galeri-thumb-item ${i === 0 ? "aktif" : ""}" onclick="gantiGambar('${productImage(img)}', this)">
+      <img src="${productImage(img)}" alt="${h(p.nama)} ${i + 1}" loading="lazy">
     </div>
   `,
     )
@@ -65,20 +66,22 @@ function renderDetail(p) {
   const spekHtml = Object.entries(p.spesifikasi || {})
     .map(
       ([k, v]) => `
-    <tr><td>${k}</td><td>${v}</td></tr>
+    <tr><td>${h(k)}</td><td>${h(v)}</td></tr>
   `,
     )
     .join("");
 
   // Ulasan sample
-  const ulasanSample = generateUlasanSample(p);
+  const ulasanSample = p.demo
+    ? generateUlasanSample(p)
+    : "<p>Belum ada ulasan untuk produk ini.</p>";
 
   const wrapper = document.getElementById("detail-wrapper");
   wrapper.innerHTML = `
     <!-- GALERI -->
     <div class="detail-galeri fade-in">
       <div class="galeri-utama">
-        <img src="${p.gambarList[0]}" alt="${p.nama}" id="gambar-utama">
+        <img src="${productImage(p.gambarList[0])}" alt="${h(p.nama)}" id="gambar-utama">
       </div>
       ${p.gambarList.length > 1 ? `<div class="galeri-thumb">${thumbsHtml}</div>` : ""}
     </div>
@@ -86,7 +89,7 @@ function renderDetail(p) {
     <!-- INFO -->
     <div class="detail-info fade-in-up">
       <div class="detail-badge-kategori">${katObj?.icon || ""} ${katObj?.nama || ""}</div>
-      <h1 class="detail-nama">${p.nama}</h1>
+      <h1 class="detail-nama">${h(p.nama)}</h1>
       
       <div class="detail-meta">
         <div class="detail-rating">
@@ -114,6 +117,10 @@ function renderDetail(p) {
 
       <div class="detail-divider"></div>
 
+      <div class="product-options">
+        ${p.ukuran?.length ? `<label for="pilihan-ukuran">Ukuran<select id="pilihan-ukuran" required><option value="">Pilih ukuran</option>${p.ukuran.map((value) => `<option value="${h(value)}">${h(value)}</option>`).join("")}</select></label>` : ""}
+        ${p.warna?.length ? `<label for="pilihan-warna">Warna<select id="pilihan-warna" required><option value="">Pilih warna</option>${p.warna.map((value) => `<option value="${h(value)}">${h(value)}</option>`).join("")}</select></label>` : ""}
+      </div>
       <!-- JUMLAH -->
       <div class="detail-label">Jumlah:</div>
       <div class="detail-qty">
@@ -154,7 +161,7 @@ function renderDetail(p) {
 
         <!-- Tab Deskripsi -->
         <div class="tab-konten aktif" id="tab-deskripsi">
-          <p class="tab-deskripsi">${p.deskripsi}</p>
+          <p class="tab-deskripsi">${h(p.deskripsi)}</p>
         </div>
 
         <!-- Tab Spesifikasi -->
@@ -186,18 +193,26 @@ function ubahJumlah(delta) {
 }
 function setJumlah(val) {
   if (!produkAktif) return;
-  jumlahDipilih = Math.max(1, Math.min(val, produkAktif.stok));
+  jumlahDipilih = Math.max(
+    1,
+    Math.min(Number.isFinite(val) ? val : 1, produkAktif.stok),
+  );
   document.getElementById("qty-input").value = jumlahDipilih;
 }
 
 // ── Aksi ───────────────────────────────────────────────────
 function tambahKeranjang() {
   if (!produkAktif || produkAktif.stok === 0) return;
-  tambahKeKeranjang(produkAktif.id, jumlahDipilih);
+  return tambahKeKeranjang(
+    produkAktif.id,
+    jumlahDipilih,
+    document.getElementById("pilihan-ukuran")?.value || "",
+    document.getElementById("pilihan-warna")?.value || "",
+  );
 }
 function beliSekarang() {
   if (!produkAktif || produkAktif.stok === 0) return;
-  tambahKeKeranjang(produkAktif.id, jumlahDipilih);
+  if (!tambahKeranjang()) return;
   setTimeout(() => {
     window.location.href = "keranjang.html";
   }, 600);

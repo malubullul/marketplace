@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: anredseller
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --no-control-socket --workers 1 --threads 4 --timeout 60 --bind 0.0.0.0:$PORT server:app
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.14
+      - key: ANREDSELLER_DATA_DIR
+        value: /var/data/anredseller
+      - key: ANREDSELLER_SECURE_COOKIES
+        value: "1"
+    disk:
+      name: anredseller-data
+      mountPath: /var/data/anredseller
+      sizeGB: 1

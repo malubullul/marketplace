@@ -6,7 +6,8 @@ const PER_HALAMAN = 9;
 let halamanSekarang = 1;
 let produkFiltered = [];
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await katalogSiap;
   initFilterKategori();
   initURLParams();
   initFilterEvents();

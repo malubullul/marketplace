@@ -324,3 +324,61 @@ PRODUK.sort(
     [4, 6, 7, 8, 1, 2, 3, 5, 9, 10, 11].indexOf(a.id) -
     [4, 6, 7, 8, 1, 2, 3, 5, 9, 10, 11].indexOf(b.id),
 );
+
+// All browsers load the published catalog from the same server database.
+let katalogMode = "loading";
+let katalogError = "";
+function h(value) {
+  return String(value ?? "").replace(
+    /[&<>"']/g,
+    (char) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        char
+      ],
+  );
+}
+function productImage(value) {
+  return /^(assets\/[a-zA-Z0-9_-]+\.(png|jpe?g|webp|svg)|\/uploads\/[a-f0-9]{32}\.webp)$/.test(
+    value || "",
+  )
+    ? value
+    : "assets/shirt.png";
+}
+const katalogSiap = (async () => {
+  if (location.protocol === "file:") {
+    katalogMode = "preview";
+    return;
+  }
+  try {
+    const response = await fetch("/api/products", { cache: "no-store" });
+    if (response.status === 404) {
+      katalogMode = "preview";
+      return;
+    }
+    if (!response.ok)
+      throw new Error("Katalog belum dapat dimuat. Coba muat ulang halaman.");
+    const data = await response.json();
+    if (!Array.isArray(data.products))
+      throw new Error("Respons katalog tidak valid.");
+    PRODUK.splice(0, PRODUK.length, ...data.products);
+    katalogMode = "server";
+  } catch (error) {
+    katalogMode = "error";
+    katalogError =
+      "Katalog belum dapat dimuat. Periksa koneksi lalu muat ulang halaman.";
+    PRODUK.length = 0;
+  }
+})();
+document.addEventListener("DOMContentLoaded", async () => {
+  await katalogSiap;
+  if (katalogMode === "preview" || katalogMode === "error") {
+    const banner = document.createElement("p");
+    banner.className = "catalog-notice";
+    banner.setAttribute("role", "status");
+    banner.textContent =
+      katalogMode === "preview"
+        ? "Pratinjau katalog contoh. Jalankan server Anredseller untuk mengelola produk dan menerima pesanan."
+        : katalogError;
+    (document.querySelector("main") || document.body).prepend(banner);
+  }
+});

@@ -1,152 +1,173 @@
-// ============================================================
-// CART.JS — Manajemen Keranjang Belanja (localStorage)
-// ============================================================
-
-const CART_KEY = "pasar_nusantara_cart";
-const WISHLIST_KEY = "pasar_nusantara_wishlist";
-
-// ── KERANJANG ──────────────────────────────────────────────
-
+const CART_KEY = "anredseller_cart";
+const WISHLIST_KEY = "anredseller_wishlist";
 function getKeranjang() {
   try {
-    return JSON.parse(localStorage.getItem(CART_KEY)) || [];
+    const items = JSON.parse(localStorage.getItem(CART_KEY)) || [];
+    return Array.isArray(items)
+      ? items.map((item) => ({ ...item, key: item.key || String(item.id) }))
+      : [];
   } catch {
     return [];
   }
 }
-
-function simpanKeranjang(keranjang) {
-  localStorage.setItem(CART_KEY, JSON.stringify(keranjang));
+function simpanKeranjang(items) {
+  localStorage.setItem(CART_KEY, JSON.stringify(items));
   updateBadgeKeranjang();
 }
-
-function tambahKeKeranjang(produkId, jumlah = 1) {
-  const produk = getProdukById(produkId);
-  if (!produk) return false;
-  if (produk.stok === 0) {
-    tampilToast("Produk habis!", "error");
+function cartLineKey(id, size = "", color = "") {
+  return `${id}:${encodeURIComponent(size).replace(/'/g, "%27")}:${encodeURIComponent(color).replace(/'/g, "%27")}`;
+}
+function tambahKeKeranjang(id, jumlah = 1, ukuran = "", warna = "") {
+  const product = getProdukById(id);
+  if (!product) return false;
+  if (product.stok <= 0) {
+    tampilToast("Produk sedang habis.", "error");
     return false;
   }
-
-  const keranjang = getKeranjang();
-  const idx = keranjang.findIndex((item) => item.id === produk.id);
-
-  if (idx > -1) {
-    const totalBaru = keranjang[idx].jumlah + jumlah;
-    if (totalBaru > produk.stok) {
-      tampilToast(`Stok hanya ${produk.stok} tersisa!`, "warning");
-      keranjang[idx].jumlah = produk.stok;
-    } else {
-      keranjang[idx].jumlah = totalBaru;
-    }
-  } else {
-    keranjang.push({
-      id: produk.id,
-      nama: produk.nama,
-      harga: produk.harga,
-      gambar: produk.gambar,
-      stok: produk.stok,
-      jumlah: Math.min(jumlah, produk.stok),
-    });
+  if (
+    (product.ukuran?.length && !product.ukuran.includes(ukuran)) ||
+    (product.warna?.length && !product.warna.includes(warna))
+  ) {
+    tampilToast("Pilih ukuran dan warna terlebih dahulu.", "warning");
+    return false;
   }
-
-  simpanKeranjang(keranjang);
-  tampilToast(`${produk.nama} ditambahkan ke keranjang!`, "success");
+  jumlah = Math.floor(Number(jumlah));
+  if (!Number.isFinite(jumlah) || jumlah < 1) return false;
+  const items = getKeranjang(),
+    key = cartLineKey(id, ukuran, warna),
+    existing = items.find((item) => item.key === key);
+  const total = items
+    .filter((item) => item.id === id)
+    .reduce((sum, item) => sum + item.jumlah, 0);
+  const available = product.stok - total;
+  if (available <= 0) {
+    tampilToast("Seluruh stok produk ini sudah ada di keranjang.", "warning");
+    return false;
+  }
+  const quantity = Math.min(jumlah, available);
+  if (existing) existing.jumlah += quantity;
+  else
+    items.push({
+      key,
+      id: product.id,
+      nama: product.nama,
+      harga: product.harga,
+      gambar: product.gambar,
+      stok: product.stok,
+      jumlah: quantity,
+      ukuran,
+      warna,
+    });
+  simpanKeranjang(items);
+  tampilToast(product.nama + " ditambahkan ke keranjang.", "success");
   return true;
 }
-
-function hapusDariKeranjang(produkId) {
-  const keranjang = getKeranjang().filter((item) => item.id !== produkId);
-  simpanKeranjang(keranjang);
+function hapusDariKeranjang(key) {
+  simpanKeranjang(getKeranjang().filter((item) => item.key !== String(key)));
 }
-
-function updateJumlah(produkId, jumlah) {
-  const keranjang = getKeranjang();
-  const idx = keranjang.findIndex((item) => item.id === produkId);
-  if (idx === -1) return;
+function updateJumlah(key, jumlah) {
+  const items = getKeranjang(),
+    item = items.find((item) => item.key === String(key));
+  if (!item) return;
   if (jumlah <= 0) {
-    hapusDariKeranjang(produkId);
+    hapusDariKeranjang(key);
     return;
   }
-  keranjang[idx].jumlah = Math.min(jumlah, keranjang[idx].stok);
-  simpanKeranjang(keranjang);
+  const others = items
+    .filter((line) => line.id === item.id && line.key !== item.key)
+    .reduce((sum, line) => sum + line.jumlah, 0);
+  item.jumlah = Math.min(
+    Math.max(1, Math.floor(jumlah)),
+    Math.max(0, item.stok - others),
+  );
+  simpanKeranjang(items.filter((line) => line.jumlah > 0));
 }
-
+function syncCartCatalog() {
+  if (katalogMode !== "server") return;
+  const used = {};
+  const items = getKeranjang().flatMap((item) => {
+    const p = getProdukById(item.id);
+    if (!p || p.stok <= 0) return [];
+    if (
+      (p.ukuran?.length && !p.ukuran.includes(item.ukuran)) ||
+      (p.warna?.length && !p.warna.includes(item.warna))
+    )
+      return [];
+    const quantity = Math.min(item.jumlah, p.stok - (used[p.id] || 0));
+    used[p.id] = (used[p.id] || 0) + quantity;
+    return quantity > 0
+      ? [
+          {
+            ...item,
+            nama: p.nama,
+            harga: p.harga,
+            gambar: p.gambar,
+            stok: p.stok,
+            jumlah: quantity,
+          },
+        ]
+      : [];
+  });
+  simpanKeranjang(items);
+}
 function kosongkanKeranjang() {
   simpanKeranjang([]);
 }
-
 function hitungTotalKeranjang() {
   return getKeranjang().reduce(
-    (total, item) => total + item.harga * item.jumlah,
+    (sum, item) => sum + item.harga * item.jumlah,
     0,
   );
 }
-
 function hitungJumlahItem() {
-  return getKeranjang().reduce((total, item) => total + item.jumlah, 0);
+  return getKeranjang().reduce((sum, item) => sum + item.jumlah, 0);
 }
-
 function updateBadgeKeranjang() {
-  const jumlah = hitungJumlahItem();
   document.querySelectorAll(".badge-keranjang").forEach((el) => {
-    el.textContent = jumlah;
-    el.style.display = jumlah > 0 ? "flex" : "none";
+    const total = hitungJumlahItem();
+    el.textContent = total;
+    el.style.display = total ? "flex" : "none";
   });
 }
-
-// ── WISHLIST ───────────────────────────────────────────────
-
 function getWishlist() {
   try {
-    return JSON.parse(localStorage.getItem(WISHLIST_KEY)) || [];
+    const list = JSON.parse(localStorage.getItem(WISHLIST_KEY)) || [];
+    return Array.isArray(list) ? list : [];
   } catch {
     return [];
   }
 }
-
-function toggleWishlist(produkId) {
-  const list = getWishlist();
-  const idx = list.indexOf(produkId);
-  if (idx > -1) {
-    list.splice(idx, 1);
-    tampilToast("Dihapus dari wishlist", "info");
-  } else {
-    list.push(produkId);
-    tampilToast("Ditambahkan ke wishlist ❤️", "success");
-  }
+function toggleWishlist(id) {
+  const list = getWishlist(),
+    index = list.indexOf(id);
+  if (index >= 0) list.splice(index, 1);
+  else list.push(id);
   localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
   updateIkonWishlist();
+  tampilToast(
+    index >= 0 ? "Dihapus dari wishlist." : "Disimpan ke wishlist.",
+    "info",
+  );
 }
-
-function isInWishlist(produkId) {
-  return getWishlist().includes(produkId);
+function isInWishlist(id) {
+  return getWishlist().includes(id);
 }
-
 function updateIkonWishlist() {
-  document.querySelectorAll("[data-wishlist]").forEach((btn) => {
-    const id = parseInt(btn.dataset.wishlist);
-    const selected = isInWishlist(id);
-    const produk = getProdukById(id);
-    btn.setAttribute("aria-pressed", String(selected));
-    if (produk)
-      btn.setAttribute(
+  document.querySelectorAll("[data-wishlist]").forEach((button) => {
+    const id = Number(button.dataset.wishlist),
+      selected = isInWishlist(id),
+      p = getProdukById(id);
+    button.classList.toggle("aktif", selected);
+    button.setAttribute("aria-pressed", String(selected));
+    if (p)
+      button.setAttribute(
         "aria-label",
-        `${selected ? "Hapus" : "Simpan"} ${produk.nama} ${selected ? "dari" : "ke"} wishlist`,
+        `${selected ? "Hapus" : "Simpan"} ${p.nama} ${selected ? "dari" : "ke"} wishlist`,
       );
-    if (selected) {
-      btn.classList.add("aktif");
-      btn.innerHTML = "♥";
-    } else {
-      btn.classList.remove("aktif");
-      btn.innerHTML = "♡";
-    }
+    button.textContent = selected ? "♥" : "♡";
   });
 }
-
-// ── TOAST NOTIFICATION ─────────────────────────────────────
-
-function tampilToast(pesan, tipe = "success") {
+function tampilToast(message, type = "success") {
   let container = document.getElementById("toast-container");
   if (!container) {
     container = document.createElement("div");
@@ -155,25 +176,15 @@ function tampilToast(pesan, tipe = "success") {
     container.setAttribute("aria-live", "polite");
     document.body.appendChild(container);
   }
-
   const toast = document.createElement("div");
-  toast.className = `toast toast-${tipe}`;
-
-  const ikon =
-    { success: "✅", error: "❌", warning: "⚠️", info: "ℹ️" }[tipe] || "✅";
-  toast.innerHTML = `<span class="toast-ikon">${ikon}</span><span>${pesan}</span>`;
-
+  toast.className = "toast toast-" + type;
+  toast.textContent = message;
   container.appendChild(toast);
   requestAnimationFrame(() => toast.classList.add("masuk"));
-
-  setTimeout(() => {
-    toast.classList.add("keluar");
-    setTimeout(() => toast.remove(), 400);
-  }, 3000);
+  setTimeout(() => toast.remove(), 4000);
 }
-
-// Init badge saat halaman load
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await katalogSiap;
   updateBadgeKeranjang();
   updateIkonWishlist();
 });

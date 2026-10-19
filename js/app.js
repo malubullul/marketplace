@@ -1,4 +1,5 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await katalogSiap;
   renderTrending();
   renderRekomendasi();
   if (!document.getElementById("grid-produk-list")) initSearch();
@@ -57,7 +58,7 @@ function renderRekomendasi() {
   if (el) el.innerHTML = getProdukRekomendasi().map(renderKartuProduk).join("");
 }
 function renderKartuProduk(p) {
-  return `<article class="kartu-produk" data-produk-id="${p.id}"><div class="kartu-produk-gambar"><a href="detail.html?id=${p.id}" aria-label="Lihat ${p.nama}"><img src="${p.gambar}" alt="${p.nama}" loading="lazy"></a>${p.label ? `<span class="kartu-label">${p.label}</span>` : ""}<button aria-label="Simpan ${p.nama} ke wishlist" class="btn-wishlist ${isInWishlist(p.id) ? "aktif" : ""}" data-wishlist="${p.id}" onclick="toggleWishlist(${p.id})">${isInWishlist(p.id) ? "♥" : "♡"}</button><button class="btn-keranjang-cepat" onclick="tambahKeKeranjang(${p.id},1)">+ Tambah ke keranjang</button></div><div class="kartu-produk-info"><div class="product-meta"><span>${p.brand}</span><span>${p.kategori === "sneakers" ? "UNISEX" : "EVERYDAY"}</span></div><a class="kartu-produk-nama" href="detail.html?id=${p.id}">${p.nama}</a><div class="kartu-harga"><span class="harga-sekarang">${formatHarga(p.harga)}</span><span class="harga-asli">${formatHarga(p.hargaAsli)}</span></div><div class="product-colors" aria-label="Warna sesuai foto produk"><i></i><span>Selected for you</span></div></div></article>`;
+  return `<article class="kartu-produk" data-produk-id="${p.id}"><div class="kartu-produk-gambar"><a href="detail.html?id=${p.id}" aria-label="Lihat ${h(p.nama)}"><img src="${productImage(p.gambar)}" alt="${h(p.nama)}" loading="lazy"></a>${p.label ? `<span class="kartu-label">${h(p.label)}</span>` : ""}<button aria-label="Simpan ${h(p.nama)} ke wishlist" class="btn-wishlist ${isInWishlist(p.id) ? "aktif" : ""}" data-wishlist="${p.id}" onclick="toggleWishlist(${p.id})">${isInWishlist(p.id) ? "♥" : "♡"}</button><button class="btn-keranjang-cepat" onclick="tambahCepat(${p.id})">+ Tambah ke keranjang</button></div><div class="kartu-produk-info"><div class="product-meta"><span>${h(p.brand)}</span><span>${p.kategori === "sneakers" ? "UNISEX" : "EVERYDAY"}</span></div><a class="kartu-produk-nama" href="detail.html?id=${p.id}">${h(p.nama)}</a><div class="kartu-harga"><span class="harga-sekarang">${formatHarga(p.harga)}</span>${p.hargaAsli > p.harga ? `<span class="harga-asli">${formatHarga(p.hargaAsli)}</span>` : ""}</div><div class="product-colors" aria-label="Warna sesuai foto produk"><i></i><span>Selected for you</span></div></div></article>`;
 }
 function attachProdukEvents() {
   updateIkonWishlist();
@@ -95,4 +96,13 @@ function initNewsletter() {
       }
     }),
   );
+}
+
+function tambahCepat(id) {
+  const product = getProdukById(id);
+  if (product?.ukuran?.length || product?.warna?.length) {
+    location.href = "detail.html?id=" + id;
+    return;
+  }
+  tambahKeKeranjang(id, 1);
 }

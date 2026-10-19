@@ -6,7 +6,7 @@ The user's visual reference is a dark editorial fashion campaign: full-screen ph
 
 Reviewed with [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) at commit `56ea9cf174ed86786187daa9de0e6247cb0747e4`. The skill and its searchable local dataset are checked out at `/workspace/library-files/ui-ux-pro-max-skill` in the cloud environment. This is a local tool checkout, not a runtime website dependency or a global plugin installation.
 
-The website uses plain HTML, CSS and JavaScript. Do not add a framework or Tailwind solely because a skill supports it. Search recommendations supplement the user's reference; they do not replace it. The broad luxury-commerce search returned an Apple-specific Liquid Glass style that does not fit this site, so it was rejected. Targeted minimalism and web accessibility guidance was used instead.
+The public interface uses plain HTML, CSS and JavaScript; the owner dashboard and shared catalog/order API use Flask and SQLite. Do not add a framework or Tailwind solely because a skill supports it. Search recommendations supplement the user's reference; they do not replace it. The broad luxury-commerce search returned an Apple-specific Liquid Glass style that does not fit this site, so it was rejected. Targeted minimalism and web accessibility guidance was used instead.
 
 Useful searches from this review:
 
@@ -26,7 +26,7 @@ python3 /workspace/library-files/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-ma
 - Wishlist buttons expose `aria-pressed` and the current action. Dialogs have a title, native focus handling, and an Escape route.
 - The announcement strip remains static. Avoid adding continuous movement without a pause control.
 - Provide a visible-on-focus skip link. Keep keyboard focus visible and return it to the menu button when Escape closes the navigation.
-- Maintain the demo boundary: this skill improves UI/UX; it does not add real payments, authentication, inventory or reseller pricing.
+- Preserve the operational boundary: owner authentication, shared inventory and order intake are implemented; payment, email, shipping automation and reseller pricing are not.
 
 ## Verification
 

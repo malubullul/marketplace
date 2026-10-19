@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Admin — Anredseller</title>
+    <link rel="stylesheet" href="css/admin.css" />
+  </head>
+  <body>
+    <section id="login-view" class="login-view">
+      <div class="login-editorial">
+        <a href="index.html" class="brand">ANREDSELLER</a>
+        <div>
+          <span class="eyebrow">THE OWNER'S SPACE</span>
+          <h1>Your collection.<br />Your next chapter.</h1>
+          <p>Di balik setiap produk pilihan,<br />ada toko yang kamu bangun.</p>
+        </div>
+        <span class="eyebrow">CURATED BY YOU.</span>
+      </div>
+      <div class="login-panel">
+        <a href="index.html" class="back-link">← Kembali ke toko</a>
+        <div class="login-content">
+          <span class="eyebrow">AREA PEMILIK TOKO</span>
+          <h2>Selamat datang<br />kembali.</h2>
+          <p>Masuk untuk mengelola koleksi dan pesanan Anredseller.</p>
+          <div id="setup-notice" class="notice" hidden>
+            Akun pemilik belum dibuat. Di terminal server, jalankan
+            <code>python server.py create-admin</code>, lalu tentukan email dan
+            kata sandi pribadi kamu.
+          </div>
+          <form id="login-form">
+            <label for="login-email">Email pemilik</label
+            ><input
+              id="login-email"
+              type="email"
+              autocomplete="username"
+              required
+              maxlength="150"
+            /><label for="login-password">Kata sandi</label
+            ><input
+              id="login-password"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+            <p id="login-error" class="error" role="alert"></p>
+            <button class="button primary" id="login-button" type="submit">
+              Masuk ke dashboard <span>→</span>
+            </button>
+          </form>
+          <small
+            >Pengunjung dapat melihat katalog dan memesan tanpa login.</small
+          >
+        </div>
+      </div>
+    </section>
+    <div id="dashboard" class="dashboard" hidden>
+      <aside class="sidebar">
+        <a class="brand" href="admin.html">ANREDSELLER</a
+        ><span class="sidebar-label">RUANG PEMILIK</span>
+        <nav aria-label="Dashboard">
+          <button class="nav-button active" data-page="products">
+            Koleksi produk <span id="nav-count">0</span></button
+          ><button class="nav-button" data-page="orders">
+            Pesanan masuk <span id="orders-count">0</span>
+          </button>
+        </nav>
+        <div class="sidebar-bottom">
+          <a href="index.html" target="_blank" rel="noopener"
+            >Lihat toko publik →</a
+          ><span id="owner-email"></span
+          ><button id="logout-button">Keluar akun</button>
+        </div>
+      </aside>
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <span>ANREDSELLER / <span id="page-breadcrumb">KOLEKSI</span></span
+          ><span class="server-pill"><i></i> Tersimpan di server</span>
+        </header>
+        <div id="dashboard-message" class="notice" role="status" hidden></div>
+        <section class="stats" aria-label="Ringkasan toko">
+          <article>
+            <span>Total produk</span><strong id="stat-products">0</strong
+            ><small>Di dalam koleksimu</small>
+          </article>
+          <article>
+            <span>Produk terbit</span><strong id="stat-published">0</strong
+            ><small>Bisa dilihat pengunjung</small>
+          </article>
+          <article>
+            <span>Stok menipis</span><strong id="stat-low">0</strong
+            ><small>Stok kurang dari 5</small>
+          </article>
+          <article>
+            <span>Pesanan baru</span><strong id="stat-orders">0</strong
+            ><small>Perlu kamu konfirmasi</small>
+          </article>
+        </section>
+        <section id="products-page">
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">YOUR EVERYDAY COLLECTION</span>
+              <h1>Koleksi produk<span>.</span></h1>
+              <p>Tambahkan cerita, detail, dan foto untuk setiap produkmu.</p>
+            </div>
+            <button id="add-product" class="button primary">
+              + Tambah produk
+            </button>
+          </div>
+          <div class="list-toolbar">
+            <label class="search-field"
+              ><span>Cari produk</span
+              ><input
+                id="product-search"
+                type="search"
+                placeholder="Nama produk atau brand…" /></label
+            ><label class="status-field"
+              ><span>Status</span
+              ><select id="product-filter">
+                <option value="all">Semua status</option>
+                <option value="published">Terbit</option>
+                <option value="draft">Draf</option>
+                <option value="low">Stok menipis</option>
+              </select></label
+            ><button id="refresh-products" class="button secondary">
+              Muat ulang
+            </button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Produk</th>
+                  <th>Harga jual</th>
+                  <th>Stok</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="product-rows"></tbody>
+            </table>
+            <div id="products-empty" class="empty" hidden>
+              <h3>Belum ada produk di sini.</h3>
+              <p>Tambahkan produk pertamamu atau ubah pencarian.</p>
+            </div>
+          </div>
+          <p class="table-note">
+            Hanya produk berstatus <strong>Terbit</strong> yang terlihat di
+            katalog publik. Stok 0 tetap tampil sebagai habis.
+          </p>
+        </section>
+        <section id="orders-page" hidden>
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">FROM YOUR CUSTOMERS</span>
+              <h1>Pesanan masuk<span>.</span></h1>
+              <p>
+                Tinjau pesanan dan konfirmasi pembayaran serta pengiriman
+                langsung dengan pelanggan.
+              </p>
+            </div>
+            <button id="refresh-orders" class="button secondary">
+              Muat ulang pesanan
+            </button>
+          </div>
+          <p class="notice">
+            Pembayaran belum diproses otomatis. Mengubah status pesanan tidak
+            menagih atau memindahkan uang.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pesanan</th>
+                  <th>Pelanggan</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="order-rows"></tbody>
+            </table>
+            <div id="orders-empty" class="empty" hidden>
+              <h3>Belum ada pesanan.</h3>
+              <p>Pesanan yang dibuat dari toko publik akan muncul di sini.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <dialog
+      id="product-dialog"
+      class="editor-dialog"
+      aria-labelledby="editor-title"
+    >
+      <form id="product-form">
+        <header class="editor-header">
+          <div>
+            <span class="eyebrow">THE COLLECTION EDITOR</span>
+            <h2 id="editor-title">Tambah produk</h2>
+          </div>
+          <button
+            class="close-button"
+            type="button"
+            id="close-editor"
+            aria-label="Tutup editor"
+          >
+            ×
+          </button>
+        </header>
+        <p
+          id="product-error"
+          class="error error-summary"
+          role="alert"
+          tabindex="-1"
+          hidden
+        ></p>
+        <div class="editor-grid">
+          <div class="editor-fields">
+            <section class="form-section">
+              <h3>Informasi produk</h3>
+              <label for="product-name">Nama produk <span>*</span></label
+              ><input
+                id="product-name"
+                required
+                maxlength="150"
+                placeholder="Contoh: Suede Everyday Jacket"
+              />
+              <div class="form-row">
+                <div>
+                  <label for="product-category">Kategori <span>*</span></label
+                  ><select id="product-category">
+                    <option value="apparel">Apparel</option>
+                    <option value="sneakers">Sneakers</option>
+                    <option value="essentials">Essentials</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="product-brand">Brand</label
+                  ><input
+                    id="product-brand"
+                    maxlength="80"
+                    placeholder="Anredseller"
+                  />
+                </div>
+              </div>
+              <label for="product-description"
+                >Deskripsi lengkap <span>*</span></label
+              ><textarea
+                id="product-description"
+                required
+                maxlength="10000"
+                rows="6"
+                placeholder="Ceritakan model, potongan, detail, dan keunggulan produk…"
+              ></textarea>
+            </section>
+            <section class="form-section">
+              <h3>Harga & persediaan</h3>
+              <div class="form-row">
+                <div>
+                  <label for="product-price"
+                    >Harga jual (Rp) <span>*</span></label
+                  ><input
+                    id="product-price"
+                    type="number"
+                    inputmode="numeric"
+                    min="1000"
+                    max="1000000000"
+                    step="1"
+                    required
+                  />
+                </div>
+                <div>
+                  <label for="product-old-price"
+                    >Harga sebelum diskon (Rp)</label
+                  ><input
+                    id="product-old-price"
+                    type="number"
+                    inputmode="numeric"
+                    min="1000"
+                    max="1000000000"
+                    step="1"
+                  /><small>Kosongkan jika tidak ada diskon.</small>
+                </div>
+              </div>
+              <label for="product-stock">Total stok <span>*</span></label
+              ><input
+                id="product-stock"
+                type="number"
+                inputmode="numeric"
+                min="0"
+                max="1000000"
+                step="1"
+                value="0"
+                required
+              /><small>Total persediaan gabungan semua ukuran dan warna.</small>
+              <div class="form-row">
+                <div>
+                  <label for="product-sizes">Pilihan ukuran</label
+                  ><input
+                    id="product-sizes"
+                    maxlength="600"
+                    placeholder="S, M, L, XL"
+                  /><small>Pisahkan dengan koma.</small>
+                </div>
+                <div>
+                  <label for="product-colors">Pilihan warna</label
+                  ><input
+                    id="product-colors"
+                    maxlength="600"
+                    placeholder="Cokelat, Hitam"
+                  /><small>Pisahkan dengan koma.</small>
+                </div>
+              </div>
+            </section>
+            <section class="form-section">
+              <h3>Detail tambahan</h3>
+              <label for="product-material">Bahan</label
+              ><input
+                id="product-material"
+                maxlength="120"
+                placeholder="Contoh: Suede sintetis"
+              /><label for="product-care">Panduan perawatan</label
+              ><textarea id="product-care" rows="2" maxlength="500"></textarea
+              ><label for="product-label">Label koleksi</label
+              ><input
+                id="product-label"
+                maxlength="40"
+                placeholder="Contoh: New arrival"
+              /><label class="checkbox-label"
+                ><input id="product-featured" type="checkbox" /> Pilihan
+                unggulan</label
+              ><label class="checkbox-label"
+                ><input id="product-recommended" type="checkbox" /> Rekomendasi
+                toko</label
+              >
+            </section>
+          </div>
+          <aside class="editor-photos">
+            <h3>Foto produk <span>*</span></h3>
+            <p>Foto pertama menjadi sampul katalog.</p>
+            <label id="upload-zone" class="upload-zone" for="product-photos"
+              ><span class="upload-plus">+</span
+              ><strong>Pilih atau tarik foto ke sini</strong
+              ><small
+                >JPG, PNG, WebP · maksimal 5 MB/foto<br />Hingga 8 foto
+                produk</small
+              ><input
+                id="product-photos"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+            /></label>
+            <p id="upload-status" role="status"></p>
+            <div id="photo-grid" class="photo-grid"></div>
+            <div class="publish-note">
+              <strong>Draf atau terbit?</strong>
+              <p>
+                Simpan draf untuk melengkapi produk nanti. Terbitkan jika produk
+                siap ditampilkan kepada pengunjung.
+              </p>
+            </div>
+          </aside>
+        </div>
+        <footer class="editor-footer">
+          <span id="editor-status">Produk baru</span>
+          <div>
+            <button
+              class="button secondary"
+              type="submit"
+              name="intent"
+              value="draft"
+            >
+              Simpan draf</button
+            ><button
+              class="button primary"
+              type="submit"
+              name="intent"
+              value="publish"
+            >
+              Terbitkan produk →
+            </button>
+          </div>
+        </footer>
+      </form>
+    </dialog>
+    <dialog
+      id="order-dialog"
+      class="order-dialog"
+      aria-labelledby="order-title"
+    >
+      <button
+        class="close-button"
+        id="close-order"
+        aria-label="Tutup rincian pesanan"
+      >
+        ×
+      </button>
+      <div id="order-details"></div>
+    </dialog>
+    <script src="js/admin.js"></script>
+  </body>
+</html>

@@ -10,7 +10,10 @@ const KUPON_VALID = {
 
 let diskonKupon = 0;
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await katalogSiap;
+  syncCartCatalog();
+  diskonKupon = KUPON_VALID[sessionStorage.getItem("checkout_kupon")] || 0;
   renderKeranjang();
   renderProdukSuka();
   initKupon();
@@ -62,26 +65,26 @@ function renderKeranjang() {
       <!-- Gambar -->
       <a href="detail.html?id=${item.id}">
         <div class="keranjang-gambar">
-          <img src="${item.gambar}" alt="${item.nama}" loading="lazy">
+          <img src="${productImage(item.gambar)}" alt="${h(item.nama)}" loading="lazy">
         </div>
       </a>
       <!-- Nama -->
       <div>
-        <a href="detail.html?id=${item.id}" class="keranjang-nama">${item.nama}</a>
-        <div style="font-size:11px;color:var(--abu-teks);margin-top:4px">Stok: ${item.stok}</div>
+        <a href="detail.html?id=${item.id}" class="keranjang-nama">${h(item.nama)}</a>
+        <div class="cart-variant">${h([item.ukuran, item.warna].filter(Boolean).join(" / "))}</div><div style="font-size:11px;color:var(--abu-teks);margin-top:4px">Stok: ${item.stok}</div>
       </div>
       <!-- Harga Satuan -->
       <div class="keranjang-harga">${formatHarga(item.harga)}</div>
       <!-- Jumlah -->
       <div class="keranjang-qty">
-        <button onclick="kurangiItem(${item.id})">−</button>
-        <span class="keranjang-qty-angka" id="qty-${item.id}">${item.jumlah}</span>
-        <button onclick="tambahItem(${item.id})">+</button>
+        <button onclick="kurangiItem('${item.key}')">−</button>
+        <span class="keranjang-qty-angka" id="qty-${item.key}">${item.jumlah}</span>
+        <button onclick="tambahItem('${item.key}')">+</button>
       </div>
       <!-- Subtotal -->
-      <div class="keranjang-subtotal" id="subtotal-${item.id}">${formatHarga(item.harga * item.jumlah)}</div>
+      <div class="keranjang-subtotal" id="subtotal-${item.key}">${formatHarga(item.harga * item.jumlah)}</div>
       <!-- Hapus -->
-      <button class="btn-hapus-item" onclick="hapusItem(${item.id})" title="Hapus">✕</button>
+      <button class="btn-hapus-item" onclick="hapusItem('${item.key}')" title="Hapus">✕</button>
     </div>
   `,
     )
@@ -105,38 +108,21 @@ function renderKeranjang() {
 }
 
 // ── Update Item ────────────────────────────────────────────
-function kurangiItem(id) {
-  const keranjang = getKeranjang();
-  const item = keranjang.find((i) => i.id === id);
+function kurangiItem(key) {
+  const item = getKeranjang().find((line) => line.key === String(key));
   if (!item) return;
   if (item.jumlah <= 1) {
-    if (confirm(`Hapus "${item.nama}" dari keranjang?`)) {
-      hapusItem(id);
-    }
+    if (confirm(`Hapus "${item.nama}" dari keranjang?`)) hapusItem(key);
     return;
   }
-  updateJumlah(id, item.jumlah - 1);
-  document.getElementById(`qty-${id}`).textContent = item.jumlah - 1;
-  document.getElementById(`subtotal-${id}`).textContent = formatHarga(
-    item.harga * (item.jumlah - 1),
-  );
-  updateRingkasan();
+  updateJumlah(key, item.jumlah - 1);
+  renderKeranjang();
 }
-
-function tambahItem(id) {
-  const keranjang = getKeranjang();
-  const item = keranjang.find((i) => i.id === id);
+function tambahItem(key) {
+  const item = getKeranjang().find((line) => line.key === String(key));
   if (!item) return;
-  if (item.jumlah >= item.stok) {
-    tampilToast(`Stok hanya ${item.stok}!`, "warning");
-    return;
-  }
-  updateJumlah(id, item.jumlah + 1);
-  document.getElementById(`qty-${id}`).textContent = item.jumlah + 1;
-  document.getElementById(`subtotal-${id}`).textContent = formatHarga(
-    item.harga * (item.jumlah + 1),
-  );
-  updateRingkasan();
+  updateJumlah(key, item.jumlah + 1);
+  renderKeranjang();
 }
 
 function hapusItem(id) {
@@ -206,12 +192,14 @@ function initKupon() {
 
     if (KUPON_VALID[kode]) {
       diskonKupon = KUPON_VALID[kode];
+      sessionStorage.setItem("checkout_kupon", kode);
       const persen = Math.round(diskonKupon * 100);
       pesanEl.textContent = `✅ Kupon "${kode}" berhasil! Diskon ${persen}% diterapkan.`;
       pesanEl.style.color = "var(--hijau)";
       updateRingkasan();
     } else {
       diskonKupon = 0;
+      sessionStorage.removeItem("checkout_kupon");
       pesanEl.textContent = `❌ Kode kupon "${kode}" tidak valid atau sudah kadaluwarsa.`;
       pesanEl.style.color = "var(--merah)";
       updateRingkasan();
