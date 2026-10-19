@@ -3,23 +3,48 @@ document.addEventListener("DOMContentLoaded", () => {
   renderRekomendasi();
   if (!document.getElementById("grid-produk-list")) initSearch();
   initNewsletter();
-  document.querySelectorAll("[data-collection]").forEach((button) =>
-    button.addEventListener("click", () => {
-      document.querySelectorAll("[data-collection]").forEach((tab) => {
-        tab.classList.toggle("selected", tab === button);
-        tab.setAttribute("aria-selected", String(tab === button));
-      });
-      const products =
-        button.dataset.collection === "all"
-          ? PRODUK.slice(0, 4)
-          : PRODUK.filter(
-              (p) => p.kategori === button.dataset.collection,
-            ).slice(0, 4);
-      document.getElementById("grid-trending").innerHTML = products
-        .map(renderKartuProduk)
-        .join("");
-      updateIkonWishlist();
-    }),
+  const tabs = [...document.querySelectorAll("[data-collection]")];
+  const panel = document.getElementById("grid-trending");
+  if (!panel || !tabs.length) return;
+  panel.setAttribute("role", "tabpanel");
+  panel.tabIndex = 0;
+  const selectCollection = (button) => {
+    tabs.forEach((tab) => {
+      const selected = tab === button;
+      tab.classList.toggle("selected", selected);
+      tab.setAttribute("aria-selected", String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+    });
+    panel.setAttribute("aria-labelledby", button.id);
+    const products =
+      button.dataset.collection === "all"
+        ? PRODUK.slice(0, 4)
+        : PRODUK.filter((p) => p.kategori === button.dataset.collection).slice(
+            0,
+            4,
+          );
+    panel.innerHTML = products.map(renderKartuProduk).join("");
+    updateIkonWishlist();
+  };
+  tabs.forEach((button, index) => {
+    button.id = `collection-tab-${button.dataset.collection}`;
+    button.setAttribute("aria-controls", panel.id);
+    button.addEventListener("click", () => selectCollection(button));
+    button.addEventListener("keydown", (event) => {
+      let next;
+      if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
+      else if (event.key === "ArrowLeft")
+        next = (index - 1 + tabs.length) % tabs.length;
+      else if (event.key === "Home") next = 0;
+      else if (event.key === "End") next = tabs.length - 1;
+      else return;
+      event.preventDefault();
+      tabs[next].focus();
+      selectCollection(tabs[next]);
+    });
+  });
+  selectCollection(
+    tabs.find((tab) => tab.classList.contains("selected")) || tabs[0],
   );
 });
 function renderKategori() {}

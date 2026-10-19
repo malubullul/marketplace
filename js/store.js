@@ -42,6 +42,24 @@ if (header && document.body.classList.contains("archive-home")) {
       </div>
     </header>`;
 }
+const mainContent = document.querySelector("main, .page-banner, .breadcrumb");
+if (mainContent) {
+  mainContent.id = "main-content";
+  mainContent.tabIndex = -1;
+  const skipLink = document.createElement("a");
+  skipLink.className = "skip-link";
+  skipLink.href = "#main-content";
+  skipLink.textContent = "Langsung ke konten";
+  document.body.prepend(skipLink);
+}
+const navigation = document.querySelector(".desktop-nav");
+if (navigation) {
+  const savedItems = document.createElement("button");
+  savedItems.className = "mobile-wishlist";
+  savedItems.dataset.dialog = "wishlist";
+  savedItems.textContent = "Wishlist";
+  navigation.appendChild(savedItems);
+}
 const footer = document.getElementById("store-footer");
 if (footer)
   footer.innerHTML = `<footer class="store-footer"><div class="footer-top"><div><a class="wordmark" href="index.html">Anredseller<span>•</span></a><p>A good find changes your day.<br>Find yours here.</p></div><div><h3>THE COLLECTION</h3><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><a href="produk.html?sort=diskon">The good deals</a></div><div><h3>LET'S TALK</h3><button data-dialog="help">Bantuan & FAQ</button><button data-dialog="shipping">Pengiriman & pengembalian</button><button data-dialog="reseller">Program reseller</button></div><div><h3>A LITTLE ABOUT US</h3><button data-dialog="about">Our story</button><button data-dialog="privacy">Privasi</button><span class="footer-location">Based in Indonesia.<br>Curated for everywhere.</span></div></div><div class="footer-bottom"><span>© ${new Date().getFullYear()} Anredseller. All good things reserved.</span><span>Katalog demo · Pembayaran simulasi</span><span>GOOD TASTE IS ALWAYS IN SEASON. <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></span></div></footer>`;
@@ -103,6 +121,9 @@ function openStoreDialog(type) {
     const copy = info[type] || info.help;
     dialogContent.innerHTML = `<div class="eyebrow">Anredseller / ${type.toUpperCase()}</div><h2>${copy[0]}</h2><p>${copy[1]}</p><p>${copy[2]}</p>${type === "reseller" ? '<a class="solid-link" href="produk.html">Jelajahi katalog contoh <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a>' : ""}`;
   }
+  const title = dialogContent.querySelector("h2");
+  title.id = "store-dialog-title";
+  dialog.setAttribute("aria-labelledby", title.id);
   dialog.showModal();
 }
 document.addEventListener("click", (e) => {
@@ -146,7 +167,11 @@ function closeStoreMenu() {
   document.querySelector(".desktop-nav")?.classList.remove("mobile-open");
 }
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeStoreMenu();
+  if (e.key === "Escape" && !dialog.open) {
+    const focusWasInMenu = navigation?.contains(document.activeElement);
+    closeStoreMenu();
+    if (focusWasInMenu) document.querySelector(".mobile-menu")?.focus();
+  }
 });
 document.addEventListener("click", (e) => {
   if (!e.target.closest(".store-header")) closeStoreMenu();

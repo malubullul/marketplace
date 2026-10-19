@@ -44,3 +44,7 @@ Before launch, replace the demo catalog with verified product details and licens
 ## Validation
 
 The implementation was exercised in Chromium with Python Playwright: collection tabs, wishlist add/remove, search, category filtering, sorting, cart persistence, checkout validation and confirmation, newsletter feedback, reseller dialog and mobile navigation. Responsive checks cover 390, 768, 1024 and 1440px. No application package or test runner is required for serving the site.
+
+## UI/UX guidance
+
+See [docs/UI_GUIDE.md](docs/UI_GUIDE.md) for the approved visual direction and the UI/UX Pro Max review: mobile controls, readable product text, keyboard-operated category tabs and accessible wishlist/dialog states.

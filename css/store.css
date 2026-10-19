@@ -1854,3 +1854,211 @@ svg {
     animation: none;
   }
 }
+
+/* UI/UX Pro Max review: readable catalog and comfortable web controls. */
+:root {
+  --text-secondary: #62685b;
+  --control-size: 44px;
+}
+.skip-link {
+  position: fixed;
+  left: 16px;
+  top: 12px;
+  z-index: 2000;
+  padding: 12px 18px;
+  background: #faf9f6;
+  color: #252822;
+  border: 2px solid #252822;
+  font-size: 14px;
+  transform: translateY(-160%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+.mobile-wishlist {
+  display: none;
+}
+.archive-home .desktop-nav .mobile-wishlist {
+  display: block;
+}
+.icon-button,
+.archive-home .store-actions .icon-button {
+  width: var(--control-size);
+  height: var(--control-size);
+}
+.store-actions,
+.archive-home .store-actions {
+  gap: 8px;
+}
+.cart-link .badge-keranjang {
+  top: 3px;
+  right: 0;
+}
+.btn-wishlist {
+  width: var(--control-size);
+  height: var(--control-size);
+  top: 4px;
+  right: 4px;
+}
+.btn-wishlist:active,
+.icon-button:active {
+  opacity: 0.65;
+}
+.collection-tabs {
+  gap: 8px;
+}
+.collection-tabs button {
+  min-height: var(--control-size);
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.collection-tabs button[aria-selected="true"] {
+  font-weight: 600;
+}
+.product-meta {
+  font-size: 12px;
+  color: var(--text-secondary);
+  gap: 8px;
+}
+.product-meta > span:last-child {
+  font-size: 10px;
+}
+.kartu-produk-nama {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.kartu-harga {
+  font-variant-numeric: tabular-nums;
+}
+.harga-sekarang {
+  font-size: 14px;
+}
+.harga-asli {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.kartu-label {
+  font-size: 11px;
+}
+.product-colors {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.collection-note,
+.category-note {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.dialog-close {
+  width: var(--control-size);
+  height: var(--control-size);
+  top: 4px;
+  right: 6px;
+}
+.wishlist-list > div > button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.store-dialog p {
+  color: var(--text-secondary);
+}
+.archive-ticker {
+  animation: none;
+}
+@media (max-width: 760px) {
+  .store-header-inner,
+  .archive-home .store-header-inner {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 96px;
+    column-gap: 8px;
+  }
+  .store-header-inner > .wordmark,
+  .archive-home .store-header-inner > .wordmark {
+    position: static;
+    transform: none;
+    justify-self: center;
+    font-size: clamp(20px, 6vw, 26px);
+    letter-spacing: -1.3px;
+  }
+  .store-actions > [data-dialog="wishlist"] {
+    display: none !important;
+  }
+  .store-actions,
+  .archive-home .store-actions {
+    gap: 8px;
+  }
+  .store-actions .icon-button,
+  .archive-home .store-actions .icon-button {
+    width: 44px;
+    height: 44px;
+  }
+  .desktop-nav.mobile-open .mobile-wishlist {
+    display: block;
+  }
+  .desktop-nav.mobile-open {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .desktop-nav.mobile-open a,
+  .desktop-nav.mobile-open button {
+    min-height: 44px;
+    padding: 12px 0;
+  }
+  .desktop-nav.mobile-open {
+    padding: 20px 24px;
+  }
+  .archive-home .desktop-nav.mobile-open {
+    padding: 17px 25px;
+  }
+  .btn-keranjang-cepat {
+    min-height: 44px;
+    padding: 10px 4px;
+    font-size: 11px;
+  }
+  .kartu-produk-nama {
+    font-size: 14px;
+  }
+  .product-meta {
+    font-size: 11px;
+  }
+  .product-meta > span:last-child {
+    display: none;
+  }
+  .harga-sekarang {
+    font-size: 14px;
+  }
+  .harga-asli {
+    font-size: 12px;
+  }
+  .kartu-harga {
+    gap: 4px 8px;
+  }
+  .product-colors {
+    font-size: 11px;
+  }
+  .kartu-label {
+    font-size: 10px;
+  }
+  .form-input,
+  .form-select,
+  .form-textarea,
+  .dialog-search input,
+  .newsletter-edit input {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 760px) {
+  .collection-tabs button {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+@media (max-width: 360px) {
+  .collection-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+}
