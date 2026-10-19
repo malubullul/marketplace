@@ -98,7 +98,7 @@ function initNewsletter() {
   );
 }
 
-function tambahCepat(id) {
+async function tambahCepat(id) {
   const product = getProdukById(id);
   if (product?.ukuran?.length || product?.warna?.length) {
     location.href = "detail.html?id=" + id;

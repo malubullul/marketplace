@@ -1,4 +1,5 @@
 const storeIcons = {
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 22v-2a8 8 0 0 1 16 0v2"/>',
   search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/>',
   bag: '<path d="M5 7h14l1 14H4L5 7Z"/><path d="M9 8V5a3 3 0 0 1 6 0v3"/>',
   heart:
@@ -15,7 +16,7 @@ const icon = (name) =>
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${storeIcons[name] || ""}</svg>`;
 const header = document.getElementById("store-header");
 if (header)
-  header.innerHTML = `<div class="announcement"><span>A little upgrade for your everyday.</span><a href="produk.html?sort=terbaru">Discover the new collection <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></div><header class="store-header"><div class="store-header-inner"><button class="mobile-menu icon-button" aria-label="Buka menu" aria-expanded="false">${icon("menu")}</button><nav class="desktop-nav" aria-label="Navigasi utama"><a href="produk.html">Shop all</a><a href="produk.html?sort=terbaru">New arrivals <span class="nav-dot"></span></a><button data-dialog="about">Our story</button></nav><a class="wordmark" href="index.html" aria-label="Anredseller Beranda">Anredseller<span>•</span></a><div class="store-actions"><button class="icon-button" data-dialog="search" aria-label="Cari produk">${icon("search")}</button><button class="icon-button" data-dialog="wishlist" aria-label="Buka wishlist">${icon("heart")}</button><a class="icon-button cart-link" href="keranjang.html" aria-label="Buka keranjang">${icon("bag")}<span class="badge-keranjang">0</span></a></div></div><nav class="store-subnav" aria-label="Kategori"><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><span></span><a href="produk.html?sort=terlaris">Best sellers</a><a href="produk.html?sort=diskon" class="sale-link">The good deals <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></nav></header>`;
+  header.innerHTML = `<div class="announcement"><span>A little upgrade for your everyday.</span><a href="produk.html?sort=terbaru">Discover the new collection <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></div><header class="store-header"><div class="store-header-inner"><button class="mobile-menu icon-button" aria-label="Buka menu" aria-expanded="false">${icon("menu")}</button><nav class="desktop-nav" aria-label="Navigasi utama"><a href="produk.html">Shop all</a><a href="produk.html?sort=terbaru">New arrivals <span class="nav-dot"></span></a><button data-dialog="about">Our story</button></nav><a class="wordmark" href="index.html" aria-label="Anredseller Beranda">Anredseller<span>•</span></a><div class="store-actions"><button class="icon-button" data-dialog="search" aria-label="Cari produk">${icon("search")}</button><a class="icon-button customer-account-link" href="akun.html" aria-label="Akun pembeli">${icon("user")}</a><a class="icon-button cart-link" href="keranjang.html" aria-label="Buka keranjang">${icon("bag")}<span class="badge-keranjang">0</span></a></div></div><nav class="store-subnav" aria-label="Kategori"><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><span></span><a href="produk.html?sort=terlaris">Best sellers</a><a href="produk.html?sort=diskon" class="sale-link">The good deals <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></nav></header>`;
 if (header && document.body.classList.contains("archive-home")) {
   const ticker = `<span>FREE SHIPPING OVER IDR 200K</span><span class="ticker-dot">•</span><span>ANREDSELLER ARCHIVE</span><span class="ticker-dot">•</span>`;
   header.innerHTML = `
@@ -35,7 +36,7 @@ if (header && document.body.classList.contains("archive-home")) {
         </nav>
         <a class="wordmark" href="index.html" aria-label="Anredseller Beranda">Anredseller</a>
         <div class="store-actions">
-          <button class="icon-button" data-dialog="wishlist" aria-label="Buka wishlist">${icon("heart")}</button>
+          <a class="icon-button customer-account-link" href="akun.html" aria-label="Akun pembeli">${icon("user")}</a>
           <button class="icon-button" data-dialog="search" aria-label="Cari produk">${icon("search")}</button>
           <a class="icon-button cart-link" href="keranjang.html" aria-label="Buka keranjang">${icon("bag")}<span class="badge-keranjang">0</span></a>
         </div>
@@ -59,6 +60,11 @@ if (navigation) {
   savedItems.dataset.dialog = "wishlist";
   savedItems.textContent = "Wishlist";
   navigation.appendChild(savedItems);
+  const accountLink = document.createElement("a");
+  accountLink.href = "akun.html";
+  accountLink.textContent = "Akun saya / Masuk";
+  accountLink.className = "menu-account-link";
+  navigation.prepend(accountLink);
 }
 const footer = document.getElementById("store-footer");
 if (footer)
@@ -90,8 +96,8 @@ const info = {
   ],
   privacy: [
     "Your details, thoughtfully kept.",
-    "Wishlist dan keranjang tersimpan di browser. Data yang kamu kirim saat checkout disimpan oleh toko untuk memproses pesanan.",
-    "Email dan alamat pesanan hanya tersedia bagi pemilik toko yang sudah login.",
+    "Profil, alamat, wishlist, keranjang, dan pesanan tersimpan di akun pembeli. Kamu dapat mengaksesnya setelah masuk di perangkat lain.",
+    "Data pesanan hanya dapat dilihat oleh pembeli yang bersangkutan dan pemilik toko yang sudah login.",
   ],
   reseller: [
     "Good things. Better together.",
@@ -99,7 +105,8 @@ const info = {
     "Program akan mencakup katalog pilihan, informasi stok, dan panduan pemesanan. Harga reseller, minimum order, dan kontak admin belum ditetapkan.",
   ],
 };
-function openStoreDialog(type) {
+async function openStoreDialog(type) {
+  if (type === "wishlist" && !(await requireBuyer())) return;
   if (type === "search") {
     dialogContent.innerHTML =
       '<div class="eyebrow">FIND YOUR NEXT FAVORITE</div><h2>What are you looking for?</h2><form class="dialog-search" action="produk.html"><input name="q" type="search" placeholder="Cari sneakers, kaos, atau brand…" aria-label="Cari produk" required><button type="submit">Cari <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></button></form><p>Coba: Nike, Jordan, essential</p>';
@@ -126,7 +133,7 @@ function openStoreDialog(type) {
   dialog.setAttribute("aria-labelledby", title.id);
   dialog.showModal();
 }
-document.addEventListener("click", (e) => {
+document.addEventListener("click", async (e) => {
   const trigger = e.target.closest("[data-dialog]");
   if (trigger) {
     e.preventDefault();
@@ -134,7 +141,7 @@ document.addEventListener("click", (e) => {
   }
   const remove = e.target.closest("[data-remove-wish]");
   if (remove) {
-    toggleWishlist(Number(remove.dataset.removeWish));
+    await toggleWishlist(Number(remove.dataset.removeWish));
     dialog.close();
     openStoreDialog("wishlist");
   }
@@ -177,3 +184,16 @@ document.addEventListener("click", (e) => {
   if (!e.target.closest(".store-header")) closeStoreMenu();
 });
 updateBadgeKeranjang();
+
+window.addEventListener("customer:session", () => {
+  document
+    .querySelectorAll(".customer-account-link")
+    .forEach((link) =>
+      link.setAttribute(
+        "aria-label",
+        buyerSession.authenticated
+          ? "Akun " + buyerSession.customer.nama
+          : "Masuk atau daftar pembeli",
+      ),
+    );
+});

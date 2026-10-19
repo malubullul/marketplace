@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Akun Saya — Anredseller</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/store.css" />
+    <link rel="stylesheet" href="css/account.css" />
+  </head>
+  <body class="account-page">
+    <div id="store-header"></div>
+    <main class="account-main">
+      <section id="customer-auth" hidden class="account-auth-layout">
+        <div class="account-editorial">
+          <div>
+            <span class="eyebrow">YOUR OWN LITTLE ARCHIVE</span>
+            <h1>Good finds.<br />Kept for you.</h1>
+            <p>
+              Satu akun untuk koleksi favorit,<br />alamat tersimpan, dan setiap
+              pesananmu.
+            </p>
+          </div>
+        </div>
+        <div class="auth-content">
+          <span class="eyebrow">WELCOME TO ANREDSELLER</span>
+          <h2 id="auth-title">Senang melihatmu kembali.</h2>
+          <div class="auth-tabs" aria-label="Pilih masuk atau daftar">
+            <button id="show-login" class="selected" aria-pressed="true">
+              Masuk</button
+            ><button id="show-register" aria-pressed="false">
+              Daftar akun
+            </button>
+          </div>
+          <form id="buyer-login-form">
+            <label for="buyer-login-email">Email</label
+            ><input
+              id="buyer-login-email"
+              type="email"
+              autocomplete="username"
+              maxlength="150"
+              required
+            /><label for="buyer-login-password">Kata sandi</label
+            ><input
+              id="buyer-login-password"
+              type="password"
+              autocomplete="current-password"
+              maxlength="128"
+              required
+            />
+            <p
+              id="buyer-login-error"
+              class="account-error"
+              role="alert"
+              tabindex="-1"
+            ></p>
+            <button class="account-button primary" type="submit">
+              Masuk ke akun
+            </button>
+          </form>
+          <form id="buyer-register-form" hidden>
+            <label for="buyer-register-name">Nama lengkap</label
+            ><input
+              id="buyer-register-name"
+              autocomplete="name"
+              maxlength="150"
+              required
+            /><label for="buyer-register-phone">Nomor HP</label
+            ><input
+              id="buyer-register-phone"
+              type="tel"
+              autocomplete="tel"
+              maxlength="30"
+              required
+            /><label for="buyer-register-email">Email</label
+            ><input
+              id="buyer-register-email"
+              type="email"
+              autocomplete="username"
+              maxlength="150"
+              required
+            /><label for="buyer-register-password">Kata sandi</label
+            ><input
+              id="buyer-register-password"
+              type="password"
+              autocomplete="new-password"
+              minlength="12"
+              maxlength="128"
+              required
+            /><small
+              >Gunakan 12–128 karakter. Kamu dapat memakai password
+              manager.</small
+            ><label for="buyer-register-confirm">Ulangi kata sandi</label
+            ><input
+              id="buyer-register-confirm"
+              type="password"
+              autocomplete="new-password"
+              minlength="12"
+              maxlength="128"
+              required
+            />
+            <p
+              id="buyer-register-error"
+              class="account-error"
+              role="alert"
+              tabindex="-1"
+            ></p>
+            <button class="account-button primary" type="submit">
+              Buat akun pembeli
+            </button>
+          </form>
+          <p class="auth-help">
+            Akun ini untuk pembeli.
+            <a href="admin.html">Pemilik toko masuk di sini.</a>
+          </p>
+        </div>
+      </section>
+      <p id="account-loading" class="account-loading" role="status">
+        Memuat akunmu…
+      </p>
+      <div id="customer-dashboard" class="customer-layout" hidden>
+        <aside class="customer-sidebar">
+          <div class="customer-greeting">
+            <span id="customer-avatar" class="customer-avatar">A</span>
+            <div>
+              <small>Halo, selamat datang</small
+              ><strong id="customer-name"></strong>
+            </div>
+          </div>
+          <nav class="customer-menu" aria-label="Menu akun">
+            <button
+              class="active"
+              data-customer-panel="profile"
+              aria-current="page"
+            >
+              Profil saya</button
+            ><button data-customer-panel="addresses">Alamat tersimpan</button
+            ><button data-customer-panel="orders">
+              Pesanan saya <span id="customer-order-count">0</span></button
+            ><button data-customer-panel="wishlist">
+              Wishlist <span id="customer-wish-count">0</span></button
+            ><a href="keranjang.html">Keranjang belanja</a>
+          </nav>
+          <button id="customer-logout" class="customer-logout">
+            Keluar dari akun
+          </button>
+        </aside>
+        <div class="customer-content">
+          <div class="customer-page-heading">
+            <div>
+              <span class="eyebrow">YOUR PERSONAL ARCHIVE</span>
+              <h1 id="customer-panel-title">Profil saya<span>.</span></h1>
+              <p id="customer-panel-description">
+                Detail kecil untuk pengalaman belanja yang lebih personal.
+              </p>
+            </div>
+            <button id="refresh-account" class="account-button secondary">
+              Muat ulang
+            </button>
+          </div>
+          <p
+            id="account-message"
+            class="account-message"
+            role="status"
+            hidden
+          ></p>
+          <section id="panel-profile">
+            <form id="customer-profile-form" class="account-card">
+              <h2>Informasi pribadi</h2>
+              <label for="profile-name">Nama lengkap</label
+              ><input
+                id="profile-name"
+                autocomplete="name"
+                maxlength="150"
+                required
+              /><label for="profile-email">Email akun</label
+              ><input id="profile-email" type="email" readonly /><small
+                >Email ini digunakan untuk masuk ke akun.</small
+              ><label for="profile-phone">Nomor HP</label
+              ><input
+                id="profile-phone"
+                type="tel"
+                autocomplete="tel"
+                maxlength="30"
+                required
+              /><button class="account-button primary" type="submit">
+                Simpan profil
+              </button>
+            </form>
+            <details class="account-card password-card">
+              <summary>Ganti kata sandi</summary>
+              <p>Perangkat lain akan keluar setelah kata sandi diganti.</p>
+              <form id="customer-password-form">
+                <label for="password-current">Kata sandi saat ini</label
+                ><input
+                  id="password-current"
+                  type="password"
+                  autocomplete="current-password"
+                  maxlength="128"
+                  required
+                /><label for="password-new">Kata sandi baru</label
+                ><input
+                  id="password-new"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="12"
+                  maxlength="128"
+                  required
+                /><label for="password-confirm">Ulangi kata sandi baru</label
+                ><input
+                  id="password-confirm"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="12"
+                  maxlength="128"
+                  required
+                /><button class="account-button primary" type="submit">
+                  Perbarui kata sandi
+                </button>
+              </form>
+            </details>
+          </section>
+          <section id="panel-addresses" hidden>
+            <div class="account-section-heading">
+              <p>
+                Simpan sampai 10 alamat. Alamat utama otomatis dipilih saat
+                checkout.
+              </p>
+              <button id="add-address" class="account-button primary">
+                + Tambah alamat
+              </button>
+            </div>
+            <div id="customer-address-list" class="address-grid"></div>
+          </section>
+          <section id="panel-orders" hidden>
+            <div class="account-section-heading">
+              <p>Pesanan dari akun ini beserta status terbaru dari toko.</p>
+              <label class="order-filter-label" for="customer-order-filter"
+                >Status<select id="customer-order-filter">
+                  <option value="all">Semua pesanan</option>
+                  <option value="baru">Menunggu konfirmasi</option>
+                  <option value="diproses">Diproses</option>
+                  <option value="dikirim">Dikirim</option>
+                  <option value="selesai">Selesai</option>
+                  <option value="dibatalkan">Dibatalkan</option>
+                </select></label
+              >
+            </div>
+            <div id="customer-order-list"></div>
+          </section>
+          <section id="panel-wishlist" hidden>
+            <p class="account-section-note">
+              Pilihan favoritmu, tersimpan untuk kunjungan berikutnya.
+            </p>
+            <div id="customer-wishlist" class="grid-produk grid-produk-3"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+    <div id="store-footer"></div>
+    <dialog
+      id="address-dialog"
+      class="account-dialog"
+      aria-labelledby="address-title"
+    >
+      <form id="customer-address-form">
+        <div class="account-dialog-heading">
+          <h2 id="address-title">Tambah alamat</h2>
+          <button
+            type="button"
+            id="close-address"
+            class="account-close"
+            aria-label="Tutup alamat"
+          >
+            ×
+          </button>
+        </div>
+        <p
+          id="address-error"
+          class="account-error"
+          role="alert"
+          tabindex="-1"
+        ></p>
+        <label for="address-label">Nama alamat</label
+        ><input
+          id="address-label"
+          maxlength="40"
+          placeholder="Rumah, kantor, atau kos"
+        />
+        <div class="account-form-row">
+          <div>
+            <label for="address-recipient">Nama penerima</label
+            ><input
+              id="address-recipient"
+              autocomplete="shipping name"
+              maxlength="150"
+              required
+            />
+          </div>
+          <div>
+            <label for="address-phone">Nomor HP penerima</label
+            ><input
+              id="address-phone"
+              type="tel"
+              autocomplete="shipping tel"
+              maxlength="30"
+              required
+            />
+          </div>
+        </div>
+        <label for="address-street">Alamat lengkap</label
+        ><textarea
+          id="address-street"
+          autocomplete="shipping street-address"
+          maxlength="1000"
+          rows="3"
+          required
+        ></textarea>
+        <div class="account-form-row">
+          <div>
+            <label for="address-city">Kota/kabupaten</label
+            ><input
+              id="address-city"
+              autocomplete="shipping address-level2"
+              maxlength="100"
+              required
+            />
+          </div>
+          <div>
+            <label for="address-province">Provinsi</label
+            ><input
+              id="address-province"
+              autocomplete="shipping address-level1"
+              maxlength="100"
+              required
+            />
+          </div>
+        </div>
+        <label for="address-postcode">Kode pos</label
+        ><input
+          id="address-postcode"
+          inputmode="numeric"
+          autocomplete="shipping postal-code"
+          pattern="[0-9]{5}"
+          maxlength="5"
+          required
+        /><label class="account-check"
+          ><input id="address-default" type="checkbox" /> Jadikan alamat
+          utama</label
+        ><button class="account-button primary" type="submit">
+          Simpan alamat
+        </button>
+      </form>
+    </dialog>
+    <dialog
+      id="customer-order-dialog"
+      class="account-dialog"
+      aria-labelledby="customer-order-title"
+    >
+      <button
+        id="close-customer-order"
+        class="account-close"
+        aria-label="Tutup pesanan"
+      >
+        ×
+      </button>
+      <div id="customer-order-details"></div>
+    </dialog>
+    <script src="js/data.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/account.js"></script>
+  </body>
+</html>

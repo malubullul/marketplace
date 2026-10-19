@@ -1,11 +1,20 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  await katalogSiap;
+  await buyerReady;
+  if (!(await requireBuyer())) return;
+  const number =
+    new URLSearchParams(location.search).get("order") ||
+    sessionStorage.getItem("pesanan_terakhir");
+  if (!number || !/^ANR-[A-F0-9]{12}$/.test(number)) {
+    location.replace("akun.html#orders");
+    return;
+  }
   let order;
   try {
-    order = JSON.parse(sessionStorage.getItem("pesanan_terakhir"));
-  } catch {}
-  if (!order?.nomor) {
-    location.replace("produk.html");
+    order = (await customerRequest("/orders/" + encodeURIComponent(number)))
+      .order;
+  } catch (error) {
+    document.getElementById("konfirmasi-sub").textContent = error.message;
+    document.getElementById("nomor-pesanan").textContent = "—";
     return;
   }
   document.getElementById("nomor-pesanan").textContent = order.nomor;

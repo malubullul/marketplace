@@ -11,7 +11,7 @@ const KUPON_VALID = {
 let diskonKupon = 0;
 
 document.addEventListener("DOMContentLoaded", async () => {
-  await katalogSiap;
+  await buyerReady;
   syncCartCatalog();
   diskonKupon = KUPON_VALID[sessionStorage.getItem("checkout_kupon")] || 0;
   renderKeranjang();
@@ -29,7 +29,9 @@ function renderKeranjang() {
   document.getElementById("subtitle-keranjang").textContent =
     jumlah > 0
       ? `${jumlah} produk dalam keranjang`
-      : "Keranjang kamu masih kosong";
+      : buyerSession.authenticated
+        ? "Keranjang kamu masih kosong"
+        : "Masuk untuk melihat keranjang yang tersimpan di akunmu.";
 
   if (keranjang.length === 0) {
     kiri.innerHTML = `
@@ -37,8 +39,8 @@ function renderKeranjang() {
         <div class="keranjang-kosong-ikon">🛒</div>
         <div class="keranjang-kosong-judul">Keranjang Kamu Kosong</div>
         <div class="keranjang-kosong-sub">Yuk, temukan produk favorit kamu dan tambahkan ke keranjang!</div>
-        <a href="produk.html" class="btn-beli-sekarang" style="display:inline-flex;margin:0 auto">
-          🛍️ Mulai Belanja
+        <a href="${buyerSession.authenticated ? "produk.html" : buyerLoginUrl("keranjang.html")}" class="btn-beli-sekarang" style="display:inline-flex;margin:0 auto">
+          ${buyerSession.authenticated ? "Mulai Belanja" : "Masuk ke akun pembeli"}
         </a>
       </div>
     `;
@@ -103,36 +105,41 @@ function renderKeranjang() {
     </div>
   `;
 
-  document.getElementById("btn-checkout").disabled = false;
+  const totals = {};
+  for (const item of keranjang)
+    totals[item.id] = (totals[item.id] || 0) + item.jumlah;
+  document.getElementById("btn-checkout").disabled = keranjang.some(
+    (item) => !item.available || totals[item.id] > item.stok,
+  );
   updateRingkasan();
 }
 
 // ── Update Item ────────────────────────────────────────────
-function kurangiItem(key) {
+async function kurangiItem(key) {
   const item = getKeranjang().find((line) => line.key === String(key));
   if (!item) return;
   if (item.jumlah <= 1) {
     if (confirm(`Hapus "${item.nama}" dari keranjang?`)) hapusItem(key);
     return;
   }
-  updateJumlah(key, item.jumlah - 1);
+  await updateJumlah(key, item.jumlah - 1);
   renderKeranjang();
 }
-function tambahItem(key) {
+async function tambahItem(key) {
   const item = getKeranjang().find((line) => line.key === String(key));
   if (!item) return;
-  updateJumlah(key, item.jumlah + 1);
+  await updateJumlah(key, item.jumlah + 1);
   renderKeranjang();
 }
 
-function hapusItem(id) {
-  hapusDariKeranjang(id);
+async function hapusItem(id) {
+  await hapusDariKeranjang(id);
   renderKeranjang();
 }
 
-function konfirmasiKosongkan() {
+async function konfirmasiKosongkan() {
   if (confirm("Yakin ingin mengosongkan semua keranjang?")) {
-    kosongkanKeranjang();
+    await kosongkanKeranjang();
     renderKeranjang();
   }
 }
@@ -234,3 +241,11 @@ function initSearch() {
     if (e.key === "Enter") doSearch();
   });
 }
+
+window.addEventListener("customer:state", () => {
+  if (
+    document.readyState !== "loading" &&
+    document.getElementById("keranjang-kiri")
+  )
+    renderKeranjang();
+});

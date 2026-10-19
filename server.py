@@ -18,6 +18,7 @@ from flask import Flask, abort, g, jsonify, request, send_from_directory, sessio
 from PIL import Image, ImageOps, UnidentifiedImageError
 from werkzeug.exceptions import HTTPException
 from werkzeug.security import check_password_hash, generate_password_hash
+from customer_api import CustomerAPI
 
 ROOT = Path(__file__).resolve().parent
 CATEGORIES = {"apparel", "sneakers", "essentials"}
@@ -34,7 +35,7 @@ def create_app(config=None):
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_COOKIE_SECURE=os.environ.get("ANREDSELLER_SECURE_COOKIES") == "1",
-        PERMANENT_SESSION_LIFETIME=8 * 3600,
+        PERMANENT_SESSION_LIFETIME=30 * 86400,
     )
     app.config.update(config or {})
     directory = Path(app.config["DATA_DIR"])
@@ -97,6 +98,8 @@ def create_app(config=None):
             abort(400)
         return data
 
+    customers = CustomerAPI(app, db, fail, body)
+
     def authenticated_owner():
         sid = session.get("sid", "")
         return db().execute("SELECT owners.id,owners.email FROM owner_sessions JOIN owners ON owners.id=owner_sessions.owner_id WHERE owner_sessions.token=? AND expires_at>?", (hashlib.sha256(sid.encode()).hexdigest(), int(time.time()))).fetchone()
@@ -118,7 +121,7 @@ def create_app(config=None):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "same-origin"
         response.headers["Content-Security-Policy"] = "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
-        if request.path.startswith("/api/") or request.path.startswith("/admin"):
+        if request.path.startswith("/api/") or request.path.startswith("/admin") or request.path in {"/akun","/akun.html","/checkout.html","/konfirmasi.html"}:
             response.headers["Cache-Control"] = "no-store"
         return response
 
@@ -157,7 +160,8 @@ def create_app(config=None):
             db().commit()
             return fail("Email atau kata sandi salah.", 401)
         db().execute("DELETE FROM login_attempts WHERE address=?", (address,))
-        session.clear()
+        db().execute("DELETE FROM owner_sessions WHERE token=?", (hashlib.sha256(session.get("sid", "").encode()).hexdigest(),))
+        session.pop("csrf", None)
         session["sid"] = secrets.token_urlsafe(32)
         db().execute("DELETE FROM owner_sessions WHERE expires_at<?", (now,))
         db().execute("INSERT INTO owner_sessions VALUES(?,?,?)", (hashlib.sha256(session["sid"].encode()).hexdigest(), owner["id"], now+8*3600))
@@ -170,7 +174,8 @@ def create_app(config=None):
     def logout():
         db().execute("DELETE FROM owner_sessions WHERE token=?", (hashlib.sha256(session.get("sid", "").encode()).hexdigest(),))
         db().commit()
-        session.clear()
+        session.pop("sid", None)
+        session.pop("csrf", None)
         return jsonify(ok=True)
 
     def products(include_drafts=False):
@@ -303,19 +308,31 @@ def create_app(config=None):
         return jsonify(url="/uploads/" + name), 201
 
     @app.post("/api/orders")
+    @customers.required
     def create_order():
         if not request.is_json:
             return fail("Gunakan formulir pemesanan toko.")
         data = body()
+        customer_id = g.customer["id"]
         key = request.headers.get("Idempotency-Key", "")
         if not re.fullmatch(r"[a-zA-Z0-9-]{16,80}", key):
             return fail("Identitas permintaan tidak valid. Muat ulang checkout.")
-        existing = db().execute("SELECT document FROM orders WHERE idempotency_key=?", (hashlib.sha256(key.encode()).hexdigest(),)).fetchone()
+        order_key = hashlib.sha256(f"{customer_id}:{key}".encode()).hexdigest()
+        existing = db().execute("SELECT document FROM orders WHERE idempotency_key=? AND customer_id=?", (order_key,customer_id)).fetchone()
         if existing:
-            return jsonify(order=json.loads(existing["document"]))
+            return jsonify(order=json.loads(existing["document"]),state=customers.resolved_state(customer_id))
         customer = data.get("customer", {})
         if not isinstance(customer, dict):
             return fail("Lengkapi data penerima.")
+        customer["nama"] = g.customer["nama"]
+        customer["email"] = g.customer["email"]
+        address_id = data.get("address_id")
+        if address_id is not None and (isinstance(address_id,bool) or not isinstance(address_id,int) or address_id<1):
+            return fail("Alamat tidak valid.")
+        if address_id is not None:
+            address = db().execute("SELECT document FROM customer_addresses WHERE id=? AND customer_id=?", (address_id,customer_id)).fetchone()
+            if not address: return fail("Alamat tidak ditemukan.",404)
+            customer.update(json.loads(address["document"]))
         required = {"nama":150,"nama_penerima":150,"email":150,"nohp":30,"alamat":1000,"kota":100,"provinsi":100,"kodepos":5}
         for field, maximum in required.items():
             value = customer.get(field)
@@ -334,10 +351,10 @@ def create_app(config=None):
         try:
             db().execute("BEGIN IMMEDIATE")
             # Check again inside the write transaction for simultaneous retries.
-            existing = db().execute("SELECT document FROM orders WHERE idempotency_key=?", (hashlib.sha256(key.encode()).hexdigest(),)).fetchone()
+            existing = db().execute("SELECT document FROM orders WHERE idempotency_key=? AND customer_id=?", (order_key,customer_id)).fetchone()
             if existing:
                 db().rollback()
-                return jsonify(order=json.loads(existing["document"]))
+                return jsonify(order=json.loads(existing["document"]),state=customers.resolved_state(customer_id))
             quantities = Counter()
             items = []
             source = {}
@@ -372,9 +389,12 @@ def create_app(config=None):
             shipping = 0 if subtotal >= 200000 else 15000
             order_id = "ANR-" + secrets.token_hex(6).upper()
             order = dict(customer, nomor=order_id, tanggal=time.strftime("%Y-%m-%d"), created_at=int(time.time()), items=items, subtotal=subtotal, diskon=discount, ongkir=shipping, total=subtotal-discount+shipping, kurir="Dikonfirmasi oleh toko", metode="manual", status="baru", catatan=str(data.get("catatan", ""))[:1000])
-            db().execute("INSERT INTO orders VALUES(?,?,?,?,?)", (order_id, json.dumps(order), "baru", hashlib.sha256(key.encode()).hexdigest(), int(time.time())))
+            if data.get("save_address") is True and address_id is None:
+                customers.save_address(customer_id, dict(customer,label="Alamat checkout"))
+            db().execute("INSERT INTO orders(id,document,status,idempotency_key,created_at,customer_id) VALUES(?,?,?,?,?,?)", (order_id, json.dumps(order), "baru", order_key, int(time.time()), customer_id))
+            customers.consume_cart(customer_id,items)
             db().commit()
-            return jsonify(order=order), 201
+            return jsonify(order=order,state=customers.resolved_state(customer_id)), 201
         except ValueError as error:
             db().rollback()
             return fail(str(error), 409)
@@ -421,13 +441,17 @@ def create_app(config=None):
     def index():
         return send_from_directory(ROOT, "index.html")
 
+    @app.get("/akun")
+    def customer_page():
+        return send_from_directory(ROOT,"akun.html")
+
     @app.get("/admin")
     def admin_page():
         return send_from_directory(ROOT, "admin.html")
 
     @app.get("/<path:filename>")
     def static_file(filename):
-        pages = {"index.html","produk.html","detail.html","keranjang.html","checkout.html","konfirmasi.html","admin.html"}
+        pages = {"index.html","produk.html","detail.html","keranjang.html","checkout.html","konfirmasi.html","admin.html","akun.html"}
         parts = Path(filename).parts
         if filename in pages or (parts and parts[0] in {"css","js","assets"} and not any(part.startswith(".") for part in parts)):
             return send_from_directory(ROOT, filename)

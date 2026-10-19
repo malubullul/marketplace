@@ -2109,3 +2109,47 @@ svg {
 #checkout-error:empty {
   display: none;
 }
+.menu-account-link {
+  display: none;
+}
+.archive-home .desktop-nav .menu-account-link {
+  display: block;
+}
+.checkout-saved-address {
+  padding: 18px;
+  background: #edf0e5;
+  border: 1px solid #d7dfcc;
+  margin-bottom: 24px;
+}
+.checkout-saved-address label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.checkout-saved-address select {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #b9c3aa;
+  background: transparent;
+  width: 100%;
+  min-height: 44px;
+}
+.checkout-save-address {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  font-size: 13px;
+}
+.checkout-save-address input {
+  width: 17px;
+  height: 17px;
+}
+@media (max-width: 760px) {
+  .store-actions .customer-account-link {
+    display: none !important;
+  }
+  .desktop-nav.mobile-open .menu-account-link {
+    display: block;
+  }
+}

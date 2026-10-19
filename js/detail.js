@@ -201,7 +201,7 @@ function setJumlah(val) {
 }
 
 // ── Aksi ───────────────────────────────────────────────────
-function tambahKeranjang() {
+async function tambahKeranjang() {
   if (!produkAktif || produkAktif.stok === 0) return;
   return tambahKeKeranjang(
     produkAktif.id,
@@ -210,9 +210,9 @@ function tambahKeranjang() {
     document.getElementById("pilihan-warna")?.value || "",
   );
 }
-function beliSekarang() {
+async function beliSekarang() {
   if (!produkAktif || produkAktif.stok === 0) return;
-  if (!tambahKeranjang()) return;
+  if (!(await tambahKeranjang())) return;
   setTimeout(() => {
     window.location.href = "keranjang.html";
   }, 600);

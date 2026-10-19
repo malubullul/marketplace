@@ -31,3 +31,7 @@ python3 /workspace/library-files/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-ma
 ## Verification
 
 Check 320/375/390px phones, 768px tablet, and 1440px desktop. Confirm no horizontal overflow, no header overlap, keyboard-only category navigation, wishlist state, dialog focus and mobile menu access. Run the existing browser smoke workflow after shared navigation changes. Do not describe these checks as a full WCAG audit.
+
+## Customer accounts
+
+Keep account pages consistent with the cream/olive storefront rather than replacing the approved editorial direction with a generated generic ecommerce palette. The customer account page provides login/registration, profile, addresses, orders and wishlist. Use visible form labels, native autocomplete, minimum 44px controls, contextual errors and explicit loading feedback. Public catalog browsing remains anonymous; customer state and checkout require sign-in. Show order status as supplied by the backend, not as proof of payment. Never display another account's cached profile, cart or receipt after account switching or logout.

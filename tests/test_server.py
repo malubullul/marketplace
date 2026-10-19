@@ -20,6 +20,10 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(result.status_code,200)
         self.headers = {'X-CSRF-Token':result.json['csrf']}
         self.public = self.app.test_client()
+        buyer_csrf=self.public.get('/api/customer/session').json['csrf']
+        buyer=self.public.post('/api/customer/register',json={'nama':'Pembeli Uji','nohp':'081234567890','email':'customer@example.test','password':secrets.token_urlsafe(24)},headers={'X-CSRF-Token':buyer_csrf})
+        self.assertEqual(buyer.status_code,201,buyer.json)
+        self.buyer_headers={'X-CSRF-Token':buyer.json['csrf']}
 
     def tearDown(self):
         self.directory.cleanup()
@@ -34,7 +38,7 @@ class StoreTests(unittest.TestCase):
     def order(self, product, quantity=1, key=None, **changes):
         data = dict(customer=dict(nama='Pembeli Uji',nama_penerima='Penerima Uji',email='customer@example.test',nohp='081234567890',alamat='Jl. Pengujian 1',kota='Jakarta',provinsi='DKI Jakarta',kodepos='12345'),items=[dict(id=product['id'],harga=product['harga'],jumlah=quantity,ukuran='S',warna='Hitam')])
         data.update(changes)
-        return self.public.post('/api/orders',json=data,headers={'Idempotency-Key':key or secrets.token_hex(16)})
+        return self.public.post('/api/orders',json=data,headers={**self.buyer_headers,'Idempotency-Key':key or secrets.token_hex(16)})
 
     def current_product(self, product_id):
         return next(p for p in self.client.get('/api/admin/products').json['products'] if p['id']==product_id)
@@ -87,7 +91,7 @@ class StoreTests(unittest.TestCase):
         for change in [{'harga':-1},{'stok':-1},{'gambarList':['https://untrusted.invalid/photo.png']},{'ukuran':'M'},{'hargaAsli':1}]:
             payload=dict(product,**change)
             self.assertEqual(self.client.put('/api/admin/products/'+str(product['id']),json=payload,headers=self.headers).status_code,400,change)
-        self.assertEqual(self.public.post('/api/orders',json=[]).status_code,400)
+        self.assertEqual(self.public.post('/api/orders',json=[],headers=self.buyer_headers).status_code,400)
 
     def test_order_authoritative_price_variants_stock_and_idempotency(self):
         product = self.product()

@@ -10,6 +10,7 @@ from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix='anredseller-browser-') as directory:
     password=secrets.token_urlsafe(24)
+    buyer_password=secrets.token_urlsafe(24)
     source='''import json,sys
 from server import app,create_owner
 from werkzeug.serving import make_server
@@ -48,14 +49,28 @@ http.serve_forever()
                 assert '<b>suede</b>' in shopper.locator('#tab-deskripsi').inner_text();assert shopper.locator('#tab-deskripsi b').count()==0
                 shopper.locator('#btn-tambah').click();assert shopper.evaluate('getKeranjang().length')==0
                 shopper.locator('#pilihan-ukuran').select_option('S');shopper.locator('#pilihan-warna').select_option('Hitam');shopper.locator('#btn-tambah').click()
-                shopper.locator('#pilihan-ukuran').select_option('M');shopper.locator('#pilihan-warna').select_option('Cokelat');shopper.locator('#btn-tambah').click();assert shopper.evaluate('getKeranjang().length')==2
+                shopper.wait_for_url('**/akun.html?next=*');shopper.locator('#show-register').click()
+                for field,value in {'buyer-register-name':'Pembeli Uji','buyer-register-phone':'081234567890','buyer-register-email':'buyer@example.test','buyer-register-password':buyer_password,'buyer-register-confirm':buyer_password}.items():shopper.locator('#'+field).fill(value)
+                shopper.get_by_role('button',name='Buat akun pembeli',exact=True).click();shopper.wait_for_url('**/detail.html?id=*');shopper.locator('#pilihan-ukuran').wait_for()
+                shopper.goto(base+'produk.html?q=Jaket+Suede+Uji',wait_until='networkidle');shopper.locator('.btn-wishlist').first.click();shopper.wait_for_function('() => getWishlist().length===1')
+                shopper.locator('#grid-produk-list .kartu-produk-nama').click();shopper.wait_for_url('**/detail.html?id=*');shopper.locator('#pilihan-ukuran').wait_for()
+                shopper.locator('#pilihan-ukuran').select_option('S');shopper.locator('#pilihan-warna').select_option('Hitam');shopper.locator('#btn-tambah').click();shopper.wait_for_function('() => getKeranjang().length===1')
+                shopper.locator('#pilihan-ukuran').select_option('M');shopper.locator('#pilihan-warna').select_option('Cokelat');shopper.locator('#btn-tambah').click();shopper.wait_for_function('() => getKeranjang().length===2')
+                shopper.goto(base+'akun.html#addresses',wait_until='networkidle');shopper.locator('#add-address').click()
+                for field,value in {'address-label':'Rumah','address-recipient':'Penerima Uji','address-street':'Jl. Pengujian 1','address-city':'Jakarta','address-province':'DKI Jakarta','address-postcode':'12345'}.items():shopper.locator('#'+field).fill(value)
+                shopper.get_by_role('button',name='Simpan alamat',exact=True).click();shopper.locator('#address-dialog').wait_for(state='hidden')
+                device_context=browser.new_context(viewport={'width':1440,'height':1000},reduced_motion='reduce');device=device_context.new_page();device.on('pageerror',lambda e:errors.append(str(e)))
+                device.goto(base+'akun.html?next=keranjang.html',wait_until='networkidle');device.locator('#buyer-login-email').fill('buyer@example.test');device.locator('#buyer-login-password').fill(buyer_password);device.get_by_role('button',name='Masuk ke akun',exact=True).click();device.wait_for_url('**/keranjang.html');device.wait_for_function('() => getKeranjang().length===2&&getWishlist().length===1')
+                assert device_context.request.get(base+'api/customer/addresses').json()['addresses'][0]['label']=='Rumah'
                 shopper.goto(base+'keranjang.html',wait_until='networkidle');assert shopper.locator('.keranjang-item').count()==2
-                shopper.locator('.keranjang-qty').first.locator('button').nth(1).click();assert shopper.evaluate('hitungJumlahItem()')==3
-                shopper.locator('.keranjang-qty').first.locator('button').first.click();assert shopper.evaluate('hitungJumlahItem()')==2
+                shopper.locator('.keranjang-qty').first.locator('button').nth(1).click();shopper.wait_for_function('() => hitungJumlahItem()===3')
+                shopper.locator('.keranjang-qty').first.locator('button').first.click();shopper.wait_for_function('() => hitungJumlahItem()===2')
                 shopper.locator('#btn-checkout').click();shopper.wait_for_url('**/checkout.html')
-                shopper.locator('#btn-pesan').click();assert shopper.locator('#err-email').inner_text()
-                for field,value in {'nama-depan':'Pembeli','nama-belakang':'Uji','email':'buyer@example.test','nohp':'081234567890','nama-penerima':'Penerima Uji','alamat':'Jl. Pengujian 1','kota':'Jakarta','kodepos':'12345'}.items():shopper.locator('#'+field).fill(value)
-                shopper.locator('#provinsi').select_option(label='DKI Jakarta');shopper.locator('#btn-pesan').click();shopper.wait_for_url('**/konfirmasi.html');shopper.locator('#nomor-pesanan').filter(has_text='ANR-').wait_for()
+                shopper.wait_for_function('() => document.getElementById("kodepos").value==="12345"')
+                assert shopper.locator('#email').input_value()=='buyer@example.test'
+                shopper.locator('#kodepos').fill('1');shopper.locator('#btn-pesan').click();assert shopper.locator('#err-kodepos').inner_text()
+                shopper.locator('#kodepos').fill('12345');shopper.locator('#checkout-address-select').select_option(index=1)
+                shopper.locator('#btn-pesan').click();shopper.wait_for_url('**/konfirmasi.html?order=*');shopper.locator('#nomor-pesanan').filter(has_text='ANR-').wait_for()
                 order_number=shopper.locator('#nomor-pesanan').inner_text();assert shopper.evaluate('getKeranjang().length')==0
                 assert 'Pembeli Uji' in shopper.locator('#konfirmasi-sub').inner_text()
                 owner.locator('[data-page="orders"]').click();owner.locator('#refresh-orders').click();owner.get_by_role('button',name='Lihat pesanan',exact=True).wait_for();owner.get_by_role('button',name='Lihat pesanan',exact=True).click()
@@ -69,8 +84,23 @@ http.serve_forever()
                 owner.screenshot(path=str(screenshots/'admin-desktop.png'),full_page=True)
                 owner.set_viewport_size({'width':390,'height':844});owner.screenshot(path=str(screenshots/'admin-mobile.png'),full_page=True)
                 owner.locator('#logout-button').click();owner.locator('#login-view').wait_for(state='visible');assert admin_context.request.get(base+'api/admin/products').status==401
+                device.goto(base+'akun.html#orders',wait_until='networkidle');device.get_by_role('button',name='Lihat rincian',exact=True).wait_for();device.get_by_role('button',name='Lihat rincian',exact=True).click();device.locator('#customer-order-dialog').wait_for(state='visible');assert order_number in device.locator('#customer-order-details').inner_text();device.locator('#close-customer-order').click()
+                assert device_context.request.get(base+'api/admin/orders').status==401
+                other_context=browser.new_context(viewport={'width':390,'height':844},reduced_motion='reduce');other=other_context.new_page();other.on('pageerror',lambda e:errors.append(str(e)));other.goto(base+'akun.html',wait_until='networkidle');other.locator('#show-register').click()
+                for field,value in {'buyer-register-name':'Pelanggan Lain','buyer-register-phone':'089123456789','buyer-register-email':'other@example.test','buyer-register-password':buyer_password,'buyer-register-confirm':buyer_password}.items():other.locator('#'+field).fill(value)
+                other.get_by_role('button',name='Buat akun pembeli',exact=True).click();other.locator('#customer-dashboard').wait_for(state='visible')
+                assert other_context.request.get(base+'api/customer/orders').json()['orders']==[]
+                assert other_context.request.get(base+'api/customer/addresses').json()['addresses']==[]
+                assert other_context.request.get(base+'api/customer/state').json()['state']['wishlist']==[]
+                assert other_context.request.get(base+'api/customer/orders/'+order_number).status==404
+                for width in [320,390,768,1440]:
+                    device.set_viewport_size({'width':width,'height':900});assert device.evaluate('document.documentElement.scrollWidth<=innerWidth'),width
+                device.screenshot(path=str(screenshots/'customer-desktop.png'),full_page=True)
+                device.set_viewport_size({'width':390,'height':844});device.screenshot(path=str(screenshots/'customer-mobile.png'),full_page=True)
+                shopper.goto(base+'akun.html',wait_until='networkidle');shopper.locator('#customer-logout').click();shopper.locator('#customer-auth').wait_for(state='visible');assert public_context.request.get(base+'api/customer/orders').status==401
+                assert device_context.request.get(base+'api/customer/orders').status==200
                 assert not errors,errors
                 browser.close()
-                print('PASS: owner login, image upload, draft isolation, publication to a separate public browser, photo/details, variants, cart quantities, real order persistence, owner order view, stock deduction, unpublishing, responsive dashboard and logout')
+                print('PASS: owner product management; customer signup/login, saved address, wishlist, cross-device cart, authenticated checkout, private order history, account isolation, responsive account/dashboard and independent logout')
         finally:
             process.terminate();process.wait(timeout=10)

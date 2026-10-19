@@ -1,23 +1,145 @@
-const CART_KEY = "anredseller_cart";
-const WISHLIST_KEY = "anredseller_wishlist";
-function getKeranjang() {
-  try {
-    const items = JSON.parse(localStorage.getItem(CART_KEY)) || [];
-    return Array.isArray(items)
-      ? items.map((item) => ({ ...item, key: item.key || String(item.id) }))
-      : [];
-  } catch {
-    return [];
+let buyerSession = { authenticated: false, customer: null, csrf: "" };
+let shoppingState = { cart: [], wishlist: [], revision: 0 };
+let shoppingQueue = Promise.resolve();
+async function customerRequest(path, options = {}) {
+  const headers = { ...options.headers };
+  if (options.method && options.method !== "GET") {
+    headers["X-CSRF-Token"] = buyerSession.csrf;
+    headers["Content-Type"] = "application/json";
   }
+  const response = await fetch("/api/customer" + path, {
+    ...options,
+    headers,
+    body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    cache: "no-store",
+  });
+  const data = await response
+    .json()
+    .catch(() => ({ error: "Layanan akun belum dapat diakses." }));
+  if (!response.ok) {
+    if (response.status === 401) {
+      buyerSession = {
+        authenticated: false,
+        customer: null,
+        csrf: buyerSession.csrf,
+      };
+      shoppingState = { cart: [], wishlist: [], revision: 0 };
+      updateBadgeKeranjang();
+      updateIkonWishlist();
+    }
+    const error = new Error(data.error || "Permintaan belum berhasil.");
+    error.status = response.status;
+    throw error;
+  }
+  return data;
 }
-function simpanKeranjang(items) {
-  localStorage.setItem(CART_KEY, JSON.stringify(items));
+function applyShoppingState(state) {
+  if (!state) return;
+  if (state.customer_id && state.customer_id !== buyerSession.customer?.id) {
+    location.reload();
+    return;
+  }
+  if (state.revision < shoppingState.revision) return;
+  shoppingState = state;
   updateBadgeKeranjang();
+  updateIkonWishlist();
+  window.dispatchEvent(new CustomEvent("customer:state", { detail: state }));
+}
+const buyerReady = (async () => {
+  await katalogSiap;
+  if (katalogMode !== "server") return;
+  try {
+    buyerSession = await customerRequest("/session");
+    if (buyerSession.authenticated) {
+      const data = await customerRequest("/state");
+      applyShoppingState(data.state);
+    }
+  } catch (error) {
+    buyerSession.error = error.message;
+  }
+  window.dispatchEvent(new Event("customer:session"));
+})();
+function buyerLoginUrl(
+  next = location.pathname.split("/").pop() + location.search,
+) {
+  return "akun.html?next=" + encodeURIComponent(next || "index.html");
+}
+async function requireBuyer() {
+  await buyerReady;
+  if (katalogMode !== "server") {
+    tampilToast("Layanan akun memerlukan server Anredseller.", "error");
+    return false;
+  }
+  if (!buyerSession.authenticated) {
+    location.href = buyerLoginUrl();
+    return false;
+  }
+  return true;
+}
+function clearBuyerBrowserData() {
+  for (const key of [
+    "pesanan_terakhir",
+    "checkout_request_key",
+    "checkout_kupon",
+    "checkout_subtotal",
+    "checkout_total",
+    "checkout_ongkir",
+    "checkout_diskon",
+  ])
+    sessionStorage.removeItem(key);
+}
+function signalCustomerAuthChange() {
+  try {
+    localStorage.setItem(
+      "anredseller_auth_changed",
+      Date.now() + ":" + Math.random(),
+    );
+  } catch {}
+}
+window.addEventListener("storage", (event) => {
+  if (event.key === "anredseller_auth_changed") {
+    clearBuyerBrowserData();
+    location.reload();
+  }
+});
+async function customerLogout() {
+  await customerRequest("/logout", { method: "POST" });
+  clearBuyerBrowserData();
+  signalCustomerAuthChange();
+  shoppingState = { cart: [], wishlist: [], revision: 0 };
+  location.replace("akun.html");
+}
+function getKeranjang() {
+  return shoppingState.cart;
+}
+function getWishlist() {
+  return shoppingState.wishlist;
+}
+function isInWishlist(id) {
+  return getWishlist().includes(id);
 }
 function cartLineKey(id, size = "", color = "") {
   return `${id}:${encodeURIComponent(size).replace(/'/g, "%27")}:${encodeURIComponent(color).replace(/'/g, "%27")}`;
 }
-function tambahKeKeranjang(id, jumlah = 1, ukuran = "", warna = "") {
+async function mutateShopping(path, body) {
+  if (!(await requireBuyer())) return false;
+  const job = shoppingQueue
+    .catch(() => {})
+    .then(async () => {
+      try {
+        const data = await customerRequest(path, { method: "POST", body });
+        applyShoppingState(data.state);
+        return true;
+      } catch (error) {
+        tampilToast(error.message, "error");
+        if (error.status === 401) location.href = buyerLoginUrl();
+        return false;
+      }
+    });
+  shoppingQueue = job;
+  return job;
+}
+async function tambahKeKeranjang(id, jumlah = 1, ukuran = "", warna = "") {
   const product = getProdukById(id);
   if (!product) return false;
   if (product.stok <= 0) {
@@ -33,85 +155,25 @@ function tambahKeKeranjang(id, jumlah = 1, ukuran = "", warna = "") {
   }
   jumlah = Math.floor(Number(jumlah));
   if (!Number.isFinite(jumlah) || jumlah < 1) return false;
-  const items = getKeranjang(),
-    key = cartLineKey(id, ukuran, warna),
-    existing = items.find((item) => item.key === key);
-  const total = items
-    .filter((item) => item.id === id)
-    .reduce((sum, item) => sum + item.jumlah, 0);
-  const available = product.stok - total;
-  if (available <= 0) {
-    tampilToast("Seluruh stok produk ini sudah ada di keranjang.", "warning");
-    return false;
-  }
-  const quantity = Math.min(jumlah, available);
-  if (existing) existing.jumlah += quantity;
-  else
-    items.push({
-      key,
-      id: product.id,
-      nama: product.nama,
-      harga: product.harga,
-      gambar: product.gambar,
-      stok: product.stok,
-      jumlah: quantity,
-      ukuran,
-      warna,
-    });
-  simpanKeranjang(items);
-  tampilToast(product.nama + " ditambahkan ke keranjang.", "success");
-  return true;
-}
-function hapusDariKeranjang(key) {
-  simpanKeranjang(getKeranjang().filter((item) => item.key !== String(key)));
-}
-function updateJumlah(key, jumlah) {
-  const items = getKeranjang(),
-    item = items.find((item) => item.key === String(key));
-  if (!item) return;
-  if (jumlah <= 0) {
-    hapusDariKeranjang(key);
-    return;
-  }
-  const others = items
-    .filter((line) => line.id === item.id && line.key !== item.key)
-    .reduce((sum, line) => sum + line.jumlah, 0);
-  item.jumlah = Math.min(
-    Math.max(1, Math.floor(jumlah)),
-    Math.max(0, item.stok - others),
-  );
-  simpanKeranjang(items.filter((line) => line.jumlah > 0));
-}
-function syncCartCatalog() {
-  if (katalogMode !== "server") return;
-  const used = {};
-  const items = getKeranjang().flatMap((item) => {
-    const p = getProdukById(item.id);
-    if (!p || p.stok <= 0) return [];
-    if (
-      (p.ukuran?.length && !p.ukuran.includes(item.ukuran)) ||
-      (p.warna?.length && !p.warna.includes(item.warna))
-    )
-      return [];
-    const quantity = Math.min(item.jumlah, p.stok - (used[p.id] || 0));
-    used[p.id] = (used[p.id] || 0) + quantity;
-    return quantity > 0
-      ? [
-          {
-            ...item,
-            nama: p.nama,
-            harga: p.harga,
-            gambar: p.gambar,
-            stok: p.stok,
-            jumlah: quantity,
-          },
-        ]
-      : [];
+  const success = await mutateShopping("/cart", {
+    action: "add",
+    id,
+    jumlah,
+    ukuran,
+    warna,
   });
-  simpanKeranjang(items);
+  if (success) tampilToast(product.nama + " ditambahkan ke keranjang.");
+  return success;
 }
-function kosongkanKeranjang() {
-  simpanKeranjang([]);
+async function hapusDariKeranjang(key) {
+  return mutateShopping("/cart", { action: "remove", key });
+}
+async function updateJumlah(key, jumlah) {
+  return mutateShopping("/cart", { action: "update", key, jumlah });
+}
+function syncCartCatalog() {} // Prices and availability are resolved by the server.
+async function kosongkanKeranjang() {
+  return mutateShopping("/cart", { action: "clear" });
 }
 function hitungTotalKeranjang() {
   return getKeranjang().reduce(
@@ -129,28 +191,15 @@ function updateBadgeKeranjang() {
     el.style.display = total ? "flex" : "none";
   });
 }
-function getWishlist() {
-  try {
-    const list = JSON.parse(localStorage.getItem(WISHLIST_KEY)) || [];
-    return Array.isArray(list) ? list : [];
-  } catch {
-    return [];
-  }
-}
-function toggleWishlist(id) {
-  const list = getWishlist(),
-    index = list.indexOf(id);
-  if (index >= 0) list.splice(index, 1);
-  else list.push(id);
-  localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
-  updateIkonWishlist();
-  tampilToast(
-    index >= 0 ? "Dihapus dari wishlist." : "Disimpan ke wishlist.",
-    "info",
-  );
-}
-function isInWishlist(id) {
-  return getWishlist().includes(id);
+async function toggleWishlist(id) {
+  const saved = isInWishlist(id);
+  const success = await mutateShopping("/wishlist", { id });
+  if (success)
+    tampilToast(
+      saved ? "Dihapus dari wishlist." : "Disimpan di wishlist akunmu.",
+      "info",
+    );
+  return success;
 }
 function updateIkonWishlist() {
   document.querySelectorAll("[data-wishlist]").forEach((button) => {
@@ -184,7 +233,36 @@ function tampilToast(message, type = "success") {
   setTimeout(() => toast.remove(), 4000);
 }
 document.addEventListener("DOMContentLoaded", async () => {
-  await katalogSiap;
+  await buyerReady;
   updateBadgeKeranjang();
   updateIkonWishlist();
+});
+let refreshingBuyer = false;
+async function refreshBuyerState() {
+  await buyerReady;
+  if (!buyerSession.authenticated || refreshingBuyer) return;
+  refreshingBuyer = true;
+  try {
+    const data = await customerRequest("/state");
+    applyShoppingState(data.state);
+  } catch (error) {
+    if (error.status === 401) {
+      clearBuyerBrowserData();
+      location.reload();
+    } else
+      tampilToast(
+        "Belum dapat memperbarui keranjang. Muat ulang halaman.",
+        "info",
+      );
+  } finally {
+    refreshingBuyer = false;
+  }
+}
+window.addEventListener("focus", refreshBuyerState);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") refreshBuyerState();
+});
+
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) location.reload();
 });

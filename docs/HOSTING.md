@@ -4,6 +4,7 @@ Anredseller sekarang memiliki dua sisi yang memakai database server yang sama:
 
 - `/` atau `/index.html`: toko publik. Pengunjung melihat produk terbit tanpa login.
 - `/admin` atau `/admin.html`: dashboard pemilik. Pengelolaan produk dan pesanan membutuhkan login.
+- `/akun` atau `/akun.html`: akun pembeli untuk daftar/masuk, profil, alamat, wishlist, keranjang lintas perangkat, serta riwayat pesanan.
 
 GitHub menyimpan kode. GitHub Pages dan membuka file HTML langsung tidak menjalankan database atau API; keduanya hanya memberikan pratinjau statis. Gunakan hosting yang dapat menjalankan Python dan menyediakan penyimpanan permanen.
 
@@ -54,19 +55,25 @@ Stok adalah total persediaan gabungan semua pilihan ukuran dan warna, bukan stok
 
 ## Alur pengunjung dan pesanan
 
-Pengunjung membuka katalog → memilih produk, ukuran/warna, serta jumlah → keranjang → checkout → mengisi penerima → **Kirim pesanan ke toko**.
+Pengunjung membuka katalog → daftar/masuk akun pembeli → memilih produk, ukuran/warna, serta jumlah → keranjang → checkout memakai alamat tersimpan atau alamat baru → **Kirim pesanan ke toko**.
 
-Harga, diskon, ongkir, dan ketersediaan diperiksa kembali di server. Stok dicadangkan ketika pesanan tercatat. Pengiriman ulang permintaan yang sama tidak membuat pesanan ganda. Rincian pembeli dan alamat hanya dapat dibaca kembali melalui dashboard pemilik yang sudah login.
+Katalog tetap dapat dibuka tanpa login. Menyimpan wishlist/keranjang dan checkout membutuhkan akun. Pembeli dapat mendaftar langsung melalui `/akun`; pendaftaran tidak membuat akun admin. Profil, hingga 10 alamat, alamat utama, wishlist, keranjang dan riwayat pesanan disimpan di database yang sama untuk seluruh perangkat. Email dan nama pemesan diambil dari akun yang terautentikasi; alamat pengiriman dapat ditujukan kepada penerima lain.
+
+Pembeli hanya dapat membaca pesanannya sendiri. Pengelola toko dapat membaca seluruh pesanan dari dashboard admin. Pesanan lama yang dibuat sebelum fitur akun tidak otomatis ditautkan hanya karena alamat email sama. Migrasi database menambahkan kepemilikan akun tanpa menghapus data lama.
+
+Keluar akun mencabut sesi perangkat tersebut. Mengganti kata sandi memerlukan kata sandi saat ini dan mencabut sesi di perangkat lain. Password disimpan sebagai hash; tidak ada kata sandi pelanggan bawaan. Verifikasi email, pemulihan kata sandi lewat email, serta login Google/OTP belum terhubung ke layanan pengiriman email atau SMS.
+
+Harga, diskon, ongkir, dan ketersediaan diperiksa kembali di server. Stok dicadangkan ketika pesanan tercatat. Pengiriman ulang permintaan yang sama tidak membuat pesanan ganda. Rincian pesanan dapat dibaca kembali melalui akun pembeli yang bersangkutan dan dashboard pemilik.
 
 Dashboard **Pesanan masuk** menampilkan rincian pesanan dan status Baru/Diproses/Dikirim/Selesai/Dibatalkan. Membatalkan pesanan mengembalikan stok satu kali. Pesanan selesai atau dibatalkan tidak dapat diaktifkan kembali.
 
-Pembayaran masih dikonfirmasi manual dengan pelanggan. Tidak ada pemotongan uang, pengiriman email, integrasi kurir, atau pelacakan otomatis. Mengubah status tidak membuktikan pembayaran berhasil. Belum ada fitur akun pelanggan, harga reseller bertingkat, stok per varian, atau refund otomatis.
+Pembayaran masih dikonfirmasi manual dengan pelanggan. Tidak ada pemotongan uang, pengiriman email, integrasi kurir, atau pelacakan otomatis. Mengubah status tidak membuktikan pembayaran berhasil. Belum ada harga reseller bertingkat, stok per varian, atau refund otomatis.
 
 ## Data dan pencadangan
 
 - Default lokal: `instance/`.
 - Produksi contoh Render: `/var/data/anredseller`, diatur oleh `ANREDSELLER_DATA_DIR`.
-- `store.sqlite3`: produk, akun, sesi, dan pesanan.
+- `store.sqlite3`: produk, akun pemilik/pembeli, sesi, alamat, keranjang, wishlist, dan pesanan.
 - `uploads/`: foto yang diunggah.
 - `session.key`: kunci penandatanganan cookie, dibuat otomatis dan disimpan di disk.
 

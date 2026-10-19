@@ -5,7 +5,8 @@
 let metodeBayarDipilih = "manual";
 
 document.addEventListener("DOMContentLoaded", async () => {
-  await katalogSiap;
+  await buyerReady;
+  if (!(await requireBuyer())) return;
   // Cek keranjang
   const keranjang = getKeranjang();
   if (keranjang.length === 0) {
@@ -13,17 +14,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
   renderRingkasanCheckout();
+  await loadCheckoutAddresses();
 });
 
 // ── Ringkasan Checkout ─────────────────────────────────────
 function renderRingkasanCheckout() {
   const keranjang = getKeranjang();
-  const subtotal = parseInt(
-    sessionStorage.getItem("checkout_subtotal") || hitungTotalKeranjang(),
+  const subtotal = hitungTotalKeranjang();
+  const coupons = { HEMAT10: 10, ANRED15: 15, SALE20: 20 };
+  const diskon = Math.floor(
+    (subtotal * (coupons[sessionStorage.getItem("checkout_kupon")] || 0)) / 100,
   );
-  const ongkir = parseInt(sessionStorage.getItem("checkout_ongkir") || 0);
-  const diskon = parseInt(sessionStorage.getItem("checkout_diskon") || 0);
-  const total = parseInt(sessionStorage.getItem("checkout_total") || subtotal);
+  const ongkir = subtotal >= 200000 ? 0 : 15000;
+  const total = subtotal - diskon + ongkir;
 
   // Daftar Item
   const itemsEl = document.getElementById("ringkasan-items");
@@ -79,7 +82,7 @@ function validasiForm() {
   let valid = true;
   const fields = [
     { id: "nama-depan", label: "Nama depan wajib diisi" },
-    { id: "nama-belakang", label: "Nama belakang wajib diisi" },
+
     { id: "email", label: "Email wajib diisi", type: "email" },
     { id: "nohp", label: "Nomor HP wajib diisi" },
     { id: "nama-penerima", label: "Nama penerima wajib diisi" },
@@ -120,6 +123,7 @@ function validasiForm() {
 
 // ── Proses Checkout ────────────────────────────────────────
 async function prosesCheckout() {
+  if (!(await requireBuyer())) return;
   if (!validasiForm()) {
     document.querySelector(".error")?.focus();
     tampilToast("Lengkapi data pemesan dan penerima.", "error");
@@ -165,21 +169,36 @@ async function prosesCheckout() {
     })),
     coupon: sessionStorage.getItem("checkout_kupon") || "",
     catatan: val("catatan"),
+    address_id: document.getElementById("checkout-address-select").value
+      ? Number(document.getElementById("checkout-address-select").value)
+      : null,
+    save_address:
+      !document.getElementById("checkout-address-select").value &&
+      document.getElementById("save-checkout-address").checked,
   };
   try {
     const response = await fetch("/api/orders", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Idempotency-Key": key },
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": key,
+        "X-CSRF-Token": buyerSession.csrf,
+      },
       body: JSON.stringify(body),
     });
     const data = await response.json();
+    if (response.status === 401) {
+      location.href = buyerLoginUrl("checkout.html");
+      return;
+    }
     if (!response.ok)
       throw new Error(data.error || "Pesanan belum terkirim. Coba lagi.");
-    sessionStorage.setItem("pesanan_terakhir", JSON.stringify(data.order));
-    kosongkanKeranjang();
+    sessionStorage.setItem("pesanan_terakhir", data.order.nomor);
+    applyShoppingState(data.state);
     sessionStorage.removeItem("checkout_request_key");
     sessionStorage.removeItem("checkout_kupon");
-    location.href = "konfirmasi.html";
+    location.href =
+      "konfirmasi.html?order=" + encodeURIComponent(data.order.nomor);
   } catch (error) {
     errorEl.textContent = error.message;
     errorEl.focus();
@@ -187,3 +206,71 @@ async function prosesCheckout() {
     btn.textContent = "Kirim pesanan ke toko";
   }
 }
+
+let checkoutAddresses = [];
+async function loadCheckoutAddresses() {
+  const profile = buyerSession.customer,
+    names = profile.nama.trim().split(/\s+/);
+  document.getElementById("nama-depan").value = names[0];
+  document.getElementById("nama-belakang").value = names.slice(1).join(" ");
+  document.getElementById("email").value = profile.email;
+  document.getElementById("nama-penerima").value = profile.nama;
+  document.getElementById("nohp").value = profile.nohp;
+  try {
+    checkoutAddresses = (await customerRequest("/addresses")).addresses;
+    const select = document.getElementById("checkout-address-select");
+    select.innerHTML =
+      '<option value="">Alamat baru</option>' +
+      checkoutAddresses
+        .map(
+          (address) =>
+            `<option value="${address.id}">${h(address.label)} — ${h(address.nama_penerima)}${address.is_default ? " (Utama)" : ""}</option>`,
+        )
+        .join("");
+    select.value = String(
+      checkoutAddresses.find((address) => address.is_default)?.id || "",
+    );
+    const choose = () => {
+      const address = checkoutAddresses.find(
+        (address) => String(address.id) === select.value,
+      );
+      document.getElementById("checkout-save-label").hidden = !!address;
+      if (address)
+        for (const [id, key] of Object.entries({
+          "nama-penerima": "nama_penerima",
+          nohp: "nohp",
+          alamat: "alamat",
+          kota: "kota",
+          provinsi: "provinsi",
+          kodepos: "kodepos",
+        }))
+          document.getElementById(id).value = address[key];
+    };
+    select.addEventListener("change", choose);
+    choose();
+    for (const id of [
+      "nama-penerima",
+      "nohp",
+      "alamat",
+      "kota",
+      "provinsi",
+      "kodepos",
+    ])
+      document.getElementById(id).addEventListener("input", () => {
+        if (select.value) {
+          select.value = "";
+          document.getElementById("checkout-save-label").hidden = false;
+        }
+      });
+  } catch (error) {
+    document.getElementById("checkout-error").textContent = error.message;
+  }
+}
+
+window.addEventListener("customer:state", () => {
+  if (
+    document.readyState !== "loading" &&
+    document.getElementById("ringkasan-items")
+  )
+    renderRingkasanCheckout();
+});
