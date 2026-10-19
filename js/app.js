@@ -1,132 +1,73 @@
-// ============================================================
-// APP.JS — Logic Halaman Beranda
-// ============================================================
-
-document.addEventListener('DOMContentLoaded', () => {
-  renderKategori();
+document.addEventListener("DOMContentLoaded", () => {
   renderTrending();
   renderRekomendasi();
-  initSearch();
+  if (!document.getElementById("grid-produk-list")) initSearch();
   initNewsletter();
+  document.querySelectorAll("[data-collection]").forEach((button) =>
+    button.addEventListener("click", () => {
+      document.querySelectorAll("[data-collection]").forEach((tab) => {
+        tab.classList.toggle("selected", tab === button);
+        tab.setAttribute("aria-selected", String(tab === button));
+      });
+      const products =
+        button.dataset.collection === "all"
+          ? PRODUK.slice(0, 4)
+          : PRODUK.filter(
+              (p) => p.kategori === button.dataset.collection,
+            ).slice(0, 4);
+      document.getElementById("grid-trending").innerHTML = products
+        .map(renderKartuProduk)
+        .join("");
+      updateIkonWishlist();
+    }),
+  );
 });
-
-// ── Render Kategori ────────────────────────────────────────
-function renderKategori() {
-  const el = document.getElementById('grid-kategori');
-  if (!el) return;
-  el.innerHTML = KATEGORI.map(k => `
-    <div class="kartu-kategori fade-in-up" onclick="window.location='produk.html?kategori=${k.id}'" style="cursor:pointer">
-      <div class="kategori-ikon">
-        <span style="font-size:28px">${k.icon}</span>
-      </div>
-      <div class="kategori-nama">${k.nama}</div>
-    </div>
-  `).join('');
-}
-
-// ── Render Trending ────────────────────────────────────────
+function renderKategori() {}
 function renderTrending() {
-  const el = document.getElementById('grid-trending');
-  if (!el) return;
-  const produk = getProdukTrending();
-  el.innerHTML = produk.map((p, i) => renderKartuProduk(p, i)).join('');
-  attachProdukEvents(el);
+  const el = document.getElementById("grid-trending");
+  if (el) el.innerHTML = PRODUK.slice(0, 4).map(renderKartuProduk).join("");
 }
-
-// ── Render Rekomendasi ─────────────────────────────────────
 function renderRekomendasi() {
-  const el = document.getElementById('grid-rekomendasi');
-  if (!el) return;
-  const produk = getProdukRekomendasi();
-  el.innerHTML = produk.map((p, i) => renderKartuProduk(p, i)).join('');
-  attachProdukEvents(el);
+  const el = document.getElementById("grid-rekomendasi");
+  if (el) el.innerHTML = getProdukRekomendasi().map(renderKartuProduk).join("");
 }
-
-// ── Render Kartu Produk ────────────────────────────────────
-function renderKartuProduk(p, delay = 0) {
-  const diskon = hitungDiskon(p.harga, p.hargaAsli);
-  const stokHtml = p.stok === 0
-    ? '<span class="badge-stok-habis">● Stok Habis</span>'
-    : p.stok < 10
-    ? `<span class="badge-stok-menipis">● Tersisa ${p.stok}</span>`
-    : '';
-
-  const labelHtml = p.label
-    ? `<div class="kartu-label ${p.label === 'Stok Terbatas' || p.label === 'Stok Habis' ? 'merah' : ''}">${p.label}</div>`
-    : '';
-
-  return `
-    <div class="kartu-produk fade-in-up" 
-         style="animation-delay:${delay * 0.08}s"
-         onclick="window.location='detail.html?id=${p.id}'"
-         data-produk-id="${p.id}">
-      <div class="kartu-produk-gambar">
-        <img src="${p.gambar}" alt="${p.nama}" loading="lazy">
-        ${labelHtml}
-        <button class="btn-wishlist ${isInWishlist(p.id) ? 'aktif' : ''}" 
-                data-wishlist="${p.id}"
-                onclick="event.stopPropagation(); toggleWishlist(${p.id})">
-          ${isInWishlist(p.id) ? '♥' : '♡'}
-        </button>
-        ${p.stok > 0 ? `
-        <button class="btn-keranjang-cepat" onclick="event.stopPropagation(); tambahKeKeranjang(${p.id}, 1)">
-          🛒 Tambah ke Keranjang
-        </button>` : ''}
-      </div>
-      <div class="kartu-produk-info">
-        <div class="kartu-produk-kategori">${KATEGORI.find(k => k.id === p.kategori)?.nama || ''}</div>
-        <div class="kartu-produk-nama">${p.nama}</div>
-        <div class="kartu-rating">
-          ${renderBintang(p.rating)}
-          <span class="rating-angka">${p.rating}</span>
-          <span class="rating-ulasan">(${p.ulasan.toLocaleString('id-ID')})</span>
-        </div>
-        ${stokHtml}
-        <div class="kartu-harga" style="margin-top:${stokHtml ? '6px' : '0'}">
-          <span class="harga-sekarang">${formatHarga(p.harga)}</span>
-          <span class="harga-asli">${formatHarga(p.hargaAsli)}</span>
-          <span class="persen-diskon">-${diskon}%</span>
-        </div>
-      </div>
-    </div>
-  `;
+function renderKartuProduk(p) {
+  return `<article class="kartu-produk" data-produk-id="${p.id}"><div class="kartu-produk-gambar"><a href="detail.html?id=${p.id}" aria-label="Lihat ${p.nama}"><img src="${p.gambar}" alt="${p.nama}" loading="lazy"></a>${p.label ? `<span class="kartu-label">${p.label}</span>` : ""}<button aria-label="Simpan ${p.nama} ke wishlist" class="btn-wishlist ${isInWishlist(p.id) ? "aktif" : ""}" data-wishlist="${p.id}" onclick="toggleWishlist(${p.id})">${isInWishlist(p.id) ? "♥" : "♡"}</button><button class="btn-keranjang-cepat" onclick="tambahKeKeranjang(${p.id},1)">+ Tambah ke keranjang</button></div><div class="kartu-produk-info"><div class="product-meta"><span>${p.brand}</span><span>${p.kategori === "sneakers" ? "UNISEX" : "EVERYDAY"}</span></div><a class="kartu-produk-nama" href="detail.html?id=${p.id}">${p.nama}</a><div class="kartu-harga"><span class="harga-sekarang">${formatHarga(p.harga)}</span><span class="harga-asli">${formatHarga(p.hargaAsli)}</span></div><div class="product-colors" aria-label="Warna sesuai foto produk"><i></i><span>Selected for you</span></div></div></article>`;
 }
-
-// ── Attach Events ──────────────────────────────────────────
-function attachProdukEvents(container) {
-  // Events sudah ditangani inline di HTML
+function attachProdukEvents() {
   updateIkonWishlist();
 }
-
-// ── Search ─────────────────────────────────────────────────
 function initSearch() {
-  const input = document.getElementById('search-input');
-  const btn = document.getElementById('search-btn');
-  if (!input) return;
-
-  function doSearch() {
-    const q = input.value.trim();
-    if (q) {
-      window.location.href = `produk.html?q=${encodeURIComponent(q)}`;
-    }
-  }
-
-  btn?.addEventListener('click', doSearch);
-  input.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') doSearch();
+  const input = document.getElementById("search-input"),
+    btn = document.getElementById("search-btn");
+  if (!input || input.dataset.bound) return;
+  input.dataset.bound = "true";
+  const run = () => {
+    if (input.value.trim())
+      location.href = "produk.html?q=" + encodeURIComponent(input.value.trim());
+  };
+  btn?.addEventListener("click", run);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") run();
   });
 }
-
-// ── Newsletter ─────────────────────────────────────────────
 function initNewsletter() {
-  const form = document.getElementById('newsletter-form');
-  if (!form) return;
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = form.querySelector('input').value;
-    if (email) {
-      tampilToast(`✉️ Terima kasih! ${email} telah didaftarkan.`, 'success');
-      form.reset();
-    }
-  });
+  document.querySelectorAll("#newsletter-form").forEach((form) =>
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = form.querySelector("input").value.trim();
+      if (!email) return;
+      try {
+        localStorage.setItem("curated_newsletter_interest", email);
+        const message =
+          "Minatmu tersimpan di perangkat ini. Pengiriman email belum diaktifkan.";
+        const status = document.getElementById("newsletter-status");
+        if (status) status.textContent = message;
+        else tampilToast(message, "info");
+        form.reset();
+      } catch {
+        tampilToast("Penyimpanan browser tidak tersedia. Coba lagi.", "error");
+      }
+    }),
+  );
 }

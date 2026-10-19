@@ -3,14 +3,14 @@
 // ============================================================
 
 const KUPON_VALID = {
-  'HEMAT10': 0.10,  // 10% off
-  'NUSANTARA15': 0.15, // 15% off
-  'SALE20': 0.20,  // 20% off
+  HEMAT10: 0.1, // 10% off
+  ANRED15: 0.15, // 15% off
+  SALE20: 0.2, // 20% off
 };
 
 let diskonKupon = 0;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   renderKeranjang();
   renderProdukSuka();
   initKupon();
@@ -19,12 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── Render Keranjang ───────────────────────────────────────
 function renderKeranjang() {
-  const kiri = document.getElementById('keranjang-kiri');
+  const kiri = document.getElementById("keranjang-kiri");
   const keranjang = getKeranjang();
   const jumlah = hitungJumlahItem();
 
-  document.getElementById('subtitle-keranjang').textContent =
-    jumlah > 0 ? `${jumlah} produk dalam keranjang` : 'Keranjang kamu masih kosong';
+  document.getElementById("subtitle-keranjang").textContent =
+    jumlah > 0
+      ? `${jumlah} produk dalam keranjang`
+      : "Keranjang kamu masih kosong";
 
   if (keranjang.length === 0) {
     kiri.innerHTML = `
@@ -37,7 +39,7 @@ function renderKeranjang() {
         </a>
       </div>
     `;
-    document.getElementById('btn-checkout').disabled = true;
+    document.getElementById("btn-checkout").disabled = true;
     updateRingkasan();
     return;
   }
@@ -53,7 +55,9 @@ function renderKeranjang() {
     </div>
   `;
 
-  const itemsHtml = keranjang.map(item => `
+  const itemsHtml = keranjang
+    .map(
+      (item) => `
     <div class="keranjang-item" id="item-${item.id}">
       <!-- Gambar -->
       <a href="detail.html?id=${item.id}">
@@ -79,7 +83,9 @@ function renderKeranjang() {
       <!-- Hapus -->
       <button class="btn-hapus-item" onclick="hapusItem(${item.id})" title="Hapus">✕</button>
     </div>
-  `).join('');
+  `,
+    )
+    .join("");
 
   kiri.innerHTML = `
     ${headerHtml}
@@ -94,14 +100,14 @@ function renderKeranjang() {
     </div>
   `;
 
-  document.getElementById('btn-checkout').disabled = false;
+  document.getElementById("btn-checkout").disabled = false;
   updateRingkasan();
 }
 
 // ── Update Item ────────────────────────────────────────────
 function kurangiItem(id) {
   const keranjang = getKeranjang();
-  const item = keranjang.find(i => i.id === id);
+  const item = keranjang.find((i) => i.id === id);
   if (!item) return;
   if (item.jumlah <= 1) {
     if (confirm(`Hapus "${item.nama}" dari keranjang?`)) {
@@ -111,21 +117,25 @@ function kurangiItem(id) {
   }
   updateJumlah(id, item.jumlah - 1);
   document.getElementById(`qty-${id}`).textContent = item.jumlah - 1;
-  document.getElementById(`subtotal-${id}`).textContent = formatHarga(item.harga * (item.jumlah - 1));
+  document.getElementById(`subtotal-${id}`).textContent = formatHarga(
+    item.harga * (item.jumlah - 1),
+  );
   updateRingkasan();
 }
 
 function tambahItem(id) {
   const keranjang = getKeranjang();
-  const item = keranjang.find(i => i.id === id);
+  const item = keranjang.find((i) => i.id === id);
   if (!item) return;
   if (item.jumlah >= item.stok) {
-    tampilToast(`Stok hanya ${item.stok}!`, 'warning');
+    tampilToast(`Stok hanya ${item.stok}!`, "warning");
     return;
   }
   updateJumlah(id, item.jumlah + 1);
   document.getElementById(`qty-${id}`).textContent = item.jumlah + 1;
-  document.getElementById(`subtotal-${id}`).textContent = formatHarga(item.harga * (item.jumlah + 1));
+  document.getElementById(`subtotal-${id}`).textContent = formatHarga(
+    item.harga * (item.jumlah + 1),
+  );
   updateRingkasan();
 }
 
@@ -135,7 +145,7 @@ function hapusItem(id) {
 }
 
 function konfirmasiKosongkan() {
-  if (confirm('Yakin ingin mengosongkan semua keranjang?')) {
+  if (confirm("Yakin ingin mengosongkan semua keranjang?")) {
     kosongkanKeranjang();
     renderKeranjang();
   }
@@ -149,43 +159,48 @@ function updateRingkasan() {
   const ongkir = subtotal >= 200000 ? 0 : 15000;
   const total = subtotal - diskon + ongkir;
 
-  document.getElementById('jumlah-item-ringkasan').textContent = jumlah;
-  document.getElementById('subtotal-ringkasan').textContent = formatHarga(subtotal);
-  
-  const ongkirEl = document.getElementById('ongkir-ringkasan');
+  document.getElementById("jumlah-item-ringkasan").textContent = jumlah;
+  document.getElementById("subtotal-ringkasan").textContent =
+    formatHarga(subtotal);
+
+  const ongkirEl = document.getElementById("ongkir-ringkasan");
   if (ongkir === 0) {
-    ongkirEl.textContent = 'GRATIS';
-    ongkirEl.className = 'gratis';
+    ongkirEl.textContent = "GRATIS";
+    ongkirEl.className = "gratis";
   } else {
     ongkirEl.textContent = formatHarga(ongkir);
-    ongkirEl.className = '';
+    ongkirEl.className = "";
   }
 
   if (diskon > 0) {
-    document.getElementById('baris-diskon-kupon').style.display = 'flex';
-    document.getElementById('diskon-kupon-val').textContent = `-${formatHarga(diskon)}`;
+    document.getElementById("baris-diskon-kupon").style.display = "flex";
+    document.getElementById("diskon-kupon-val").textContent =
+      `-${formatHarga(diskon)}`;
   } else {
-    document.getElementById('baris-diskon-kupon').style.display = 'none';
+    document.getElementById("baris-diskon-kupon").style.display = "none";
   }
 
-  document.getElementById('total-ringkasan').textContent = formatHarga(total);
+  document.getElementById("total-ringkasan").textContent = formatHarga(total);
 
   // Simpan ke sessionStorage untuk checkout
-  sessionStorage.setItem('checkout_subtotal', subtotal);
-  sessionStorage.setItem('checkout_ongkir', ongkir);
-  sessionStorage.setItem('checkout_diskon', diskon);
-  sessionStorage.setItem('checkout_total', total);
+  sessionStorage.setItem("checkout_subtotal", subtotal);
+  sessionStorage.setItem("checkout_ongkir", ongkir);
+  sessionStorage.setItem("checkout_diskon", diskon);
+  sessionStorage.setItem("checkout_total", total);
 }
 
 // ── Kupon ──────────────────────────────────────────────────
 function initKupon() {
-  document.getElementById('btn-kupon')?.addEventListener('click', () => {
-    const kode = document.getElementById('kupon-input').value.trim().toUpperCase();
-    const pesanEl = document.getElementById('kupon-pesan');
+  document.getElementById("btn-kupon")?.addEventListener("click", () => {
+    const kode = document
+      .getElementById("kupon-input")
+      .value.trim()
+      .toUpperCase();
+    const pesanEl = document.getElementById("kupon-pesan");
 
     if (!kode) {
-      pesanEl.textContent = '⚠️ Masukkan kode kupon terlebih dahulu.';
-      pesanEl.style.color = 'var(--bintang)';
+      pesanEl.textContent = "⚠️ Masukkan kode kupon terlebih dahulu.";
+      pesanEl.style.color = "var(--bintang)";
       return;
     }
 
@@ -193,39 +208,41 @@ function initKupon() {
       diskonKupon = KUPON_VALID[kode];
       const persen = Math.round(diskonKupon * 100);
       pesanEl.textContent = `✅ Kupon "${kode}" berhasil! Diskon ${persen}% diterapkan.`;
-      pesanEl.style.color = 'var(--hijau)';
+      pesanEl.style.color = "var(--hijau)";
       updateRingkasan();
     } else {
       diskonKupon = 0;
       pesanEl.textContent = `❌ Kode kupon "${kode}" tidak valid atau sudah kadaluwarsa.`;
-      pesanEl.style.color = 'var(--merah)';
+      pesanEl.style.color = "var(--merah)";
       updateRingkasan();
     }
   });
 
-  document.getElementById('kupon-input')?.addEventListener('keypress', e => {
-    if (e.key === 'Enter') document.getElementById('btn-kupon')?.click();
+  document.getElementById("kupon-input")?.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") document.getElementById("btn-kupon")?.click();
   });
 }
 
 // ── Produk Suka ────────────────────────────────────────────
 function renderProdukSuka() {
-  const el = document.getElementById('grid-suka');
+  const el = document.getElementById("grid-suka");
   if (!el) return;
-  const produk = PRODUK.filter(p => p.trending || p.rekomendasi).slice(0, 5);
-  el.innerHTML = produk.map((p, i) => renderKartuProduk(p, i)).join('');
+  const produk = PRODUK.filter((p) => p.trending || p.rekomendasi).slice(0, 5);
+  el.innerHTML = produk.map((p, i) => renderKartuProduk(p, i)).join("");
   updateIkonWishlist();
 }
 
 // ── Search ─────────────────────────────────────────────────
 function initSearch() {
-  const input = document.getElementById('search-input');
-  const btn = document.getElementById('search-btn');
+  const input = document.getElementById("search-input");
+  const btn = document.getElementById("search-btn");
   if (!input) return;
   function doSearch() {
     const q = input.value.trim();
     if (q) window.location.href = `produk.html?q=${encodeURIComponent(q)}`;
   }
-  btn?.addEventListener('click', doSearch);
-  input.addEventListener('keypress', e => { if (e.key === 'Enter') doSearch(); });
+  btn?.addEventListener("click", doSearch);
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") doSearch();
+  });
 }

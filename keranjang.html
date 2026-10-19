@@ -1,160 +1,151 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Keranjang Belanja — Pasar Nusantara</title>
-  <meta name="description" content="Keranjang belanja Pasar Nusantara - Periksa dan konfirmasi pesanan kamu.">
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Keranjang Belanja — Anredseller</title>
+    <meta
+      name="description"
+      content="Keranjang belanja Anredseller - Periksa dan konfirmasi pesanan kamu."
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/store.css" />
+  </head>
+  <body>
+    <!-- TOP BAR -->
+    <div id="store-header"></div>
 
-<!-- TOP BAR -->
-<div class="top-bar">
-  <div class="container">
-    <div class="top-bar-kiri">
-      <span>🚚 Gratis Ongkir pembelian di atas Rp200.000</span>
-    </div>
-    <div class="top-bar-kanan">
-      <a href="#">Lacak Pesanan</a>
-      <a href="#">Pusat Bantuan</a>
-    </div>
-  </div>
-</div>
-
-<!-- HEADER -->
-<header class="header">
-  <div class="container header-dalam">
-    <a href="index.html" class="logo">
-      <div class="logo-ikon">P</div>
-      Pasar Nusantara
-    </a>
-    <div class="search-wrapper">
-      <input type="text" class="search-input" id="search-input" placeholder="Cari produk, merek, dan lainnya..." autocomplete="off">
-      <button class="search-btn" id="search-btn">🔍</button>
-    </div>
-    <div class="header-aksi">
-      <a href="index.html" class="header-btn-aksi"><span class="ikon">🏠</span><span>Beranda</span></a>
-      <a href="keranjang.html" class="header-btn-aksi aktif">
-        <span class="ikon">🛒</span>
-        <span class="badge-keranjang">0</span>
-        <span>Keranjang</span>
-      </a>
-    </div>
-  </div>
-</header>
-
-<!-- PAGE BANNER -->
-<div class="page-banner">
-  <div class="container page-banner-dalam">
-    <div>
-      <h1>Keranjang Belanja</h1>
-      <p id="subtitle-keranjang">Periksa produk pilihanmu</p>
-    </div>
-    <nav class="breadcrumb" style="background:transparent;padding:0">
-      <a href="index.html" style="color:#aaa">Beranda</a>
-      <span class="breadcrumb-sep" style="color:#555">›</span>
-      <span style="color:#eee">Keranjang</span>
-    </nav>
-  </div>
-</div>
-
-<!-- KONTEN UTAMA -->
-<div class="container">
-  <div class="keranjang-layout" style="padding-top:28px" id="keranjang-layout">
-
-    <!-- KIRI: DAFTAR ITEM -->
-    <div id="keranjang-kiri">
-      <!-- Diisi JS -->
+    <!-- PAGE BANNER -->
+    <div class="page-banner">
+      <div class="container page-banner-dalam">
+        <div>
+          <h1>Keranjang Belanja</h1>
+          <p id="subtitle-keranjang">Periksa produk pilihanmu</p>
+        </div>
+        <nav class="breadcrumb" style="background: transparent; padding: 0">
+          <a href="index.html" style="color: #aaa">Beranda</a>
+          <span class="breadcrumb-sep" style="color: #555">›</span>
+          <span style="color: #eee">Keranjang</span>
+        </nav>
+      </div>
     </div>
 
-    <!-- KANAN: RINGKASAN -->
-    <div>
-      <div class="ringkasan-order" id="ringkasan-order">
-        <div class="ringkasan-judul">📋 Ringkasan Pesanan</div>
-
-        <div class="ringkasan-baris">
-          <span>Subtotal (<span id="jumlah-item-ringkasan">0</span> produk)</span>
-          <span id="subtotal-ringkasan">Rp0</span>
-        </div>
-        <div class="ringkasan-baris">
-          <span>Ongkos Kirim</span>
-          <span id="ongkir-ringkasan" class="gratis">GRATIS</span>
-        </div>
-        <div class="ringkasan-baris" id="baris-diskon-kupon" style="display:none">
-          <span>Diskon Kupon</span>
-          <span id="diskon-kupon-val" style="color:var(--merah)">-Rp0</span>
-        </div>
-        <div class="ringkasan-baris total">
-          <span>Total</span>
-          <span id="total-ringkasan">Rp0</span>
+    <!-- KONTEN UTAMA -->
+    <div class="container">
+      <div
+        class="keranjang-layout"
+        style="padding-top: 28px"
+        id="keranjang-layout"
+      >
+        <!-- KIRI: DAFTAR ITEM -->
+        <div id="keranjang-kiri">
+          <!-- Diisi JS -->
         </div>
 
-        <!-- Kupon -->
-        <div class="kupon-box">
-          <input type="text" class="kupon-input" id="kupon-input" placeholder="Kode kupon...">
-          <button class="btn-kupon" id="btn-kupon">Pakai</button>
-        </div>
-        <div id="kupon-pesan" style="font-size:12px; margin-top:-8px; margin-bottom:8px"></div>
+        <!-- KANAN: RINGKASAN -->
+        <div>
+          <div class="ringkasan-order" id="ringkasan-order">
+            <div class="ringkasan-judul">📋 Ringkasan Pesanan</div>
 
-        <button class="btn-checkout" id="btn-checkout" onclick="window.location.href='checkout.html'" disabled>
-          🔒 Lanjut ke Checkout
-        </button>
+            <div class="ringkasan-baris">
+              <span
+                >Subtotal (<span id="jumlah-item-ringkasan">0</span>
+                produk)</span
+              >
+              <span id="subtotal-ringkasan">Rp0</span>
+            </div>
+            <div class="ringkasan-baris">
+              <span>Ongkos Kirim</span>
+              <span id="ongkir-ringkasan" class="gratis">GRATIS</span>
+            </div>
+            <div
+              class="ringkasan-baris"
+              id="baris-diskon-kupon"
+              style="display: none"
+            >
+              <span>Diskon Kupon</span>
+              <span id="diskon-kupon-val" style="color: var(--merah)"
+                >-Rp0</span
+              >
+            </div>
+            <div class="ringkasan-baris total">
+              <span>Total</span>
+              <span id="total-ringkasan">Rp0</span>
+            </div>
 
-        <div class="ringkasan-jaminan">
-          🔐 Pembayaran 100% aman & terlindungi
-        </div>
+            <!-- Kupon -->
+            <div class="kupon-box">
+              <input
+                type="text"
+                class="kupon-input"
+                id="kupon-input"
+                placeholder="Kode kupon..."
+              />
+              <button class="btn-kupon" id="btn-kupon">Pakai</button>
+            </div>
+            <div
+              id="kupon-pesan"
+              style="font-size: 12px; margin-top: -8px; margin-bottom: 8px"
+            ></div>
 
-        <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--abu-border)">
-          <a href="produk.html" style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--abu-teks);transition:var(--transisi)">
-            ← Lanjut Belanja
-          </a>
+            <button
+              class="btn-checkout"
+              id="btn-checkout"
+              onclick="window.location.href = 'checkout.html'"
+              disabled
+            >
+              🔒 Lanjut ke Checkout
+            </button>
+
+            <div class="ringkasan-jaminan">
+              Checkout demo · tanpa pembayaran nyata
+            </div>
+
+            <div
+              style="
+                margin-top: 16px;
+                padding-top: 16px;
+                border-top: 1px solid var(--abu-border);
+              "
+            >
+              <a
+                href="produk.html"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  font-size: 13px;
+                  color: var(--abu-teks);
+                  transition: var(--transisi);
+                "
+              >
+                ← Lanjut Belanja
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- MUNGKIN KAMU SUKA -->
-<div class="container" style="padding-bottom:60px">
-  <div class="section-header" style="border-top:2px solid var(--abu-border); padding-top:28px">
-    <h2 class="section-judul">Mungkin Kamu Suka</h2>
-    <a href="produk.html" class="lihat-semua">Lihat semua →</a>
-  </div>
-  <div class="grid-produk" id="grid-suka"></div>
-</div>
-
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <div class="logo" style="color:white;margin-bottom:12px"><div class="logo-ikon">P</div>Pasar Nusantara</div>
-        <p>Marketplace terpercaya untuk produk berkualitas di seluruh Indonesia.</p>
+    <!-- MUNGKIN KAMU SUKA -->
+    <div class="container" style="padding-bottom: 60px">
+      <div
+        class="section-header"
+        style="border-top: 2px solid var(--abu-border); padding-top: 28px"
+      >
+        <h2 class="section-judul">Mungkin Kamu Suka</h2>
+        <a href="produk.html" class="lihat-semua">Lihat semua →</a>
       </div>
-      <div class="footer-col">
-        <div class="footer-col-judul">Belanja</div>
-        <ul><li><a href="produk.html">Semua Kategori</a></li><li><a href="produk.html?sort=diskon">Top Deals</a></li></ul>
-      </div>
-      <div class="footer-col">
-        <div class="footer-col-judul">Bantuan</div>
-        <ul><li><a href="#">Pusat Bantuan</a></li><li><a href="#">Lacak Pesanan</a></li></ul>
-      </div>
-      <div class="footer-col">
-        <div class="footer-col-judul">Tentang</div>
-        <ul><li><a href="#">Tentang Kami</a></li></ul>
-      </div>
-      <div class="footer-col"></div>
+      <div class="grid-produk" id="grid-suka"></div>
     </div>
-    <div class="footer-bawah">
-      <span>© 2024 Pasar Nusantara. Semua hak dilindungi.</span>
-    </div>
-  </div>
-</footer>
 
-<script src="js/data.js"></script>
-<script src="js/cart.js"></script>
-<script src="js/app.js"></script>
-<script src="js/keranjang.js"></script>
-</body>
+    <!-- FOOTER -->
+    <div id="store-footer"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/keranjang.js"></script>
+    <script src="js/store.js"></script>
+  </body>
 </html>

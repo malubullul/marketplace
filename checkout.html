@@ -1,292 +1,394 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout — Pasar Nusantara</title>
-  <meta name="description" content="Selesaikan pembelian kamu di Pasar Nusantara dengan aman dan mudah.">
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout — Anredseller</title>
+    <meta
+      name="description"
+      content="Selesaikan pembelian kamu di Anredseller dengan aman dan mudah."
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/store.css" />
+  </head>
+  <body>
+    <!-- TOP BAR -->
+    <div id="store-header"></div>
 
-<!-- TOP BAR -->
-<div class="top-bar">
-  <div class="container">
-    <div class="top-bar-kiri"><span>🔒 Checkout Aman & Terpercaya</span></div>
-    <div class="top-bar-kanan"><a href="#">Pusat Bantuan</a></div>
-  </div>
-</div>
-
-<!-- HEADER -->
-<header class="header">
-  <div class="container header-dalam">
-    <a href="index.html" class="logo">
-      <div class="logo-ikon">P</div>
-      Pasar Nusantara
-    </a>
-    <div style="flex:1; text-align:center">
-      <span style="font-size:14px;color:var(--abu-teks);font-weight:500">🔒 Transaksi 100% Aman</span>
-    </div>
-    <div class="header-aksi">
-      <a href="keranjang.html" class="header-btn-aksi">
-        <span class="ikon">🛒</span>
-        <span class="badge-keranjang">0</span>
-        <span>Keranjang</span>
-      </a>
-    </div>
-  </div>
-</header>
-
-<!-- PAGE BANNER -->
-<div class="page-banner">
-  <div class="container page-banner-dalam">
-    <div>
-      <h1>Checkout</h1>
-      <p>Selesaikan pesananmu dengan aman</p>
-    </div>
-    <nav class="breadcrumb" style="background:transparent;padding:0">
-      <a href="index.html" style="color:#aaa">Beranda</a>
-      <span class="breadcrumb-sep" style="color:#555">›</span>
-      <a href="keranjang.html" style="color:#aaa">Keranjang</a>
-      <span class="breadcrumb-sep" style="color:#555">›</span>
-      <span style="color:#eee">Checkout</span>
-    </nav>
-  </div>
-</div>
-
-<!-- KONTEN -->
-<div class="container" style="padding-top:28px">
-
-  <!-- LANGKAH -->
-  <div class="checkout-langkah" style="max-width:500px; margin-bottom:32px">
-    <div class="langkah-item selesai">
-      <div class="langkah-nomor">✓</div>
-      <div class="langkah-nama">Keranjang</div>
-    </div>
-    <div class="langkah-item aktif">
-      <div class="langkah-nomor">2</div>
-      <div class="langkah-nama">Checkout</div>
-    </div>
-    <div class="langkah-item">
-      <div class="langkah-nomor">3</div>
-      <div class="langkah-nama">Konfirmasi</div>
-    </div>
-  </div>
-
-  <div class="checkout-layout" style="padding-bottom:60px">
-
-    <!-- KIRI: FORM -->
-    <div>
-      <!-- Informasi Pribadi -->
-      <div class="form-section">
-        <div class="form-section-judul">👤 Informasi Pribadi</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Nama Depan <span class="wajib">*</span></label>
-            <input type="text" class="form-input" id="nama-depan" placeholder="Budi" required>
-            <span class="form-error" id="err-nama-depan"></span>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Nama Belakang <span class="wajib">*</span></label>
-            <input type="text" class="form-input" id="nama-belakang" placeholder="Santoso" required>
-            <span class="form-error" id="err-nama-belakang"></span>
-          </div>
+    <!-- PAGE BANNER -->
+    <div class="page-banner">
+      <div class="container page-banner-dalam">
+        <div>
+          <h1>Checkout</h1>
+          <p>Coba alur pemesanan koleksi pilihanmu</p>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Email <span class="wajib">*</span></label>
-            <input type="email" class="form-input" id="email" placeholder="budi@email.com" required>
-            <span class="form-error" id="err-email"></span>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Nomor HP <span class="wajib">*</span></label>
-            <input type="tel" class="form-input" id="nohp" placeholder="0812-3456-7890" required>
-            <span class="form-error" id="err-nohp"></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Alamat Pengiriman -->
-      <div class="form-section">
-        <div class="form-section-judul">📍 Alamat Pengiriman</div>
-        <div class="form-group">
-          <label class="form-label">Nama Penerima <span class="wajib">*</span></label>
-          <input type="text" class="form-input" id="nama-penerima" placeholder="Nama yang tertera di paket">
-          <span class="form-error" id="err-nama-penerima"></span>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Alamat Lengkap <span class="wajib">*</span></label>
-          <textarea class="form-textarea" id="alamat" placeholder="Jl. Contoh No. 123, RT 01/RW 02, Kelurahan, Kecamatan" required></textarea>
-          <span class="form-error" id="err-alamat"></span>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Provinsi <span class="wajib">*</span></label>
-            <select class="form-select" id="provinsi" required>
-              <option value="">Pilih Provinsi</option>
-              <option>DKI Jakarta</option>
-              <option>Jawa Barat</option>
-              <option>Jawa Tengah</option>
-              <option>Jawa Timur</option>
-              <option>DI Yogyakarta</option>
-              <option>Banten</option>
-              <option>Bali</option>
-              <option>Sumatera Utara</option>
-              <option>Sumatera Barat</option>
-              <option>Sumatera Selatan</option>
-              <option>Kalimantan Timur</option>
-              <option>Sulawesi Selatan</option>
-              <option>Nusa Tenggara Barat</option>
-              <option>Papua</option>
-            </select>
-            <span class="form-error" id="err-provinsi"></span>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Kota/Kabupaten <span class="wajib">*</span></label>
-            <input type="text" class="form-input" id="kota" placeholder="Jakarta Selatan" required>
-            <span class="form-error" id="err-kota"></span>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Kode Pos <span class="wajib">*</span></label>
-            <input type="text" class="form-input" id="kodepos" placeholder="12345" maxlength="5" required>
-            <span class="form-error" id="err-kodepos"></span>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Jasa Pengiriman</label>
-            <select class="form-select" id="kurir">
-              <option value="jne">JNE Regular (2-3 hari)</option>
-              <option value="jnt">J&T Express (2-3 hari)</option>
-              <option value="sicepat">SiCepat (1-2 hari)</option>
-              <option value="gosend">GoSend Same Day</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Catatan Pengiriman (Opsional)</label>
-          <textarea class="form-textarea" id="catatan" placeholder="Instruksi khusus untuk kurir..."></textarea>
-        </div>
-      </div>
-
-      <!-- Metode Pembayaran -->
-      <div class="form-section">
-        <div class="form-section-judul">💳 Metode Pembayaran</div>
-        <div class="metode-list" id="metode-list">
-          <div class="metode-item aktif" onclick="pilihMetode(this, 'transfer_bank')" id="metode-transfer_bank">
-            <div class="metode-radio"></div>
-            <div class="metode-ikon">🏦</div>
-            <div class="metode-info">
-              <div class="metode-nama">Transfer Bank</div>
-              <div class="metode-sub">BCA, Mandiri, BNI, BRI</div>
-            </div>
-          </div>
-          <div class="metode-item" onclick="pilihMetode(this, 'gopay')" id="metode-gopay">
-            <div class="metode-radio"></div>
-            <div class="metode-ikon">💚</div>
-            <div class="metode-info">
-              <div class="metode-nama">GoPay</div>
-              <div class="metode-sub">Bayar dengan GoPay</div>
-            </div>
-          </div>
-          <div class="metode-item" onclick="pilihMetode(this, 'ovo')" id="metode-ovo">
-            <div class="metode-radio"></div>
-            <div class="metode-ikon">💜</div>
-            <div class="metode-info">
-              <div class="metode-nama">OVO</div>
-              <div class="metode-sub">Bayar dengan OVO</div>
-            </div>
-          </div>
-          <div class="metode-item" onclick="pilihMetode(this, 'dana')" id="metode-dana">
-            <div class="metode-radio"></div>
-            <div class="metode-ikon">🔵</div>
-            <div class="metode-info">
-              <div class="metode-nama">DANA</div>
-              <div class="metode-sub">Bayar dengan DANA</div>
-            </div>
-          </div>
-          <div class="metode-item" onclick="pilihMetode(this, 'kartu_kredit')" id="metode-kartu_kredit">
-            <div class="metode-radio"></div>
-            <div class="metode-ikon">💳</div>
-            <div class="metode-info">
-              <div class="metode-nama">Kartu Kredit / Debit</div>
-              <div class="metode-sub">Visa, Mastercard, JCB</div>
-            </div>
-          </div>
-          <div class="metode-item" onclick="pilihMetode(this, 'cod')" id="metode-cod">
-            <div class="metode-radio"></div>
-            <div class="metode-ikon">💵</div>
-            <div class="metode-info">
-              <div class="metode-nama">Bayar di Tempat (COD)</div>
-              <div class="metode-sub">Tersedia untuk area tertentu</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <button class="btn-lanjut-checkout" id="btn-pesan" onclick="prosesCheckout()">
-        ✅ Buat Pesanan
-      </button>
-    </div>
-
-    <!-- KANAN: RINGKASAN -->
-    <div>
-      <div class="ringkasan-order">
-        <div class="ringkasan-judul">📋 Ringkasan Pesanan</div>
-
-        <!-- Daftar Item -->
-        <div id="ringkasan-items" style="margin-bottom:16px; max-height:280px; overflow-y:auto"></div>
-        <div style="height:1px;background:var(--abu-border);margin-bottom:12px"></div>
-
-        <div class="ringkasan-baris">
-          <span>Subtotal</span>
-          <span id="co-subtotal">Rp0</span>
-        </div>
-        <div class="ringkasan-baris">
-          <span>Ongkos Kirim</span>
-          <span id="co-ongkir" class="gratis">GRATIS</span>
-        </div>
-        <div class="ringkasan-baris" id="co-diskon-row" style="display:none">
-          <span>Diskon Kupon</span>
-          <span id="co-diskon" style="color:var(--merah)">-Rp0</span>
-        </div>
-        <div class="ringkasan-baris total">
-          <span>Total Pembayaran</span>
-          <span id="co-total">Rp0</span>
-        </div>
-
-        <div class="ringkasan-jaminan" style="margin-top:16px">
-          🔒 Data kamu aman dan terlindungi
-        </div>
-
-        <div style="margin-top:16px;padding:12px;background:var(--abu-muda);border-radius:var(--radius-md)">
-          <div style="font-size:12px;color:var(--abu-teks);line-height:1.6">
-            Dengan melanjutkan, kamu menyetujui 
-            <a href="#" style="color:var(--teks-hitam);text-decoration:underline">Syarat & Ketentuan</a> 
-            dan <a href="#" style="color:var(--teks-hitam);text-decoration:underline">Kebijakan Privasi</a> Pasar Nusantara.
-          </div>
-        </div>
+        <nav class="breadcrumb" style="background: transparent; padding: 0">
+          <a href="index.html" style="color: #aaa">Beranda</a>
+          <span class="breadcrumb-sep" style="color: #555">›</span>
+          <a href="keranjang.html" style="color: #aaa">Keranjang</a>
+          <span class="breadcrumb-sep" style="color: #555">›</span>
+          <span style="color: #eee">Checkout</span>
+        </nav>
       </div>
     </div>
 
-  </div>
-</div>
+    <!-- KONTEN -->
+    <div class="container" style="padding-top: 28px">
+      <!-- LANGKAH -->
+      <div
+        class="checkout-langkah"
+        style="max-width: 500px; margin-bottom: 32px"
+      >
+        <div class="langkah-item selesai">
+          <div class="langkah-nomor">✓</div>
+          <div class="langkah-nama">Keranjang</div>
+        </div>
+        <div class="langkah-item aktif">
+          <div class="langkah-nomor">2</div>
+          <div class="langkah-nama">Checkout</div>
+        </div>
+        <div class="langkah-item">
+          <div class="langkah-nomor">3</div>
+          <div class="langkah-nama">Konfirmasi</div>
+        </div>
+      </div>
 
-<!-- FOOTER MINI -->
-<footer class="footer">
-  <div class="container">
-    <div class="footer-bawah" style="border-top:none;padding:20px 0">
-      <span>© 2024 Pasar Nusantara. Semua hak dilindungi.</span>
-      <div class="footer-bawah-link">
-        <a href="#">Kebijakan Privasi</a>
-        <a href="#">Syarat & Ketentuan</a>
+      <div class="checkout-layout" style="padding-bottom: 60px">
+        <!-- KIRI: FORM -->
+        <div>
+          <!-- Informasi Pribadi -->
+          <div class="form-section">
+            <div class="form-section-judul">👤 Informasi Pribadi</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label"
+                  >Nama Depan <span class="wajib">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-input"
+                  id="nama-depan"
+                  placeholder="Budi"
+                  required
+                />
+                <span class="form-error" id="err-nama-depan"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label"
+                  >Nama Belakang <span class="wajib">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-input"
+                  id="nama-belakang"
+                  placeholder="Santoso"
+                  required
+                />
+                <span class="form-error" id="err-nama-belakang"></span>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label"
+                  >Email <span class="wajib">*</span></label
+                >
+                <input
+                  type="email"
+                  class="form-input"
+                  id="email"
+                  placeholder="budi@email.com"
+                  required
+                />
+                <span class="form-error" id="err-email"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label"
+                  >Nomor HP <span class="wajib">*</span></label
+                >
+                <input
+                  type="tel"
+                  class="form-input"
+                  id="nohp"
+                  placeholder="0812-3456-7890"
+                  required
+                />
+                <span class="form-error" id="err-nohp"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alamat Pengiriman -->
+          <div class="form-section">
+            <div class="form-section-judul">📍 Alamat Pengiriman</div>
+            <div class="form-group">
+              <label class="form-label"
+                >Nama Penerima <span class="wajib">*</span></label
+              >
+              <input
+                type="text"
+                class="form-input"
+                id="nama-penerima"
+                placeholder="Nama yang tertera di paket"
+              />
+              <span class="form-error" id="err-nama-penerima"></span>
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >Alamat Lengkap <span class="wajib">*</span></label
+              >
+              <textarea
+                class="form-textarea"
+                id="alamat"
+                placeholder="Jl. Contoh No. 123, RT 01/RW 02, Kelurahan, Kecamatan"
+                required
+              ></textarea>
+              <span class="form-error" id="err-alamat"></span>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label"
+                  >Provinsi <span class="wajib">*</span></label
+                >
+                <select class="form-select" id="provinsi" required>
+                  <option value="">Pilih Provinsi</option>
+                  <option>DKI Jakarta</option>
+                  <option>Jawa Barat</option>
+                  <option>Jawa Tengah</option>
+                  <option>Jawa Timur</option>
+                  <option>DI Yogyakarta</option>
+                  <option>Banten</option>
+                  <option>Bali</option>
+                  <option>Sumatera Utara</option>
+                  <option>Sumatera Barat</option>
+                  <option>Sumatera Selatan</option>
+                  <option>Kalimantan Timur</option>
+                  <option>Sulawesi Selatan</option>
+                  <option>Nusa Tenggara Barat</option>
+                  <option>Papua</option>
+                </select>
+                <span class="form-error" id="err-provinsi"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label"
+                  >Kota/Kabupaten <span class="wajib">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-input"
+                  id="kota"
+                  placeholder="Jakarta Selatan"
+                  required
+                />
+                <span class="form-error" id="err-kota"></span>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label"
+                  >Kode Pos <span class="wajib">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-input"
+                  id="kodepos"
+                  placeholder="12345"
+                  maxlength="5"
+                  required
+                />
+                <span class="form-error" id="err-kodepos"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Jasa Pengiriman</label>
+                <select class="form-select" id="kurir">
+                  <option value="jne">JNE Regular (2-3 hari)</option>
+                  <option value="jnt">J&T Express (2-3 hari)</option>
+                  <option value="sicepat">SiCepat (1-2 hari)</option>
+                  <option value="gosend">GoSend Same Day</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Catatan Pengiriman (Opsional)</label>
+              <textarea
+                class="form-textarea"
+                id="catatan"
+                placeholder="Instruksi khusus untuk kurir..."
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Metode Pembayaran -->
+          <div class="form-section">
+            <div class="form-section-judul">💳 Metode Pembayaran</div>
+            <div class="metode-list" id="metode-list">
+              <div
+                class="metode-item aktif"
+                onclick="pilihMetode(this, 'transfer_bank')"
+                id="metode-transfer_bank"
+              >
+                <div class="metode-radio"></div>
+                <div class="metode-ikon">🏦</div>
+                <div class="metode-info">
+                  <div class="metode-nama">Transfer Bank</div>
+                  <div class="metode-sub">BCA, Mandiri, BNI, BRI</div>
+                </div>
+              </div>
+              <div
+                class="metode-item"
+                onclick="pilihMetode(this, 'gopay')"
+                id="metode-gopay"
+              >
+                <div class="metode-radio"></div>
+                <div class="metode-ikon">💚</div>
+                <div class="metode-info">
+                  <div class="metode-nama">GoPay</div>
+                  <div class="metode-sub">Bayar dengan GoPay</div>
+                </div>
+              </div>
+              <div
+                class="metode-item"
+                onclick="pilihMetode(this, 'ovo')"
+                id="metode-ovo"
+              >
+                <div class="metode-radio"></div>
+                <div class="metode-ikon">💜</div>
+                <div class="metode-info">
+                  <div class="metode-nama">OVO</div>
+                  <div class="metode-sub">Bayar dengan OVO</div>
+                </div>
+              </div>
+              <div
+                class="metode-item"
+                onclick="pilihMetode(this, 'dana')"
+                id="metode-dana"
+              >
+                <div class="metode-radio"></div>
+                <div class="metode-ikon">🔵</div>
+                <div class="metode-info">
+                  <div class="metode-nama">DANA</div>
+                  <div class="metode-sub">Bayar dengan DANA</div>
+                </div>
+              </div>
+              <div
+                class="metode-item"
+                onclick="pilihMetode(this, 'kartu_kredit')"
+                id="metode-kartu_kredit"
+              >
+                <div class="metode-radio"></div>
+                <div class="metode-ikon">💳</div>
+                <div class="metode-info">
+                  <div class="metode-nama">Kartu Kredit / Debit</div>
+                  <div class="metode-sub">Visa, Mastercard, JCB</div>
+                </div>
+              </div>
+              <div
+                class="metode-item"
+                onclick="pilihMetode(this, 'cod')"
+                id="metode-cod"
+              >
+                <div class="metode-radio"></div>
+                <div class="metode-ikon">💵</div>
+                <div class="metode-info">
+                  <div class="metode-nama">Bayar di Tempat (COD)</div>
+                  <div class="metode-sub">Tersedia untuk area tertentu</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button
+            class="btn-lanjut-checkout"
+            id="btn-pesan"
+            onclick="prosesCheckout()"
+          >
+            ✅ Buat Pesanan
+          </button>
+        </div>
+
+        <!-- KANAN: RINGKASAN -->
+        <div>
+          <div class="ringkasan-order">
+            <div class="ringkasan-judul">📋 Ringkasan Pesanan</div>
+
+            <!-- Daftar Item -->
+            <div
+              id="ringkasan-items"
+              style="margin-bottom: 16px; max-height: 280px; overflow-y: auto"
+            ></div>
+            <div
+              style="
+                height: 1px;
+                background: var(--abu-border);
+                margin-bottom: 12px;
+              "
+            ></div>
+
+            <div class="ringkasan-baris">
+              <span>Subtotal</span>
+              <span id="co-subtotal">Rp0</span>
+            </div>
+            <div class="ringkasan-baris">
+              <span>Ongkos Kirim</span>
+              <span id="co-ongkir" class="gratis">GRATIS</span>
+            </div>
+            <div
+              class="ringkasan-baris"
+              id="co-diskon-row"
+              style="display: none"
+            >
+              <span>Diskon Kupon</span>
+              <span id="co-diskon" style="color: var(--merah)">-Rp0</span>
+            </div>
+            <div class="ringkasan-baris total">
+              <span>Total Pembayaran</span>
+              <span id="co-total">Rp0</span>
+            </div>
+
+            <div class="ringkasan-jaminan" style="margin-top: 16px">
+              Formulir demo · gunakan data contoh
+            </div>
+
+            <div
+              style="
+                margin-top: 16px;
+                padding: 12px;
+                background: var(--abu-muda);
+                border-radius: var(--radius-md);
+              "
+            >
+              <div
+                style="
+                  font-size: 12px;
+                  color: var(--abu-teks);
+                  line-height: 1.6;
+                "
+              >
+                Dengan melanjutkan, kamu menyetujui
+                <a
+                  href="#"
+                  style="color: var(--teks-hitam); text-decoration: underline"
+                  >Syarat & Ketentuan</a
+                >
+                dan
+                <a
+                  href="#"
+                  style="color: var(--teks-hitam); text-decoration: underline"
+                  >Kebijakan Privasi</a
+                >
+                Anredseller.
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</footer>
 
-<script src="js/data.js"></script>
-<script src="js/cart.js"></script>
-<script src="js/checkout.js"></script>
-</body>
+    <!-- FOOTER MINI -->
+    <div id="store-footer"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/checkout.js"></script>
+    <script src="js/store.js"></script>
+  </body>
 </html>

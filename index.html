@@ -1,304 +1,264 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pasar Nusantara — Belanja Mudah, Harga Terjangkau</title>
-  <meta name="description" content="Pasar Nusantara - Marketplace terpercaya Indonesia. Temukan ribuan produk berkualitas dari elektronik, fashion, kecantikan, dan banyak lagi dengan harga terbaik.">
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-
-<!-- TOP BAR -->
-<div class="top-bar">
-  <div class="container">
-    <div class="top-bar-kiri">
-      <span>🚚 Gratis Ongkir pembelian di atas Rp200.000</span>
-      <span>↩️ Garansi 30 hari</span>
-    </div>
-    <div class="top-bar-kanan">
-      <a href="#">Lacak Pesanan</a>
-      <a href="#">Pusat Bantuan</a>
-      <a href="#">Jual di Pasar Nusantara</a>
-    </div>
-  </div>
-</div>
-
-<!-- HEADER -->
-<header class="header" id="header">
-  <div class="container header-dalam">
-    <a href="index.html" class="logo">
-      <div class="logo-ikon">P</div>
-      Pasar Nusantara
-    </a>
-    <div class="search-wrapper">
-      <input type="text" class="search-input" id="search-input" placeholder="Cari produk, merek, dan lainnya..." autocomplete="off">
-      <button class="search-btn" id="search-btn" aria-label="Cari">🔍</button>
-    </div>
-    <div class="header-aksi">
-      <a href="#" class="header-btn-aksi" id="btn-akun">
-        <span class="ikon">👤</span>
-        <span>Akun</span>
-      </a>
-      <a href="#" class="header-btn-aksi" id="btn-wishlist-header">
-        <span class="ikon">♡</span>
-        <span>Wishlist</span>
-      </a>
-      <a href="keranjang.html" class="header-btn-aksi" id="btn-keranjang">
-        <span class="ikon">🛒</span>
-        <span class="badge-keranjang" id="badge-keranjang-1">0</span>
-        <span>Keranjang</span>
-      </a>
-    </div>
-  </div>
-</header>
-
-<!-- NAV KATEGORI -->
-<nav class="nav-kategori">
-  <div class="container">
-    <button class="nav-menu-btn" id="nav-menu-btn">☰ Semua Kategori</button>
-    <a href="produk.html" class="nav-link aktif">Beranda</a>
-    <a href="produk.html?sort=terbaru" class="nav-link">Baru Masuk</a>
-    <a href="produk.html?sort=diskon" class="nav-link">Top Deals <span class="nav-badge">Baru</span></a>
-    <a href="produk.html?sort=terlaris" class="nav-link">Terlaris</a>
-    <a href="produk.html?kategori=rumah" class="nav-link">Rumah & Taman</a>
-    <a href="produk.html?kategori=elektronik" class="nav-link">Elektronik</a>
-    <a href="produk.html?kategori=fashion" class="nav-link">Fashion</a>
-    <a href="produk.html?kategori=kecantikan" class="nav-link">Kecantikan</a>
-    <a href="produk.html?kategori=bayi" class="nav-link">Bayi & Anak</a>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="container">
-    <div class="hero-dalam">
-      <div class="hero-konten fade-in-up">
-        <div class="hero-label">✦ Kualitas. Gaya. Setiap Hari.</div>
-        <h1 class="hero-judul">
-          Semua yang Kamu Suka,<br>
-          <span>Dalam Satu Tempat.</span>
-        </h1>
-        <p class="hero-deskripsi">
-          Temukan produk terbaik dari ribuan kategori dengan harga terjangkau dan pengalaman belanja yang menyenangkan.
-        </p>
-        <div class="hero-aksi">
-          <a href="produk.html" class="btn-hero">Belanja Sekarang →</a>
-          <a href="produk.html?sort=diskon" class="btn-hero btn-hero-outline">Lihat Penawaran</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anredseller — Good taste. Great finds.</title>
+    <meta
+      name="description"
+      content="Fashion, sneakers, dan everyday essentials. Temukan pilihan berikutnya untuk gaya kamu di Anredseller"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/store.css" />
+  </head>
+  <body class="store-home">
+    <div id="store-header"></div>
+    <main>
+      <section class="campaign">
+        <div class="campaign-copy">
+          <div class="eyebrow">
+            <span class="tiny-star">✳</span> THE EVERYDAY COLLECTION — VOL. 01
+          </div>
+          <h1>Good taste.<br />Great <em>finds.</em></h1>
+          <p>
+            Barang pilihan. Gaya tanpa batas.<br />Temukan next favorite kamu di
+            sini.
+          </p>
+          <a class="solid-link" href="produk.html"
+            >Explore the collection
+            <span
+              ><svg
+                class="arrow-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.4"
+                aria-hidden="true"
+              >
+                <path d="M5 19 19 5M5 5h14v14" /></svg></span
+          ></a>
+          <div class="campaign-foot">
+            <span>CURATED FOR YOUR EVERYDAY.</span><span>01 / 03</span>
+          </div>
         </div>
-      </div>
-      <div class="hero-gambar">
-        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=85" alt="Interior Rumah Elegan" loading="eager">
-      </div>
-    </div>
-    <div class="hero-fitur">
-      <div class="hero-fitur-item">
-        <div class="fi-ikon">🔒</div>
-        <div><span>Pembayaran Aman</span><br><small>100% transaksi terlindungi</small></div>
-      </div>
-      <div class="hero-fitur-item">
-        <div class="fi-ikon">⭐</div>
-        <div><span>Kualitas Premium</span><br><small>Produk terverifikasi</small></div>
-      </div>
-      <div class="hero-fitur-item">
-        <div class="fi-ikon">🚀</div>
-        <div><span>Pengiriman Cepat</span><br><small>Sampai di hari yang sama</small></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SHOP BY CATEGORY -->
-<section class="section" style="padding-bottom:0">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-judul">Belanja Berdasarkan Kategori</h2>
-      <a href="produk.html" class="lihat-semua">Lihat semua kategori →</a>
-    </div>
-    <div class="grid-kategori" id="grid-kategori"></div>
-  </div>
-</section>
-
-<!-- BANNER DEALS -->
-<section class="section">
-  <div class="container">
-    <div class="grid-banner">
-      <div class="banner-deal hijau" onclick="window.location='produk.html?sort=diskon'">
-        <div class="banner-label">Penawaran Hari Ini</div>
-        <div class="banner-judul">Diskon<br>Hingga 60%</div>
-        <div class="banner-sub">Hanya untuk item pilihan</div>
-        <a class="banner-link">Lihat Penawaran →</a>
-        <div class="banner-dekorasi">🏷️</div>
-      </div>
-      <div class="banner-deal krem" onclick="window.location='produk.html?sort=terbaru'">
-        <div class="banner-label">Produk Baru</div>
-        <div class="banner-judul">Temuan<br>Segar</div>
-        <div class="banner-sub">Produk terbaru untukmu</div>
-        <a class="banner-link">Jelajahi Sekarang →</a>
-        <div class="banner-dekorasi">✨</div>
-      </div>
-      <div class="banner-deal gelap" onclick="window.location='produk.html'">
-        <div class="banner-label">Eksklusif Member</div>
-        <div class="banner-judul">Ekstra<br>10% Off</div>
-        <div class="banner-sub">Untuk pesanan prabayar akhir pekan ini</div>
-        <a class="banner-link" style="color:white">Belanja Sekarang →</a>
-        <div class="banner-dekorasi">💎</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- TRENDING NOW -->
-<section class="section" style="padding-top:0">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-judul">🔥 Sedang Trending</h2>
-      <a href="produk.html?sort=trending" class="lihat-semua">Lihat semua produk →</a>
-    </div>
-    <div class="grid-produk" id="grid-trending"></div>
-  </div>
-</section>
-
-<!-- FITUR BAR -->
-<div class="fitur-bar">
-  <div class="container">
-    <div class="fitur-bar-grid">
-      <div class="fitur-item">
-        <div class="fitur-ikon">🚚</div>
+        <div class="campaign-photo">
+          <img
+            src="assets/campaign.png"
+            alt="Editorial gaya streetwear dengan pakaian netral dan sneakers"
+            fetchpriority="high"
+          /><span class="photo-stamp">LESS ORDINARY.<br />MORE YOU.</span
+          ><a class="photo-caption" href="produk.html?kategori=apparel"
+            ><span>THE ART OF EVERYDAY DRESSING</span
+            ><span
+              ><svg
+                class="arrow-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.4"
+                aria-hidden="true"
+              >
+                <path d="M5 19 19 5M5 5h14v14" /></svg></span
+          ></a>
+        </div>
+      </section>
+      <section class="service-strip" aria-label="Keunggulan toko">
+        <span><i data-icon="box"></i> Carefully curated pieces</span
+        ><span><i data-icon="shield"></i> Detail produk transparan</span
+        ><span><i data-icon="truck"></i> Kirim ke seluruh Indonesia</span
+        ><span><i data-icon="chat"></i> Here to help you choose</span>
+      </section>
+      <section class="edit-section" id="new-arrivals">
+        <div class="section-topline">
+          <div>
+            <div class="eyebrow">FRESH FINDS, JUST LANDED</div>
+            <h2>Your next favorites<span>.</span></h2>
+          </div>
+          <a class="text-link" href="produk.html?sort=terbaru"
+            >Lihat semua produk
+            <span
+              ><svg
+                class="arrow-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.4"
+                aria-hidden="true"
+              >
+                <path d="M5 19 19 5M5 5h14v14" /></svg></span
+          ></a>
+        </div>
+        <div class="collection-toolbar">
+          <div
+            class="collection-tabs"
+            role="tablist"
+            aria-label="Kategori produk"
+          >
+            <button
+              class="selected"
+              role="tab"
+              aria-selected="true"
+              data-collection="all"
+            >
+              Semua produk</button
+            ><button
+              role="tab"
+              aria-selected="false"
+              data-collection="sneakers"
+            >
+              Sneakers</button
+            ><button role="tab" aria-selected="false" data-collection="apparel">
+              Apparel</button
+            ><button
+              role="tab"
+              aria-selected="false"
+              data-collection="essentials"
+            >
+              Essentials
+            </button>
+          </div>
+          <span class="collection-note">Good pieces. Better prices.</span>
+        </div>
+        <div class="home-products" id="grid-trending"></div>
+      </section>
+      <div class="brand-line">
+        <span>A FEW OF OUR FAVORITES</span>
         <div>
-          <div class="fitur-teks-judul">Gratis Ongkir</div>
-          <div class="fitur-teks-sub">Untuk pembelian di atas Rp200rb</div>
+          <b class="brand-nike">NIKE</b
+          ><b class="brand-jordan"
+            >JORDAN
+            <small
+              ><svg
+                class="arrow-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.4"
+                aria-hidden="true"
+              >
+                <path d="M5 19 19 5M5 5h14v14" /></svg></small></b
+          ><b class="brand-curated">anred essentials.</b
+          ><span class="brand-and">& more to discover</span>
         </div>
       </div>
-      <div class="fitur-item">
-        <div class="fitur-ikon">↩️</div>
+      <section class="edit-section category-editorial">
+        <div class="section-topline">
+          <div>
+            <div class="eyebrow">FIND YOUR EVERYDAY</div>
+            <h2>Different pieces. Same you.</h2>
+          </div>
+          <span class="category-note">Pilih yang paling kamu banget.</span>
+        </div>
+        <div class="editorial-grid">
+          <a
+            class="editorial-card sneakers-edit"
+            href="produk.html?kategori=sneakers"
+            ><span class="eyebrow">01 / THE SNEAKER EDIT</span
+            ><img
+              src="assets/shoe-3.png"
+              alt="Sneaker pilihan dalam warna netral"
+              loading="lazy" />
+            <div>
+              <h3>Start from<br />the ground up.</h3>
+              <span class="round-arrow"
+                ><svg
+                  class="arrow-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  aria-hidden="true"
+                >
+                  <path d="M5 19 19 5M5 5h14v14" /></svg
+              ></span></div></a
+          ><a
+            class="editorial-card apparel-edit"
+            href="produk.html?kategori=apparel"
+            ><span class="eyebrow">02 / EVERYDAY ESSENTIALS</span
+            ><img
+              src="assets/shirt.png"
+              alt="Kaos hitam essential"
+              loading="lazy" />
+            <div>
+              <h3>Less effort.<br />More character.</h3>
+              <span class="round-arrow"
+                ><svg
+                  class="arrow-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  aria-hidden="true"
+                >
+                  <path d="M5 19 19 5M5 5h14v14" /></svg
+              ></span></div
+          ></a>
+        </div>
+      </section>
+      <section class="reseller-banner" id="reseller">
+        <div class="eyebrow">GROW WITH Anredseller</div>
+        <div class="reseller-content">
+          <h2>Good things.<br />Better together.</h2>
+          <div>
+            <p>
+              Punya selera yang bagus? Jadikan peluang.<br />Kenali program
+              reseller dan mulai kurasi<br />koleksi untuk pelangganmu.
+            </p>
+            <button class="solid-link light" data-dialog="reseller">
+              Kenali program reseller
+              <span
+                ><svg
+                  class="arrow-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  aria-hidden="true"
+                >
+                  <path d="M5 19 19 5M5 5h14v14" /></svg
+              ></span>
+            </button>
+          </div>
+        </div>
+        <span class="reseller-watermark" aria-hidden="true">A.</span>
+      </section>
+      <section class="newsletter-edit">
         <div>
-          <div class="fitur-teks-judul">Mudah Dikembalikan</div>
-          <div class="fitur-teks-sub">Garansi uang kembali 30 hari</div>
+          <div class="eyebrow">STAY IN THE KNOW</div>
+          <h2>A little good taste<br />in your inbox.</h2>
+          <p>New drops, pilihan terbaru, dan cerita di balik koleksi.</p>
         </div>
-      </div>
-      <div class="fitur-item">
-        <div class="fitur-ikon">🔐</div>
-        <div>
-          <div class="fitur-teks-judul">Pembayaran Aman</div>
-          <div class="fitur-teks-sub">Checkout 100% terlindungi</div>
-        </div>
-      </div>
-      <div class="fitur-item">
-        <div class="fitur-ikon">💬</div>
-        <div>
-          <div class="fitur-teks-judul">Bantuan 24/7</div>
-          <div class="fitur-teks-sub">Kami siap membantu</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- REKOMENDASI -->
-<section class="section">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-judul">💡 Rekomendasi untuk Kamu</h2>
-      <a href="produk.html" class="lihat-semua">Lihat semua →</a>
-    </div>
-    <div class="grid-produk grid-produk-4" id="grid-rekomendasi"></div>
-  </div>
-</section>
-
-<!-- NEWSLETTER -->
-<div class="newsletter">
-  <div class="container">
-    <h2 class="newsletter-judul">Tetap Terhubung</h2>
-    <p class="newsletter-sub">Daftarkan email untuk mendapatkan penawaran spesial, hadiah, dan promo eksklusif.</p>
-    <form class="newsletter-form" id="newsletter-form">
-      <input type="email" class="newsletter-input" placeholder="Masukkan email kamu" required>
-      <button type="submit" class="btn-subscribe">Langganan</button>
-    </form>
-  </div>
-</div>
-
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <div class="logo">
-          <div class="logo-ikon">P</div>
-          Pasar Nusantara
-        </div>
-        <p>Marketplace terpercaya untuk produk berkualitas di seluruh Indonesia. Belanja cerdas, hidup lebih baik.</p>
-        <div class="footer-sosmed">
-          <a href="#" class="sosmed-btn" aria-label="Facebook">f</a>
-          <a href="#" class="sosmed-btn" aria-label="Instagram">📷</a>
-          <a href="#" class="sosmed-btn" aria-label="Twitter">𝕏</a>
-          <a href="#" class="sosmed-btn" aria-label="Pinterest">𝗣</a>
-          <a href="#" class="sosmed-btn" aria-label="YouTube">▶</a>
-        </div>
-      </div>
-      <div class="footer-col">
-        <div class="footer-col-judul">Belanja</div>
-        <ul>
-          <li><a href="produk.html">Semua Kategori</a></li>
-          <li><a href="produk.html?sort=diskon">Top Deals</a></li>
-          <li><a href="produk.html?sort=terlaris">Terlaris</a></li>
-          <li><a href="produk.html?sort=terbaru">Baru Masuk</a></li>
-          <li><a href="produk.html?sort=diskon">Clearance Sale</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <div class="footer-col-judul">Layanan Pelanggan</div>
-        <ul>
-          <li><a href="#">Pusat Bantuan</a></li>
-          <li><a href="#">Lacak Pesanan</a></li>
-          <li><a href="#">Pengembalian & Refund</a></li>
-          <li><a href="#">Info Pengiriman</a></li>
-          <li><a href="#">Hubungi Kami</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <div class="footer-col-judul">Tentang Kami</div>
-        <ul>
-          <li><a href="#">Tentang Kami</a></li>
-          <li><a href="#">Karir</a></li>
-          <li><a href="#">Berita & Pers</a></li>
-          <li><a href="#">Mitra Kami</a></li>
-          <li><a href="#">Jual di Sini</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <div class="footer-col-judul">Unduh Aplikasi</div>
-        <div class="footer-app">
-          <a href="#" class="app-btn">
-            <span class="app-ikon">▶</span>
-            <div class="app-btn-teks">
-              <small>Tersedia di</small>
-              <strong>Google Play</strong>
-            </div>
-          </a>
-          <a href="#" class="app-btn">
-            <span class="app-ikon">🍎</span>
-            <div class="app-btn-teks">
-              <small>Unduh di</small>
-              <strong>App Store</strong>
-            </div>
-          </a>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bawah">
-      <span>© 2024 Pasar Nusantara Marketplace. Semua hak dilindungi.</span>
-      <div class="footer-bawah-link">
-        <a href="#">Kebijakan Privasi</a>
-        <a href="#">Syarat & Ketentuan</a>
-        <a href="#">Kebijakan Cookie</a>
-      </div>
-    </div>
-  </div>
-</footer>
-
-<script src="js/data.js"></script>
-<script src="js/cart.js"></script>
-<script src="js/app.js"></script>
-</body>
+        <form id="newsletter-form">
+          <label for="newsletter-email">Email kamu</label>
+          <div>
+            <input
+              id="newsletter-email"
+              type="email"
+              placeholder="you@email.com"
+              required
+              autocomplete="email"
+            /><button type="submit" aria-label="Simpan langganan email">
+              <svg
+                class="arrow-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.4"
+                aria-hidden="true"
+              >
+                <path d="M5 19 19 5M5 5h14v14" />
+              </svg>
+            </button>
+          </div>
+          <small>Daftar minat untuk kabar koleksi berikutnya.</small>
+          <p id="newsletter-status" role="status"></p>
+        </form>
+      </section>
+    </main>
+    <div id="store-footer"></div>
+    <script src="js/data.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/store.js"></script>
+  </body>
 </html>
