@@ -6,10 +6,11 @@
     <title>Daftar Produk — Anredseller</title>
     <meta
       name="description"
-      content="Temukan ribuan produk berkualitas dengan harga terbaik di Anredseller."
+      content="Pilihan sneakers, apparel, dan essentials. Lihat foto, ukuran, harga, dan stok di katalog Anredseller."
     />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/store.css" />
+    <link rel="stylesheet" href="css/editorial.css" />
   </head>
   <body>
     <!-- TOP BAR -->
@@ -22,7 +23,9 @@
       <div class="container page-banner-dalam">
         <div>
           <h1 id="page-judul">Semua Produk</h1>
-          <p id="page-sub">Temukan produk terbaik untuk kamu</p>
+          <p id="page-sub">
+            Sneakers, apparel, dan essentials. Temukan gayamu.
+          </p>
         </div>
         <nav class="breadcrumb" style="background: transparent; padding: 0">
           <a href="index.html" style="color: #aaa">Beranda</a>
@@ -34,10 +37,18 @@
 
     <!-- MAIN CONTENT -->
     <div class="container">
-      <div class="halaman-produk-layout" style="padding-top: 28px">
+      <div class="halaman-produk-layout" data-ui style="padding-top: 28px">
         <!-- SIDEBAR FILTER -->
         <aside class="sidebar-filter">
-          <div class="filter-kartu">
+          <button
+            type="button"
+            class="filter-toggle"
+            aria-expanded="false"
+            aria-controls="catalog-filters"
+          >
+            Atur filter <span aria-hidden="true">+</span>
+          </button>
+          <div class="filter-kartu" id="catalog-filters">
             <div class="filter-judul">
               Filter
               <button
@@ -138,7 +149,6 @@
 
           <!-- EMPTY STATE -->
           <div class="empty-state" id="empty-state" style="display: none">
-            <div class="es-ikon">🔍</div>
             <h3>Produk tidak ditemukan</h3>
             <p>Coba ubah filter atau kata kunci pencarian kamu</p>
           </div>

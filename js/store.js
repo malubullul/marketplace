@@ -18,7 +18,7 @@ const header = document.getElementById("store-header");
 if (header)
   header.innerHTML = `<div class="announcement"><span>A little upgrade for your everyday.</span><a href="produk.html?sort=terbaru">Discover the new collection <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></div><header class="store-header"><div class="store-header-inner"><button class="mobile-menu icon-button" aria-label="Buka menu" aria-expanded="false">${icon("menu")}</button><nav class="desktop-nav" aria-label="Navigasi utama"><a href="produk.html">Shop all</a><a href="produk.html?sort=terbaru">New arrivals <span class="nav-dot"></span></a><button data-dialog="about">Our story</button></nav><a class="wordmark" href="index.html" aria-label="Anredseller Beranda">Anredseller<span>•</span></a><div class="store-actions"><button class="icon-button" data-dialog="search" aria-label="Cari produk">${icon("search")}</button><a class="icon-button customer-account-link" href="akun.html" aria-label="Akun pembeli">${icon("user")}</a><a class="icon-button cart-link" href="keranjang.html" aria-label="Buka keranjang">${icon("bag")}<span class="badge-keranjang">0</span></a></div></div><nav class="store-subnav" aria-label="Kategori"><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><span></span><a href="produk.html?sort=terlaris">Best sellers</a><a href="produk.html?sort=diskon" class="sale-link">The good deals <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></nav></header>`;
 if (header && document.body.classList.contains("archive-home")) {
-  const ticker = `<span>FREE SHIPPING OVER IDR 200K</span><span class="ticker-dot">•</span><span>ANREDSELLER ARCHIVE</span><span class="ticker-dot">•</span>`;
+  const ticker = `<span>Gratis ongkir mulai Rp200.000</span><span>The Archive by Anredseller</span>`;
   header.innerHTML = `
     <div class="archive-announcement" aria-label="Gratis ongkir untuk pembelian mulai Rp200.000 — Anredseller Archive">
       <div class="archive-ticker" aria-hidden="true"><div>${ticker.repeat(4)}</div><div>${ticker.repeat(4)}</div></div>
@@ -68,14 +68,14 @@ if (navigation) {
 }
 const footer = document.getElementById("store-footer");
 if (footer)
-  footer.innerHTML = `<footer class="store-footer"><div class="footer-top"><div><a class="wordmark" href="index.html">Anredseller<span>•</span></a><p>A good find changes your day.<br>Find yours here.</p></div><div><h3>THE COLLECTION</h3><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><a href="produk.html?sort=diskon">The good deals</a></div><div><h3>LET'S TALK</h3><button data-dialog="help">Bantuan & FAQ</button><button data-dialog="shipping">Pengiriman & pengembalian</button><button data-dialog="reseller">Program reseller</button></div><div><h3>A LITTLE ABOUT US</h3><button data-dialog="about">Our story</button><button data-dialog="privacy">Privasi</button><a href="admin.html">Area pemilik</a><span class="footer-location">Based in Indonesia.<br>Curated for everywhere.</span></div></div><div class="footer-bottom"><span>© ${new Date().getFullYear()} Anredseller. All good things reserved.</span><span>Pembayaran dikonfirmasi oleh toko</span><span>GOOD TASTE IS ALWAYS IN SEASON. <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></span></div></footer>`;
+  footer.innerHTML = `<footer class="store-footer"><div class="footer-top"><div class="footer-invitation"><h2>Your next good find.</h2><p>Fashion yang kamu pilih.<br>Karakter yang kamu bawa.</p><a class="text-link" href="produk.html">Jelajahi katalog ${icon("bag")}</a></div><nav aria-label="Koleksi footer"><h3>Koleksi</h3><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><a href="produk.html?sort=diskon">Pilihan diskon</a></nav><nav aria-label="Bantuan footer"><h3>Di sini untukmu</h3><button data-dialog="help">Bantuan & FAQ</button><button data-dialog="shipping">Pengiriman</button><button data-dialog="reseller">Program reseller</button><button data-dialog="privacy">Privasi</button></nav><nav aria-label="Akun footer"><h3>Anredseller</h3><a href="akun.html">Akun & pesanan</a><button data-dialog="wishlist">Wishlist</button><button data-dialog="about">Tentang kami</button><a href="admin.html">Area pemilik</a></nav></div><a class="footer-wordmark" href="index.html" aria-label="Anredseller beranda">Anredseller</a><div class="footer-bottom"><span>© ${new Date().getFullYear()} Anredseller</span><span>Pembayaran dikonfirmasi oleh toko</span><a href="#main-content">Kembali ke atas ↑</a></div></footer>`;
 document
   .querySelectorAll("[data-icon]")
   .forEach((el) => (el.innerHTML = icon(el.dataset.icon)));
 const dialog = document.createElement("dialog");
 dialog.className = "store-dialog";
 dialog.innerHTML =
-  '<button class="dialog-close" aria-label="Tutup dialog">✕</button><div id="dialog-content"></div>';
+  '<button class="dialog-close" aria-label="Tutup dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><div id="dialog-content"></div>';
 document.body.appendChild(dialog);
 const dialogContent = dialog.querySelector("#dialog-content");
 const info = {
@@ -109,24 +109,24 @@ async function openStoreDialog(type) {
   if (type === "wishlist" && !(await requireBuyer())) return;
   if (type === "search") {
     dialogContent.innerHTML =
-      '<div class="eyebrow">FIND YOUR NEXT FAVORITE</div><h2>What are you looking for?</h2><form class="dialog-search" action="produk.html"><input name="q" type="search" placeholder="Cari sneakers, kaos, atau brand…" aria-label="Cari produk" required><button type="submit">Cari <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></button></form><p>Coba: Nike, Jordan, essential</p>';
+      '<h2>Cari favoritmu.</h2><form class="dialog-search" action="produk.html"><input name="q" type="search" placeholder="Cari sneakers, kaos, atau brand…" aria-label="Cari produk" required><button type="submit">Cari <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></button></form><p>Coba: Nike, Jordan, essential</p>';
   } else if (type === "wishlist") {
     const list = getWishlist().map(getProdukById).filter(Boolean);
     dialogContent.innerHTML =
-      '<div class="eyebrow">SAVED FOR LATER</div><h2>Your good finds.</h2>' +
+      "<h2>Koleksi tersimpan.</h2>" +
       (list.length
         ? '<div class="wishlist-list">' +
           list
             .map(
               (p) =>
-                `<div><a href="detail.html?id=${p.id}"><img src="${productImage(p.gambar)}" alt="${h(p.nama)}"><span>${h(p.nama)}<small>${formatHarga(p.harga)}</small></span></a><button data-remove-wish="${p.id}" aria-label="Hapus ${h(p.nama)}">✕</button></div>`,
+                `<div><a href="detail.html?id=${p.id}"><img src="${productImage(p.gambar)}" alt="${h(p.nama)}"><span>${h(p.nama)}<small>${formatHarga(p.harga)}</small></span></a><button data-remove-wish="${p.id}" aria-label="Hapus ${h(p.nama)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>`,
             )
             .join("") +
           "</div>"
         : '<p>Belum ada produk tersimpan. Ketuk ikon hati pada produk yang kamu suka.</p><a class="solid-link" href="produk.html">Temukan favoritmu <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a>');
   } else {
     const copy = info[type] || info.help;
-    dialogContent.innerHTML = `<div class="eyebrow">Anredseller / ${type.toUpperCase()}</div><h2>${copy[0]}</h2><p>${copy[1]}</p><p>${copy[2]}</p>${type === "reseller" ? '<a class="solid-link" href="produk.html">Jelajahi katalog contoh <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a>' : ""}`;
+    dialogContent.innerHTML = `<h2>${copy[0]}</h2><p>${copy[1]}</p><p>${copy[2]}</p>${type === "reseller" ? '<a class="solid-link" href="produk.html">Jelajahi katalog contoh <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a>' : ""}`;
   }
   const title = dialogContent.querySelector("h2");
   title.id = "store-dialog-title";
@@ -197,3 +197,39 @@ window.addEventListener("customer:session", () => {
       ),
     );
 });
+
+// Small entrances support the editorial reading order without hiding any content.
+if (
+  !matchMedia("(prefers-reduced-motion: reduce)").matches &&
+  "IntersectionObserver" in window
+) {
+  const observed = new WeakSet();
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(({ target, isIntersecting }) => {
+        if (!isIntersecting) return;
+        target.classList.add(
+          target.matches(".campaign-photo, .reseller-photo")
+            ? "arriving-picture"
+            : "arriving",
+        );
+        observer.unobserve(target);
+      });
+    },
+    { threshold: 0.12 },
+  );
+  const observeEditorial = () => {
+    document
+      .querySelectorAll(
+        ".campaign h1, .campaign p, .campaign .solid-link, .section-topline h2, .section-topline p, .section-topline .text-link, .kartu-produk, .editorial-card, .reseller-content h2, .reseller-content p, .reseller-photo, .newsletter-edit h2, .newsletter-edit form, .footer-invitation, .footer-top nav",
+      )
+      .forEach((target, index) => {
+        if (observed.has(target)) return;
+        observed.add(target);
+        target.style.setProperty("--arrival-delay", `${(index % 3) * 65}ms`);
+        observer.observe(target);
+      });
+  };
+  observeEditorial();
+  window.addEventListener("store:products", observeEditorial);
+}

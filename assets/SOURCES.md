@@ -7,3 +7,7 @@
 - `shirt.png`, `jeans.png`, `check-shirt.png`, `polo.png`: demonstration product assets from https://github.com/mohammadoftadeh/next-ecommerce-shopco/tree/main/public/images (original files `pic1.png` through `pic4.png`).
 
 Product names and prices are sample catalog data and are not a verified identification of the photographed items. Replace demo photography with assets licensed for your store before commercial publication. Third-party trademarks belong to their owners; this concept does not establish a brand affiliation.
+
+## Typeface used for the editorial polish
+
+Switzer by Indian Type Foundry / Fontshare, regular, medium and semibold Latin WOFF2 files. Locally hosted in `assets/fonts/` and `admin-portal/static/fonts/`. Downloaded from the npm distribution `@carrot-kpi/switzer-font@0.1.0` (package license MIT); original font is distributed under the [Fontshare Free Font License](https://www.fontshare.com/licenses/itf-free-font-license). Original source: https://www.fontshare.com/fonts/switzer. No runtime font service is required. Georgia remains the system face for the brand wordmark.

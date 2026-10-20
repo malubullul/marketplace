@@ -10,6 +10,7 @@
     />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/store.css" />
+    <link rel="stylesheet" href="css/editorial.css" />
   </head>
   <body class="store-home archive-home">
     <div id="store-header"></div>
@@ -25,22 +26,21 @@
           />
         </div>
         <div class="campaign-copy">
-          <div class="eyebrow">THE ARCHIVE COLLECTION</div>
-          <h1>TIMELESS LAYERS.<br />EVERYDAY STATEMENTS.</h1>
-          <a class="solid-link" href="produk.html?kategori=apparel">SHOP NOW</a>
+          <h1>The Archive.<br />Worn your way.</h1>
+          <p>
+            Fashion, sneakers, dan pilihan sehari-hari. Temukan yang terasa
+            seperti kamu.
+          </p>
+          <a class="solid-link" href="produk.html?kategori=apparel"
+            >Jelajahi koleksi <span aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5 19 19 5M5 5h14v14" /></svg></span></a
+          >
         </div>
-      </section>
-      <section class="service-strip" aria-label="Keunggulan toko">
-        <span><i data-icon="box"></i> Carefully curated pieces</span
-        ><span><i data-icon="shield"></i> Detail produk transparan</span
-        ><span><i data-icon="truck"></i> Kirim ke seluruh Indonesia</span
-        ><span><i data-icon="chat"></i> Here to help you choose</span>
       </section>
       <section class="edit-section" id="new-arrivals">
         <div class="section-topline">
           <div>
-            <div class="eyebrow">FRESH FINDS, JUST LANDED</div>
-            <h2>Your next favorites<span>.</span></h2>
+            <h2>The everyday edit.</h2>
+            <p>Good pieces, on repeat. Mulai dari favorit barumu.</p>
           </div>
           <a class="text-link" href="produk.html?sort=terbaru"
             >Lihat semua produk
@@ -56,7 +56,7 @@
                 <path d="M5 19 19 5M5 5h14v14" /></svg></span
           ></a>
         </div>
-        <div class="collection-toolbar">
+        <div class="collection-toolbar" data-ui>
           <div
             class="collection-tabs"
             role="tablist"
@@ -85,35 +85,21 @@
               Essentials
             </button>
           </div>
-          <span class="collection-note">Good pieces. Better prices.</span>
+          <span class="collection-note" id="collection-note" aria-live="polite"
+            >Pilihan dari katalog</span
+          >
         </div>
-        <div class="home-products" id="grid-trending"></div>
+        <div class="home-products" id="grid-trending" data-ui></div>
+        <noscript
+          ><p>
+            <a href="produk.html">Buka katalog untuk melihat koleksi.</a>
+          </p></noscript
+        >
       </section>
-      <div class="brand-line">
-        <span>A FEW OF OUR FAVORITES</span>
-        <div>
-          <b class="brand-nike">NIKE</b
-          ><b class="brand-jordan"
-            >JORDAN
-            <small
-              ><svg
-                class="arrow-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.4"
-                aria-hidden="true"
-              >
-                <path d="M5 19 19 5M5 5h14v14" /></svg></small></b
-          ><b class="brand-curated">anred essentials.</b
-          ><span class="brand-and">& more to discover</span>
-        </div>
-      </div>
       <section class="edit-section category-editorial">
         <div class="section-topline">
           <div>
-            <div class="eyebrow">FIND YOUR EVERYDAY</div>
-            <h2>Different pieces. Same you.</h2>
+            <h2>Find your everyday.</h2>
           </div>
           <span class="category-note">Pilih yang paling kamu banget.</span>
         </div>
@@ -121,13 +107,16 @@
           <a
             class="editorial-card sneakers-edit"
             href="produk.html?kategori=sneakers"
-            ><span class="eyebrow">01 / THE SNEAKER EDIT</span
+            ><span class="editorial-label">The sneaker edit</span
             ><img
               src="assets/shoe-3.png"
-              alt="Sneaker pilihan dalam warna netral"
+              alt="Sneaker biru dan hitam"
+              width="512"
+              height="512"
               loading="lazy" />
             <div>
-              <h3>Start from<br />the ground up.</h3>
+              <h3>Sneakers.</h3>
+              <p>Langkah baru, karakter yang sama.</p>
               <span class="round-arrow"
                 ><svg
                   class="arrow-icon"
@@ -142,13 +131,16 @@
           ><a
             class="editorial-card apparel-edit"
             href="produk.html?kategori=apparel"
-            ><span class="eyebrow">02 / EVERYDAY ESSENTIALS</span
+            ><span class="editorial-label">Everyday apparel</span
             ><img
               src="assets/shirt.png"
               alt="Kaos hitam essential"
+              width="512"
+              height="512"
               loading="lazy" />
             <div>
-              <h3>Less effort.<br />More character.</h3>
+              <h3>Wear it daily.</h3>
+              <p>Layer sederhana untuk hari-harimu.</p>
               <span class="round-arrow"
                 ><svg
                   class="arrow-icon"
@@ -164,13 +156,12 @@
         </div>
       </section>
       <section class="reseller-banner" id="reseller">
-        <div class="eyebrow">GROW WITH Anredseller</div>
         <div class="reseller-content">
-          <h2>Good things.<br />Better together.</h2>
+          <h2>Good taste.<br />Shared.</h2>
           <div>
             <p>
-              Punya selera yang bagus? Jadikan peluang.<br />Kenali program
-              reseller dan mulai kurasi<br />koleksi untuk pelangganmu.
+              Punya rencana membangun koleksi untuk pelangganmu? Kenali konsep
+              program reseller Anredseller.
             </p>
             <button class="solid-link light" data-dialog="reseller">
               Kenali program reseller
@@ -188,13 +179,19 @@
             </button>
           </div>
         </div>
-        <span class="reseller-watermark" aria-hidden="true">A.</span>
+        <img
+          class="reseller-photo"
+          src="assets/archive-campaign.png"
+          width="1672"
+          height="941"
+          loading="lazy"
+          alt="Detail layer suede dari kampanye Archive"
+        />
       </section>
       <section class="newsletter-edit">
         <div>
-          <div class="eyebrow">STAY IN THE KNOW</div>
-          <h2>A little good taste<br />in your inbox.</h2>
-          <p>New drops, pilihan terbaru, dan cerita di balik koleksi.</p>
+          <h2>Keep in the loop.</h2>
+          <p>Simpan minatmu untuk kabar koleksi berikutnya.</p>
         </div>
         <form id="newsletter-form">
           <label for="newsletter-email">Email kamu</label>
@@ -218,7 +215,9 @@
               </svg>
             </button>
           </div>
-          <small>Daftar minat untuk kabar koleksi berikutnya.</small>
+          <small
+            >Minat disimpan di perangkat ini. Layanan email belum aktif.</small
+          >
           <p id="newsletter-status" role="status"></p>
         </form>
       </section>

@@ -133,10 +133,10 @@ function renderDetail(p) {
       <!-- AKSI -->
       <div class="detail-aksi">
         <button class="btn-beli-sekarang" id="btn-beli" onclick="beliSekarang()" ${p.stok === 0 ? 'disabled style="opacity:0.4;pointer-events:none"' : ""}>
-          ⚡ Beli Sekarang
+           Beli Sekarang
         </button>
         <button class="btn-tambah-keranjang-detail" id="btn-tambah" onclick="tambahKeranjang()" ${p.stok === 0 ? 'disabled style="opacity:0.4;pointer-events:none"' : ""}>
-          🛒 Keranjang
+           Keranjang
         </button>
       </div>
 
@@ -144,9 +144,9 @@ function renderDetail(p) {
 
       <!-- JAMINAN -->
       <div class="detail-jaminan">
-        <div class="jaminan-item"><span class="ji">🔒</span> Pembayaran Aman</div>
+        <div class="jaminan-item"><span class="ji"></span> Pembayaran Aman</div>
         <div class="jaminan-item"><span class="ji">↩️</span> Garansi 30 Hari</div>
-        <div class="jaminan-item"><span class="ji">🚚</span> Gratis Ongkir</div>
+        <div class="jaminan-item"><span class="ji"></span> Gratis Ongkir</div>
       </div>
 
       <div class="detail-divider"></div>

@@ -19,12 +19,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     panel.setAttribute("aria-labelledby", button.id);
     const products =
       button.dataset.collection === "all"
-        ? PRODUK.slice(0, 4)
+        ? PRODUK.slice(0, 6)
         : PRODUK.filter((p) => p.kategori === button.dataset.collection).slice(
             0,
-            4,
+            6,
           );
-    panel.innerHTML = products.map(renderKartuProduk).join("");
+    panel.innerHTML = products.length
+      ? products.map(renderKartuProduk).join("")
+      : '<p class="collection-empty">Koleksi ini sedang disiapkan. Coba kategori lainnya.</p>';
+    const note = document.getElementById("collection-note");
+    if (note)
+      note.textContent = `${products.length} pilihan · ${button.textContent.trim()}`;
+    window.dispatchEvent(new Event("store:products"));
     updateIkonWishlist();
   };
   tabs.forEach((button, index) => {
@@ -51,15 +57,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 function renderKategori() {}
 function renderTrending() {
   const el = document.getElementById("grid-trending");
-  if (el) el.innerHTML = PRODUK.slice(0, 4).map(renderKartuProduk).join("");
+  if (el) el.innerHTML = PRODUK.slice(0, 6).map(renderKartuProduk).join("");
 }
 function renderRekomendasi() {
   const el = document.getElementById("grid-rekomendasi");
   if (el) el.innerHTML = getProdukRekomendasi().map(renderKartuProduk).join("");
 }
 function renderKartuProduk(p) {
-  return `<article class="kartu-produk" data-produk-id="${p.id}"><div class="kartu-produk-gambar"><a href="detail.html?id=${p.id}" aria-label="Lihat ${h(p.nama)}"><img src="${productImage(p.gambar)}" alt="${h(p.nama)}" loading="lazy"></a>${p.label ? `<span class="kartu-label">${h(p.label)}</span>` : ""}<button aria-label="Simpan ${h(p.nama)} ke wishlist" class="btn-wishlist ${isInWishlist(p.id) ? "aktif" : ""}" data-wishlist="${p.id}" onclick="toggleWishlist(${p.id})">${isInWishlist(p.id) ? "♥" : "♡"}</button><button class="btn-keranjang-cepat" onclick="tambahCepat(${p.id})">+ Tambah ke keranjang</button></div><div class="kartu-produk-info"><div class="product-meta"><span>${h(p.brand)}</span><span>${p.kategori === "sneakers" ? "UNISEX" : "EVERYDAY"}</span></div><a class="kartu-produk-nama" href="detail.html?id=${p.id}">${h(p.nama)}</a><div class="kartu-harga"><span class="harga-sekarang">${formatHarga(p.harga)}</span>${p.hargaAsli > p.harga ? `<span class="harga-asli">${formatHarga(p.hargaAsli)}</span>` : ""}</div><div class="product-colors" aria-label="Warna sesuai foto produk"><i></i><span>Selected for you</span></div></div></article>`;
+  const saved = isInWishlist(p.id);
+  const stock =
+    p.stok === 0 ? "Stok habis" : p.stok < 5 ? `Tersisa ${p.stok}` : "Tersedia";
+  return `<article class="kartu-produk" data-ui data-produk-id="${p.id}"><div class="kartu-produk-gambar"><a href="detail.html?id=${p.id}" aria-label="Lihat ${h(p.nama)}"><img src="${productImage(p.gambar)}" alt="${h(p.nama)}" width="600" height="600" loading="lazy"></a>${p.label ? `<span class="kartu-label">${h(p.label)}</span>` : ""}<button aria-label="${saved ? "Hapus" : "Simpan"} ${h(p.nama)} ${saved ? "dari" : "ke"} wishlist" aria-pressed="${saved}" class="btn-wishlist ${saved ? "aktif" : ""}" data-wishlist="${p.id}" onclick="toggleWishlist(${p.id})">${wishlistIcon(saved)}</button><button class="btn-keranjang-cepat" onclick="tambahCepat(${p.id})" ${p.stok === 0 ? "disabled" : ""}>${p.stok === 0 ? "Stok habis" : "Pilih produk ↗"}</button></div><div class="kartu-produk-info"><div class="product-meta"><span>${h(p.brand)}</span><span>${stock}</span></div><a class="kartu-produk-nama" href="detail.html?id=${p.id}">${h(p.nama)}</a><div class="kartu-harga"><span class="harga-sekarang">${formatHarga(p.harga)}</span>${p.hargaAsli > p.harga ? `<span class="harga-asli">${formatHarga(p.hargaAsli)}</span>` : ""}</div></div></article>`;
 }
+
 function attachProdukEvents() {
   updateIkonWishlist();
 }

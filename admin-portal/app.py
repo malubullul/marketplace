@@ -146,6 +146,12 @@ def create_app(config=None):
     def ui_asset():
         return send_from_directory(ROOT / 'static', request.path.lstrip('/'))
 
+    @app.get('/fonts/<filename>')
+    def brand_font(filename):
+        if not re.fullmatch(r'switzer-latin-(?:400|500|600)-normal\.woff2', filename):
+            abort(404)
+        return send_from_directory(ROOT / 'static' / 'fonts', filename)
+
     @app.get('/assets/<filename>')
     def catalog_asset(filename):
         if not re.fullmatch(r'[A-Za-z0-9_-]+\.(?:png|jpe?g|webp|svg)', filename):

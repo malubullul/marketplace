@@ -281,3 +281,16 @@ function gantiHalaman(hal) {
   halamanSekarang = hal;
   renderProdukList();
 }
+
+// Keep the catalogue visible on phones; filters remain fully usable on demand.
+const filterSidebar = document.querySelector(".sidebar-filter");
+const filterToggle = document.querySelector(".filter-toggle");
+if (filterSidebar && filterToggle) {
+  filterSidebar.classList.add("filters-ready");
+  filterToggle.addEventListener("click", () => {
+    const open = filterToggle.getAttribute("aria-expanded") !== "true";
+    filterToggle.setAttribute("aria-expanded", String(open));
+    filterSidebar.classList.toggle("filter-open", open);
+    filterToggle.innerHTML = `${open ? "Tutup filter" : "Atur filter"} <span aria-hidden="true">${open ? "−" : "+"}</span>`;
+  });
+}

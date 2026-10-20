@@ -36,7 +36,7 @@ function renderKeranjang() {
   if (keranjang.length === 0) {
     kiri.innerHTML = `
       <div class="keranjang-kosong">
-        <div class="keranjang-kosong-ikon">🛒</div>
+        <div class="keranjang-kosong-ikon"></div>
         <div class="keranjang-kosong-judul">Keranjang Kamu Kosong</div>
         <div class="keranjang-kosong-sub">Yuk, temukan produk favorit kamu dan tambahkan ke keranjang!</div>
         <a href="${buyerSession.authenticated ? "produk.html" : buyerLoginUrl("keranjang.html")}" class="btn-beli-sekarang" style="display:inline-flex;margin:0 auto">
@@ -201,7 +201,7 @@ function initKupon() {
       diskonKupon = KUPON_VALID[kode];
       sessionStorage.setItem("checkout_kupon", kode);
       const persen = Math.round(diskonKupon * 100);
-      pesanEl.textContent = `✅ Kupon "${kode}" berhasil! Diskon ${persen}% diterapkan.`;
+      pesanEl.textContent = ` Kupon "${kode}" berhasil! Diskon ${persen}% diterapkan.`;
       pesanEl.style.color = "var(--hijau)";
       updateRingkasan();
     } else {

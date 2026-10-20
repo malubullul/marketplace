@@ -41,3 +41,11 @@ Run `python3 tests/responsive_smoke.py` with Playwright and Chromium installed. 
 ## Customer accounts
 
 Keep account pages consistent with the cream/olive storefront rather than replacing the approved editorial direction with a generated generic ecommerce palette. The customer account page provides login/registration, profile, addresses, orders and wishlist. Use visible form labels, native autocomplete, minimum 44px controls, contextual errors and explicit loading feedback. Public catalog browsing remains anonymous; customer state and checkout require sign-in. Show order status as supplied by the backend, not as proof of payment. Never display another account's cached profile, cart or receipt after account switching or logout.
+
+## Editorial polish with taste-skill
+
+The current visual layer is `css/editorial.css`, loaded after legacy styles on every public page. It shares locally hosted Switzer type, stone/olive tokens, clear product metadata and SVG wishlist controls. The existing Archive campaign and portrait phone framing remain. Mobile catalogue filters use a disclosure; without JavaScript the filters remain visible.
+
+The canonical admin stylesheet uses the same fonts, with a light frame, white work area and compact product rows. Font routes are limited to the three bundled WOFF2 files. Tooling under `.agents/` and generated inspection artifacts are excluded from the Vercel deployment.
+
+See [design direction, screenshot critique and verification](DESIGN_POLISH.md), [installed skill](../.agents/skills/design-taste-frontend/SKILL.md), and [asset provenance](../assets/SOURCES.md).

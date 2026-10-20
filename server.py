@@ -553,7 +553,7 @@ def create_app(config=None):
     def static_file(filename):
         if filename == 'admin.html':
             return admin_page()
-        if filename in {'css/admin.css', 'js/admin.js'}:
+        if filename in {'css/admin.css', 'js/admin.js'} or re.fullmatch(r'fonts/switzer-latin-(?:400|500|600)-normal\.woff2', filename):
             if app.config['ADMIN_PORTAL_URL']:
                 abort(404)
             return send_from_directory(ADMIN_ROOT / 'static', filename)

@@ -14,7 +14,10 @@
           ".git/**",
           "**/__pycache__/**",
           "**/.env",
-          "**/.env.*"
+          "**/.env.*",
+          ".agents/**",
+          ".taste-skill/**",
+          "skills-lock.json"
         ]
       }
     }
