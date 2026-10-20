@@ -587,12 +587,18 @@ def configuration_app():
     return pending
 
 
-try:
-    app = create_app()
-except ValueError:
-    if not os.environ.get('VERCEL'):
-        raise
-    app = configuration_app()
+def initialize_app():
+    """Expose a top-level Flask application for Vercel's Python entrypoint detection."""
+    try:
+        return create_app()
+    except ValueError:
+        if not os.environ.get('VERCEL'):
+            raise
+        return configuration_app()
+
+
+# Vercel's entrypoint discovery expects a top-level app assignment.
+app = initialize_app()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
