@@ -1592,41 +1592,9 @@ svg {
   position: relative;
   z-index: 30;
 }
-.archive-announcement {
-  height: 28px;
-  overflow: hidden;
-  background: #080808;
-  color: #f5f4f0;
-  font-size: 11px;
-  line-height: 28px;
-}
-.archive-ticker {
-  display: flex;
-  width: max-content;
-  animation: archive-ticker 50s linear infinite;
-}
-.archive-ticker > div {
-  display: flex;
-  align-items: center;
-  gap: 54px;
-  padding-right: 54px;
-}
-.archive-ticker span {
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-.archive-ticker .ticker-dot {
-  color: #6c6965;
-  font-size: 9px;
-}
-@keyframes archive-ticker {
-  to {
-    transform: translateX(-50%);
-  }
-}
 .archive-home .archive-header {
   position: absolute;
-  inset: 28px 0 auto;
+  inset: 0 0 auto;
   background: transparent;
   color: #f6f3eb;
 }
@@ -1691,7 +1659,7 @@ svg {
 }
 .archive-home .campaign {
   display: block;
-  height: calc(100svh - 28px);
+  height: 100svh;
   min-height: 580px;
   max-width: none;
   margin: 0;
@@ -1780,13 +1748,6 @@ svg {
   }
 }
 @media (max-width: 760px) {
-  .archive-announcement {
-    font-size: 9px;
-  }
-  .archive-ticker > div {
-    gap: 28px;
-    padding-right: 28px;
-  }
   .archive-home .store-header-inner {
     height: 74px;
     margin: 0 5%;
@@ -1847,11 +1808,6 @@ svg {
   }
   .archive-home .store-actions {
     gap: 5px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .archive-ticker {
-    animation: none;
   }
 }
 
@@ -1961,9 +1917,6 @@ svg {
 }
 .store-dialog p {
   color: var(--text-secondary);
-}
-.archive-ticker {
-  animation: none;
 }
 @media (max-width: 760px) {
   .store-header-inner,

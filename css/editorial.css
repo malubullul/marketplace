@@ -137,21 +137,6 @@ p {
   font-size: clamp(28px, 3vw, 46px);
   letter-spacing: -0.07em;
 }
-.archive-announcement {
-  background: #11150f;
-}
-.archive-ticker {
-  font-size: 13px;
-  letter-spacing: 0;
-}
-.archive-ticker > div {
-  gap: 80px;
-}
-.archive-ticker span {
-  font-size: 13px;
-  letter-spacing: 0;
-  text-transform: none;
-}
 .archive-home .campaign-copy {
   left: var(--page-gutter);
   bottom: 9%;
@@ -980,12 +965,6 @@ p {
   .archive-home .store-header-inner > .wordmark {
     font-size: clamp(21px, 6vw, 30px);
   }
-  .archive-ticker > div {
-    gap: 40px;
-  }
-  .archive-ticker span {
-    font-size: 13px;
-  }
   .desktop-nav.mobile-open,
   .archive-home .desktop-nav.mobile-open {
     background: var(--paper);
@@ -1377,7 +1356,6 @@ p {
 .archive-home .archive-header{color:var(--paper)}
 .store-footer .footer-invitation a.text-link{font-size:14px}
 .btn-wishlist{opacity:1;transform:none}
-.archive-announcement{color:var(--paper)}
 .editorial-card>img{right:4%}
 .apparel-edit>img{right:4%}
 

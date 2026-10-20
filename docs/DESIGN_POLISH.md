@@ -66,7 +66,7 @@ Admin critique: the actual product list is the dominant block, totals come from 
 
 ## Inspection allowances and assets
 
-- `inspect.mjs --allow eyebrow` applies only to the previously approved repeating static shipping announcement over the brand masthead. Decorative eyebrow labels elsewhere were removed. This is a retained brand constraint, not permission for new labels.
+- The homepage shipping/Archive announcement strip was removed at the owner's request. Its markup, ticker styles and reserved 28px space are removed; the masthead now starts at the top and the desktop campaign fills the viewport. Shipping calculations at checkout remain as configured.
 - Neutral scrims remain over real campaign photography for readable text. Lint comments identify only those exact declarations and declarations that remove inherited shadows.
 - Genuine catalogue controls and product objects carry `data-ui`, as allowed for real interface fragments.
 - Small product metadata and several display sizes are intentional commerce/brand roles. No suitable authentic campaign footage exists, so no unrelated stock video was inserted. Reduced-motion users get the complete still page.
