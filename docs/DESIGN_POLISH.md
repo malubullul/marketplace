@@ -75,6 +75,8 @@ Admin critique: the actual product list is the dominant block, totals come from 
 
 ## Verification
 
+Homepage now includes the manual five-photo [campaign slider](CAMPAIGN_SLIDER.md), retaining the original Archive photograph and adding four generated editorial scenes. Its focused browser coverage and latest native inspection are recorded in that guide.
+
 Final measurements and checks are recorded below after the final run. Browser accounts and orders used for validation are disposable test data; they are not written to the development or production store.
 
 - Source lint on the new theme/home interactions: **0 FAIL, 0 WARN**. The legacy base styles remain for compatibility; the browser measures their final computed result.

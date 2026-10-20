@@ -1420,3 +1420,46 @@ p {
   .order-confirmation .konfirmasi-detail { padding: 20px; }
   .order-confirmation .btn-kembali-belanja { display: block; margin-left: 0; }
 }
+
+/* Campaign controls follow the photo, with room for the editorial headline. */
+.archive-home .campaign-photo { touch-action: pan-y pinch-zoom; }
+.campaign-image-outgoing { position: absolute; inset: 0; background-size: cover; background-repeat: no-repeat; pointer-events: none; }
+.campaign-ready #campaign-image { opacity: 1; transition: opacity .5s ease; }
+.campaign-ready #campaign-image.campaign-image-loading { opacity: 0; transition: none; }
+.campaign-arrows { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.campaign-arrow { position: absolute; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 48px; height: 68px; padding: 10px; border: 0; border-radius: 0; background: #15140e26; color: #f5f6f3; cursor: pointer; pointer-events: auto; transition: background .2s ease, color .2s ease; }
+.campaign-arrow svg { width: 23px; height: 38px; }
+.campaign-arrow:hover { background: #15140e66; color: #fff; }
+.campaign-arrow:active { transform: translateY(-50%); }
+.campaign-previous { left: 16px; }
+.campaign-next { right: 16px; }
+.archive-home .campaign-copy { left: max(var(--page-gutter), 80px); }
+.campaign-pagination { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 24px; color: var(--paper); z-index: 3; }
+.campaign-counter { display: flex; align-items: center; gap: 10px; font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.campaign-counter-separator { opacity: .6; }
+.campaign-selectors { display: flex; align-items: center; gap: 0; }
+.campaign-selectors button { position: relative; display: block; width: 44px; height: 44px; flex: none; padding: 0; border: 0; border-radius: 0; background: transparent; color: inherit; cursor: pointer; }
+.campaign-selectors button::after { content: ""; position: absolute; left: 10px; right: 10px; top: 21px; height: 2px; background: currentColor; opacity: .35; transition: opacity .2s ease; }
+.campaign-selectors button[aria-current="true"]::after, .campaign-selectors button:hover::after { opacity: 1; }
+.campaign-arrows[hidden], .campaign-pagination[hidden] { display: none; }
+.campaign-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 760px) {
+  .campaign-arrow { width: 44px; height: 60px; padding: 10px; background: #15140e38; }
+  .campaign-arrow svg { width: 20px; height: 34px; }
+  .campaign-previous { left: 8px; }
+  .campaign-next { right: 8px; }
+  .archive-home .campaign-copy { left: auto; padding-bottom: 12px; }
+  .campaign-pagination { position: relative; bottom: auto; left: auto; transform: none; justify-content: space-between; margin: 0 var(--page-gutter); padding-bottom: 24px; min-height: 68px; max-width: 340px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .campaign-ready #campaign-image, .campaign-arrow, .campaign-selectors button::after { transition: none; }
+}
+#campaign-description { min-height: 4.65em; }
+@media (max-width: 760px) {
+  .campaign-pagination { gap: 12px; }
+  .campaign-counter { gap: 8px; }
+}
+@media (max-width: 760px) {
+  /* The compact counter leaves the other corner available to WhatsApp CS. */
+  .campaign-selectors { display: none; }
+}
