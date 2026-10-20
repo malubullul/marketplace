@@ -10,7 +10,6 @@ from urllib.parse import quote
 
 from flask import g, jsonify, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
-from google_login import GoogleLogin
 
 
 def cart_key(product_id, size='', color=''):
@@ -29,9 +28,6 @@ class CustomerAPI:
                     CREATE TABLE IF NOT EXISTS customer_addresses (id INTEGER PRIMARY KEY AUTOINCREMENT, customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE, document TEXT NOT NULL, is_default INTEGER NOT NULL DEFAULT 0);
                     CREATE UNIQUE INDEX IF NOT EXISTS customer_default_address ON customer_addresses(customer_id) WHERE is_default=1;
                     CREATE TABLE IF NOT EXISTS customer_state (customer_id INTEGER PRIMARY KEY REFERENCES customers(id) ON DELETE CASCADE, document TEXT NOT NULL, revision INTEGER NOT NULL DEFAULT 0);
-                    CREATE TABLE IF NOT EXISTS customer_google_identities (subject TEXT PRIMARY KEY, customer_id INTEGER UNIQUE NOT NULL REFERENCES customers(id) ON DELETE CASCADE, created_at INTEGER NOT NULL);
-                    CREATE TABLE IF NOT EXISTS customer_oauth_flows (state_hash TEXT PRIMARY KEY, browser_hash TEXT NOT NULL, document TEXT NOT NULL, expires_at INTEGER NOT NULL);
-                    CREATE INDEX IF NOT EXISTS customer_oauth_expiry ON customer_oauth_flows(expires_at);
                 ''')
                 columns = {row['name'] for row in db().execute('PRAGMA table_info(orders)')}
                 if 'customer_id' not in columns:
@@ -39,7 +35,6 @@ class CustomerAPI:
                 db().execute('CREATE INDEX IF NOT EXISTS customer_order_history ON orders(customer_id,created_at)')
                 db().commit()
         self.register_routes()
-        self.google = GoogleLogin(self)
 
     def csrf(self):
         if 'customer_csrf' not in session:
@@ -66,8 +61,7 @@ class CustomerAPI:
         return wrapped
 
     def profile(self, customer):
-        linked = bool(self.google.enabled and self.db().execute('SELECT 1 FROM customer_google_identities WHERE customer_id=?', (customer['id'],)).fetchone())
-        return dict({key:customer[key] for key in ['id','email','nama','nohp']}, has_password=bool(customer['password_hash']), google_linked=linked)
+        return {key:customer[key] for key in ['id','email','nama','nohp']}
 
     def confirm_password(self, customer, password):
         if not isinstance(password, str) or not 1 <= len(password) <= 128:
@@ -166,7 +160,7 @@ class CustomerAPI:
         @app.get('/api/customer/session')
         def customer_session():
             customer=self.current()
-            return jsonify(authenticated=bool(customer),customer=self.profile(customer) if customer else None,csrf=self.csrf(),providers={'google':self.google.enabled})
+            return jsonify(authenticated=bool(customer),customer=self.profile(customer) if customer else None,csrf=self.csrf())
 
         @app.post('/api/customer/register')
         def customer_register():
@@ -223,7 +217,6 @@ class CustomerAPI:
             db().commit()
             session.pop('customer_sid', None)
             session.pop('customer_csrf', None)
-            session.pop('google_flow_browser', None)
             return jsonify(ok=True)
 
         @app.get('/api/customer/profile')

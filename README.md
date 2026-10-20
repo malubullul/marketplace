@@ -77,4 +77,4 @@ Set `ANREDSELLER_TEST_DATABASE_URL` to a disposable local PostgreSQL database to
 
 See [docs/UI_GUIDE.md](docs/UI_GUIDE.md) for the approved visual direction and UI/UX Pro Max guidance.
 
-Google customer sign-in and account security: [activation guide](docs/GOOGLE_LOGIN.md), [security review and validation](docs/AUTH_SECURITY_REVIEW.md). The Google method remains unavailable until the store owner configures the production OAuth client and database migration.
+Customer accounts use email and password. See [account security notes](docs/AUTH_SECURITY_REVIEW.md).

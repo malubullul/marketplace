@@ -79,7 +79,7 @@ Katalog tetap dapat dibuka tanpa login. Menyimpan wishlist/keranjang dan checkou
 
 Pembeli hanya dapat membaca pesanannya sendiri. Pengelola toko dapat membaca seluruh pesanan dari dashboard admin. Pesanan lama yang dibuat sebelum fitur akun tidak otomatis ditautkan hanya karena alamat email sama. Migrasi database menambahkan kepemilikan akun tanpa menghapus data lama.
 
-Keluar akun mencabut sesi perangkat tersebut. Mengganti kata sandi memerlukan kata sandi saat ini dan mencabut sesi di perangkat lain. Password disimpan sebagai hash; tidak ada kata sandi pelanggan bawaan. Verifikasi email, pemulihan kata sandi lewat email, serta login Google/OTP belum terhubung ke layanan pengiriman email atau SMS.
+Keluar akun mencabut sesi perangkat tersebut. Mengganti kata sandi memerlukan kata sandi saat ini dan mencabut sesi di perangkat lain. Password disimpan sebagai hash; tidak ada kata sandi pelanggan bawaan. Verifikasi email, pemulihan kata sandi lewat email, dan SMS OTP belum tersedia. Akun menggunakan email dan kata sandi.
 
 Harga, diskon, ongkir, dan ketersediaan diperiksa kembali di server. Stok dicadangkan ketika pesanan tercatat. Pengiriman ulang permintaan yang sama tidak membuat pesanan ganda. Rincian pesanan dapat dibaca kembali melalui akun pembeli yang bersangkutan dan dashboard pemilik.
 

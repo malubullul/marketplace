@@ -721,56 +721,6 @@
 }
 
 /* Account entry and security share the store's editorial type and quiet surfaces. */
-.auth-social {
-  margin-top: 28px;
-}
-.auth-content .google-button {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  min-height: 52px;
-  padding: 14px 18px;
-  background: #fff;
-  color: #252a23;
-  border: 1px solid #aeb5a6;
-  border-radius: 0;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: transform 0.16s ease;
-}
-.auth-content .google-button:hover:not(:disabled) {
-  background: #f5f6f3;
-}
-.auth-content .google-button:disabled {
-  cursor: not-allowed;
-  color: #62665c;
-  background: #f5f6f3;
-  opacity: 1;
-  border-color: #c7cdbf;
-}
-.google-mark {
-  width: 20px;
-  height: 20px;
-  flex: none;
-}
-.auth-provider-note {
-  font-size: 13px !important;
-  color: #62665c;
-  margin: 12px 0 0;
-  line-height: 1.6;
-}
-.auth-provider-note:empty {
-  display: none;
-}
-.auth-email-label {
-  font-size: 14px;
-  color: #62665c;
-  text-align: center;
-  margin: 24px 0 0;
-}
 .auth-tabs {
   margin-top: 28px;
 }
@@ -838,60 +788,12 @@
   font-weight: 500;
   text-align: right;
 }
-.security-dialog {
-  padding: 32px;
-  width: 480px;
-  max-width: calc(100vw - 32px);
-  max-height: calc(100dvh - 32px);
-  overflow: auto;
-  background: #f5f6f3;
-  border: 0;
-  border-radius: 0;
-}
-.security-dialog::backdrop {
-  background: #12160f99;
-}
-.security-dialog h2 {
-  font-size: 28px;
-  line-height: 1.1;
-  margin: 0 0 18px;
-}
-.security-dialog form > p {
-  font-size: 15px;
-  line-height: 1.6;
-  color: #62665c;
-}
-.security-dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
-  flex-wrap: wrap;
-}
 @media (max-width: 600px) {
-  .auth-content .google-button {
-    font-size: 14px;
-    min-height: 52px;
-  }
-  .auth-social {
-    margin-top: 24px;
-  }
   .account-security {
     padding: 24px;
   }
   .auth-methods > div {
     font-size: 13px;
-  }
-  .security-dialog {
-    padding: 28px 22px;
-  }
-  .security-dialog-actions .account-button {
-    flex: 1;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .auth-content .google-button {
-    transition: none;
   }
 }
 

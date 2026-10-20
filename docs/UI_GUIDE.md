@@ -52,4 +52,4 @@ See [design direction, screenshot critique and verification](DESIGN_POLISH.md), 
 
 ## Customer sign-in polish
 
-The Google/email entry and registration components continue the same visual system. On phones the form comes first and the campaign image follows, so the main sign-in choices are available earlier. The form's title is the visible h1; provider availability and errors are explicit. Password visibility toggles retain labels, use 44px targets and never submit the form. Security settings describe actual available methods and preserve at least one usable sign-in method. See [Google activation](GOOGLE_LOGIN.md) and [security review](AUTH_SECURITY_REVIEW.md).
+Email/password entry and registration continue the same visual system. On phones the form comes first and the campaign image follows. The form's title is the visible h1. Password visibility toggles retain labels, use 44px targets and never submit the form. Account settings retain password changes and logout from all devices. See [security notes](AUTH_SECURITY_REVIEW.md).

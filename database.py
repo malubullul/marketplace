@@ -78,8 +78,7 @@ class PostgresDatabase:
 
     def initialize(self):
         self.begin()
-        source = '\n'.join((Path(__file__).resolve().parent / 'migrations' / name).read_text()
-                           for name in ('001_supabase.sql', '003_google_login.sql'))
+        source = (Path(__file__).resolve().parent / 'migrations' / '001_supabase.sql').read_text()
         self.connection.execute(source.replace('anredseller', self.schema), prepare=False)
         self.commit()
 

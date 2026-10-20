@@ -22,6 +22,19 @@ class CustomerTests(unittest.TestCase):
         self.assertEqual(response.status_code,201,response.json)
         return client,{'X-CSRF-Token':response.json['csrf']}
 
+    def test_only_email_authentication_is_exposed(self):
+        response = self.a.get('/api/customer/session').json
+        self.assertNotIn('providers', response)
+        self.assertNotIn('google_linked', response['customer'])
+        for path, method in [('/google/start', 'post'), ('/google/callback', 'get'), ('/google/unlink', 'post')]:
+            self.assertIn(getattr(self.a, method)('/api/customer' + path).status_code, {404, 405})
+        self.assertFalse(any('/google/' in rule.rule for rule in self.app.url_map.iter_rules()))
+        with self.a.get('/akun.html') as page:
+            html = page.data.decode()
+        self.assertNotIn('google-login', html)
+        self.assertNotIn('google-connect', html)
+        self.assertNotIn('google-security-dialog', html)
+
     def login(self,email,password=None):
         client=self.app.test_client();csrf=client.get('/api/customer/session').json['csrf']
         response=client.post('/api/customer/login',json={'email':email,'password':password or self.password},headers={'X-CSRF-Token':csrf})

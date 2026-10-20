@@ -49,9 +49,6 @@ def create_app(config=None):
         PERMANENT_SESSION_LIFETIME=30 * 86400,
         ADMIN_GATEWAY_KEY=os.environ.get('ANREDSELLER_ADMIN_GATEWAY_KEY', ''),
         ADMIN_PORTAL_URL=os.environ.get('ANREDSELLER_ADMIN_PORTAL_URL', '').rstrip('/'),
-        GOOGLE_CLIENT_ID=os.environ.get('GOOGLE_CLIENT_ID', ''),
-        GOOGLE_CLIENT_SECRET=os.environ.get('GOOGLE_CLIENT_SECRET', ''),
-        PUBLIC_ORIGIN=os.environ.get('ANREDSELLER_PUBLIC_ORIGIN', ''),
     )
     app.config.update(config or {})
     if app.config['ADMIN_GATEWAY_KEY'] and len(app.config['ADMIN_GATEWAY_KEY']) < 32:
