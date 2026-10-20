@@ -44,7 +44,16 @@ class PostgresDatabase:
             raise ValueError('Nama schema database tidak valid.')
         self.schema = schema
         # Transaction poolers require prepared statements to be disabled.
-        tls = {} if urlsplit(url).hostname in {'127.0.0.1', 'localhost', '::1'} else {'sslmode':'verify-full', 'sslrootcert':'system'}
+        # Supabase's pooler uses a private CA that is not in the OS trust store.
+        # Verify both its certificate chain AND the pooler hostname.
+        hostname = urlsplit(url).hostname
+        if hostname in {'127.0.0.1', 'localhost', '::1'}:
+            tls = {}
+        elif hostname and hostname.endswith('.pooler.supabase.com'):
+            root_ca = Path(__file__).resolve().parent / 'certs' / 'supabase-root-2021.crt'
+            tls = {'sslmode': 'verify-full', 'sslrootcert': str(root_ca)}
+        else:
+            tls = {'sslmode': 'verify-full', 'sslrootcert': 'system'}
         self.connection = psycopg.connect(url, row_factory=dict_row, prepare_threshold=None, connect_timeout=10, **tls)
         self.lock = int.from_bytes(hashlib.sha256(schema.encode()).digest()[:8], 'big') & ((1 << 63) - 1)
 
