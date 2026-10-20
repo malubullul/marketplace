@@ -23,7 +23,7 @@
             {% if campaign.image %}src="{{ campaign.image }}"{% else %}hidden{% endif %}
             width="1672"
             height="941"
-            alt="{{ campaign.alt }}" style="object-position: {{ campaign.crop }}"
+            alt="{{ campaign.alt }}"{% if campaign.crop %} style="object-position: {{ campaign.crop }}"{% endif %}
             fetchpriority="high"
             draggable="false"
           />

@@ -48,6 +48,7 @@ class StoreContentTests(unittest.TestCase):
         self.assertFalse(any(data.json['content']['socials'].values()))
         self.assertEqual(len(data.json['content']['images']),9)
         self.assertEqual(len(data.json['content']['campaigns']),5)
+        self.assertEqual(data.json['content']['campaigns'][0]['crop'],'')
         self.assertEqual(data.headers['Cache-Control'],'no-store')
         for path in ['/','/index.html','/akun','/akun.html','/produk.html','/detail.html']:
             page=self.guest.get(path)
@@ -56,6 +57,15 @@ class StoreContentTests(unittest.TestCase):
             parsed=HTMLSnapshot(page.data.decode())
             self.assertEqual(json.loads(parsed.snapshot),data.json['content'])
             self.assertNotIn('{{',page.data.decode())
+
+        # An already-saved preset must regain the same framing without a data migration.
+        self.assertEqual(self.save('images',self.admin()['images']).status_code,200)
+        first=self.guest.get('/api/store/content').json['content']['campaigns'][0]
+        self.assertEqual(first['crop'],'')
+        self.assertNotIn('style',HTMLSnapshot(self.guest.get('/').data.decode()).images['campaign-image'])
+        images=self.admin()['images'];images['campaign_archive']['position']=30
+        self.assertEqual(self.save('images',images).status_code,200)
+        self.assertEqual(self.guest.get('/api/store/content').json['content']['campaigns'][0]['crop'],'30% top')
 
     def test_only_owner_with_csrf_can_edit_content(self):
         payload={'section':'socials','socials':default_content()['socials'],'version':'0'}
@@ -104,6 +114,7 @@ class StoreContentTests(unittest.TestCase):
         self.assertEqual(snapshot.images['campaign-image']['src'],url)
         self.assertEqual(json.loads(snapshot.snapshot)['images']['campaign_archive']['alt'],text)
         self.assertEqual(snapshot.images['campaign-image']['alt'],text)
+        self.assertEqual(json.loads(snapshot.snapshot)['campaigns'][0]['crop'],'35% center')
         self.assertNotIn(text,html)
         self.assertEqual(self.guest.get(url).status_code,200)
         state=self.admin();state['images']['campaign_archive']['src']=''

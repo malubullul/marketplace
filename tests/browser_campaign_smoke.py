@@ -8,7 +8,8 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 VIEWPORTS = [(320,568), (360,640), (375,667), (390,844), (414,896), (430,932),
-             (600,960), (760,1024), (768,1024), (820,1180), (1024,768), (1440,1000), (667,375), (844,390)]
+             (600,960), (760,1024), (768,1024), (820,1180), (1024,768), (1440,1000), (667,375), (844,390),
+             (1535,777), (1920,900)]
 NAMES = ['archive-campaign', 'campaign-after-hours', 'campaign-city-uniform', 'campaign-soft-form', 'campaign-everyday-objects']
 
 
@@ -64,6 +65,11 @@ def main():
                         assert page.locator('#campaign-current').inner_text()==f'{index+1:02}'
                         assert page.locator('[data-campaign][aria-current=true]').count()==1
                         assert page.locator('#campaign-image').get_attribute('alt')
+                        if index == 0:
+                            # The original preset must preserve its old framing on initial
+                            # load and after navigating back, including wide desktop windows.
+                            expected = '50% 0%' if width > 1100 else '90% 0%'
+                            assert page.locator('#campaign-image').evaluate('e => getComputedStyle(e).objectPosition') == expected, (width, height, 'Archive framing changed')
                         assert page.locator('#campaign-shop-link').get_attribute('href').startswith('produk.html?kategori=')
                         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'), (width,index)
                         controls = page.locator('.campaign-pagination').bounding_box()
@@ -80,7 +86,7 @@ def main():
                         current_height = page.locator('.campaign').bounding_box()['height']
                         if original_height is None: original_height=current_height
                         assert abs(current_height-original_height)<2,(width,index,'layout jumps',original_height,current_height)
-                        if width in [1440,768,390,320,844]:
+                        if width in [1440,768,390,320,844,1535,1920]:
                             page.locator('.campaign').screenshot(path=str(output/f'slide-{index+1}-{width}.png'))
                 # Edges wrap, both directions work, and keyboard navigation stays on the page.
                 page.set_viewport_size({'width':390,'height':844});page.evaluate('scrollTo(0,0)')
@@ -127,7 +133,7 @@ def main():
                 browser.close()
         finally:
             process.terminate();process.wait(timeout=10)
-    print('PASS: all 5 campaign photos at 14 viewport sizes; stable layout, arrows and indicators, keyboard, real touch swipe/vertical scroll, rapid navigation, reduced motion/manual timing, failed-image recovery and no-JS fallback; no uncaught JavaScript errors')
+    print('PASS: all 5 campaign photos at 16 viewport sizes; original responsive Archive framing including wide desktop, stable layout, arrows and indicators, keyboard, real touch swipe/vertical scroll, rapid navigation, reduced motion/manual timing, failed-image recovery and no-JS fallback; no uncaught JavaScript errors')
 
 
 if __name__=='__main__':main()

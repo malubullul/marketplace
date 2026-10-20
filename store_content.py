@@ -44,10 +44,20 @@ def default_content():
 def public_content(saved):
     # Only curated presentation data is published, never unrelated metadata/accounts.
     result = dict(images=deepcopy(saved['images']),socials=deepcopy(saved['socials']))
-    result['campaigns'] = [dict(slide,image=saved['images'][slide['id']]['src'],
-                              alt=saved['images'][slide['id']]['alt'],
-                              crop=str(saved['images'][slide['id']]['position'])+'% center')
-                           for slide in CAMPAIGNS if saved['images'][slide['id']]['src']]
+    result['campaigns'] = []
+    for slide in CAMPAIGNS:
+        image = saved['images'][slide['id']]
+        if not image['src']:
+            continue
+        # The original Archive framing is responsive: center/top on desktop,
+        # 90%/top on smaller screens. Let its existing CSS apply to the preset.
+        original_archive = (slide['id'] == 'campaign_archive'
+                            and image['src'] == IMAGE_SLOTS['campaign_archive'][1])
+        crop = str(image['position'])+('% top' if original_archive else '% center')
+        if original_archive and image['position'] == IMAGE_SLOTS['campaign_archive'][3]:
+            crop = ''
+        result['campaigns'].append(dict(slide, image=image['src'], alt=image['alt'],
+                                        crop=crop))
     return result
 
 
