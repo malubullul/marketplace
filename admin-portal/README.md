@@ -24,7 +24,9 @@ Gunakan satu repository dan dua layanan hosting:
 | Toko publik | Root | `main` | `server:app` |
 | Admin | `admin-portal` | `main` | `app:app` |
 
-Blueprint [render.yaml di root](../render.yaml) mengatur kedua layanan dan pembaruan otomatis dari `main`. Tidak perlu membuat repository/branch admin baru atau mengunggah ZIP. File `render.yaml` di folder admin ini hanya untuk opsi ekspor mandiri, bukan Blueprint yang dipakai pada konfigurasi satu repository.
+Untuk **Vercel + Supabase**, ikuti [panduan utama](../docs/VERCEL_SUPABASE.md): buat dua project Vercel dari repository/branch yang sama, pilih Root Directory `admin-portal` untuk project admin, dan gunakan `vercel.json` di folder ini. Project admin tidak memerlukan koneksi database atau secret Supabase, hanya URL backend dan kunci gateway. Database/foto cloud dikelola backend toko.
+
+Sebagai alternatif, Blueprint [render.yaml di root](../render.yaml) mengatur dua layanan Render dan pembaruan otomatis dari `main`. Tidak perlu membuat repository/branch admin baru atau mengunggah ZIP. File `render.yaml` di folder admin ini hanya untuk opsi ekspor mandiri.
 
 ## Menghubungkan dua layanan
 
@@ -44,7 +46,7 @@ Pada Blueprint, pertahankan kunci yang dihasilkan environment group yang sama. P
 
 Setelah kedua pengaturan aktif, `/admin` dan `/admin.html` di domain toko mengarahkan pemilik ke domain admin. UI admin lama tidak disajikan di domain toko dan API pemilik memerlukan koneksi dari portal. URL publik dan akun pembeli tetap berjalan di server toko. Tanpa pengaturan tersebut, marketplace mempertahankan mode satu domain untuk pengembangan.
 
-## Pemasangan hosting
+## Alternatif pemasangan di Render
 
 1. Hubungkan repository `malubullul/marketplace`, branch `main`, ke Blueprint **root** `render.yaml`. Tidak perlu repository kedua. Tinjau biaya dua layanan Starter dan disk toko sebelum membuat layanan.
 2. Blueprint memakai root repository untuk toko dan `admin-portal` untuk admin, serta kunci koneksi bersama. Isi URL admin pada pengaturan toko dan URL backend pada pengaturan admin.

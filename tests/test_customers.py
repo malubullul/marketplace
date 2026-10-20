@@ -121,7 +121,7 @@ class CustomerTests(unittest.TestCase):
         self.assertEqual(self.a.get('/api/customer/orders').json['orders'],[])
         self.assertEqual(self.a.get('/api/customer/orders/LEGACY').status_code,404)
         restarted=create_app({'TESTING':True,'DATA_DIR':self.directory.name})
-        with restarted.app_context():self.assertIsNone(restarted.get_db().execute('SELECT customer_id FROM orders WHERE id="LEGACY"').fetchone()[0])
+        with restarted.app_context():self.assertIsNone(restarted.get_db().execute('SELECT customer_id FROM orders WHERE id=?', ('LEGACY',)).fetchone()[0])
 
     def test_registration_validation_duplicates_csrf_and_password_hash(self):
         client=self.app.test_client();csrf=client.get('/api/customer/session').json['csrf']

@@ -1,12 +1,14 @@
 # Menjalankan Anredseller untuk pemilik dan pengunjung
 
+**Untuk Vercel dan project Supabase yang sudah dibuat, gunakan [panduan Vercel + Supabase](VERCEL_SUPABASE.md).** Kedua project Vercel memakai repository/branch yang sama, dengan PostgreSQL dan Storage di Supabase. Panduan Render di bawah tetap tersedia sebagai alternatif.
+
 Anredseller sekarang memiliki dua sisi yang memakai database server yang sama:
 
 - `/` atau `/index.html`: toko publik. Pengunjung melihat produk terbit tanpa login.
 - `/admin` atau `/admin.html`: dashboard pemilik. Pengelolaan produk dan pesanan membutuhkan login.
 - `/akun` atau `/akun.html`: akun pembeli untuk daftar/masuk, profil, alamat, wishlist, keranjang lintas perangkat, serta riwayat pesanan.
 
-GitHub menyimpan kode. GitHub Pages dan membuka file HTML langsung tidak menjalankan database atau API; keduanya hanya memberikan pratinjau statis. Gunakan hosting yang dapat menjalankan Python dan menyediakan penyimpanan permanen.
+GitHub menyimpan kode. GitHub Pages dan membuka file HTML langsung tidak menjalankan database atau API; keduanya hanya memberikan pratinjau statis. Gunakan hosting Python dengan PostgreSQL/Storage eksternal untuk Vercel, atau persistent disk untuk mode SQLite.
 
 ## Satu repository, dua layanan dan domain
 
@@ -44,7 +46,7 @@ Server pengembangan hanya mendengarkan loopback. Untuk produksi, jalankan Gunico
 
 Atur `ANREDSELLER_SECURE_COOKIES=1` pada deployment HTTPS. Jangan aktifkan opsi ini untuk uji lokal melalui HTTP karena browser tidak akan mengirim cookie login.
 
-## Opsi pemasangan: Render
+## Alternatif pemasangan: Render dengan disk permanen
 
 `render.yaml` di **root repository** mendefinisikan dua web service Python pada branch `main`, satu environment group bersama, dan persistent disk hanya untuk toko. Ini belum membuat atau mempublikasikan layanan. Dua layanan Starter dan disk toko menggunakan layanan berbayar; tinjau total biaya di Render sebelum membuatnya.
 
@@ -65,7 +67,7 @@ Login ke dashboard → **Tambah produk** → isi nama, deskripsi, kategori, harg
 - **Simpan draf**: hanya terlihat oleh pemilik.
 - **Terbitkan produk**: muncul di katalog publik saat pengunjung memuat halaman.
 
-Foto pertama menjadi sampul. Foto dapat dipilih dari perangkat, diurutkan dengan **Jadikan sampul**, dan dihapus dari formulir. Format unggahan JPG/PNG/WebP, maksimal 5 MB/foto dan 8 foto/produk. Server memvalidasi gambar, menghapus metadata lewat konversi WebP, dan membatasi ukuran hasil. Batas gambar sumber 25 megapiksel.
+Foto pertama menjadi sampul. Foto dapat dipilih dari perangkat, diurutkan dengan **Jadikan sampul**, dan dihapus dari formulir. Format unggahan JPG/PNG/WebP, maksimal 4 MB/foto dan 8 foto/produk. Server memvalidasi gambar, menghapus metadata lewat konversi WebP, dan membatasi ukuran hasil. Batas gambar sumber 25 megapiksel.
 
 Stok adalah total persediaan gabungan semua pilihan ukuran dan warna, bukan stok terpisah per varian. Admin mendapat peringatan jika stok/produk sudah berubah sejak editor dibuka.
 

@@ -4,7 +4,7 @@ from pathlib import Path
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1] / 'admin-portal'
-FILES = ['app.py', 'requirements.txt', 'render.yaml', 'README.md', '.env.example', '.gitignore']
+FILES = ['app.py', 'requirements.txt', 'render.yaml', 'vercel.json', '.python-version', '.vercelignore', 'README.md', '.env.example', '.gitignore']
 
 
 def export(destination):

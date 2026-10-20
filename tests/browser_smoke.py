@@ -12,14 +12,16 @@ with tempfile.TemporaryDirectory(prefix='anredseller-browser-') as directory:
     password=secrets.token_urlsafe(24)
     buyer_password=secrets.token_urlsafe(24)
     separate=os.environ.get('ANREDSELLER_TEST_ADMIN_PORTAL')=='1'
-    source='''import json,sys,secrets,threading
+    source='''import json,sys,secrets,threading,signal
 from server import create_app,create_owner
 from werkzeug.serving import make_server
 credentials=json.loads(sys.stdin.readline())
 settings={}
 if credentials['separate']:
     settings={'ADMIN_GATEWAY_KEY':secrets.token_urlsafe(40),'ADMIN_PORTAL_URL':'https://owner.example.test'}
-app=create_app(settings)
+sys.path.insert(0,'tests')
+from browser_backend_support import configure_backend
+app,cleanup=configure_backend(settings)
 create_owner(app,credentials["email"],credentials["password"])
 http=make_server("127.0.0.1",0,app,threaded=True)
 ports={'store':http.server_port}
@@ -34,7 +36,9 @@ if credentials['separate']:
     app.config['ADMIN_PORTAL_URL']=f'http://localhost:{owner_http.server_port}'
     threading.Thread(target=owner_http.serve_forever,daemon=True).start()
 print(json.dumps(ports),flush=True)
-http.serve_forever()
+signal.signal(signal.SIGTERM,lambda *_:sys.exit(0))
+try:http.serve_forever()
+finally:cleanup()
 '''
     with open(Path(directory)/'server.log','w') as log:
         process=subprocess.Popen([str(ROOT/'.venv/bin/python'),'-c',source],cwd=ROOT,env={**os.environ,'ANREDSELLER_DATA_DIR':directory},stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=log,text=True)
@@ -122,6 +126,7 @@ http.serve_forever()
                 assert device_context.request.get(base+'api/customer/orders').status==200
                 assert not errors,errors
                 if separate:print('PASS: independent admin/public origins, admin-only routes, backend gateway protection, cookie login, photo upload, publishing and shared buyer orders')
+                if os.environ.get('ANREDSELLER_TEST_DATABASE_URL'):print('PASS: full browser workflow uses real PostgreSQL and the Supabase Storage HTTP contract')
                 browser.close()
                 print('PASS: owner product management; customer signup/login, saved address, wishlist, cross-device cart, authenticated checkout, private order history, account isolation, responsive account/dashboard and independent logout')
         finally:

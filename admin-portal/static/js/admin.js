@@ -226,8 +226,8 @@ async function uploadFiles(fileList) {
     productError("Maksimal 8 foto per produk.");
     return;
   }
-  if (files.some((file) => file.size > 5 * 1024 * 1024)) {
-    productError("Ukuran setiap foto maksimal 5 MB.");
+  if (files.some((file) => file.size > 4 * 1024 * 1024)) {
+    productError("Ukuran setiap foto maksimal 4 MB.");
     return;
   }
   if (

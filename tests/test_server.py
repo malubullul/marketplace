@@ -3,6 +3,7 @@ import json
 import secrets
 import tempfile
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from PIL import Image
 from server import create_app, create_owner
@@ -42,6 +43,31 @@ class StoreTests(unittest.TestCase):
 
     def current_product(self, product_id):
         return next(p for p in self.client.get('/api/admin/products').json['products'] if p['id']==product_id)
+
+    def simultaneous_orders(self, product, keys):
+        cookie = self.public.get_cookie('session').value
+        payload = dict(customer=dict(nama_penerima='Penerima Uji',nohp='081234567890',alamat='Jl. Uji 1',kota='Jakarta',provinsi='DKI Jakarta',kodepos='12345'),items=[dict(id=product['id'],harga=product['harga'],jumlah=1,ukuran='S',warna='Hitam')])
+        def submit(key):
+            client = self.app.test_client()
+            client.set_cookie('session',cookie)
+            return client.post('/api/orders',json=payload,headers={**self.buyer_headers,'Idempotency-Key':key})
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            return list(executor.map(submit,keys))
+
+    def test_concurrent_checkout_cannot_oversell_last_item(self):
+        product = self.product(stok=1)
+        responses = self.simultaneous_orders(product,[secrets.token_hex(16),secrets.token_hex(16)])
+        self.assertEqual(sorted(response.status_code for response in responses),[201,409])
+        self.assertEqual(self.current_product(product['id'])['stok'],0)
+        self.assertEqual(len(self.client.get('/api/admin/orders').json['orders']),1)
+
+    def test_concurrent_duplicate_checkout_reserves_stock_once(self):
+        product = self.product(stok=2)
+        key = secrets.token_hex(16)
+        responses = self.simultaneous_orders(product,[key,key])
+        self.assertEqual(sorted(response.status_code for response in responses),[200,201])
+        self.assertEqual(responses[0].json['order']['nomor'],responses[1].json['order']['nomor'])
+        self.assertEqual(self.current_product(product['id'])['stok'],1)
 
     def test_admin_auth_csrf_and_private_files(self):
         self.assertEqual(self.public.get('/api/admin/products').status_code,401)

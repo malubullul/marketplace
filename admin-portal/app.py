@@ -47,7 +47,7 @@ def create_app(config=None):
         SHOP_URL=os.environ.get('ANREDSELLER_SHOP_URL', ''),
         ADMIN_GATEWAY_KEY=os.environ.get('ANREDSELLER_ADMIN_GATEWAY_KEY', ''),
         SECURE_COOKIES=os.environ.get('ANREDSELLER_SECURE_COOKIES', '1') == '1',
-        MAX_CONTENT_LENGTH=6 * 1024 * 1024,
+        MAX_CONTENT_LENGTH=4 * 1024 * 1024 + 64 * 1024,
         UPSTREAM_TIMEOUT=20,
     )
     app.config.update(config or {})

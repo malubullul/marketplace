@@ -4,7 +4,7 @@ import hashlib
 import json
 import re
 import secrets
-import sqlite3
+from database import INTEGRITY_ERRORS
 import time
 from urllib.parse import quote
 
@@ -19,19 +19,20 @@ def cart_key(product_id, size='', color=''):
 class CustomerAPI:
     def __init__(self, app, db, fail, body):
         self.app, self.db, self.fail, self.body = app, db, fail, body
-        with app.app_context():
-            db().executescript('''
-                CREATE TABLE IF NOT EXISTS customers (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE NOT NULL COLLATE NOCASE, password_hash TEXT NOT NULL, nama TEXT NOT NULL, nohp TEXT NOT NULL, created_at INTEGER NOT NULL);
-                CREATE TABLE IF NOT EXISTS customer_sessions (token TEXT PRIMARY KEY, customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE, expires_at INTEGER NOT NULL);
-                CREATE TABLE IF NOT EXISTS customer_addresses (id INTEGER PRIMARY KEY AUTOINCREMENT, customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE, document TEXT NOT NULL, is_default INTEGER NOT NULL DEFAULT 0);
-                CREATE UNIQUE INDEX IF NOT EXISTS customer_default_address ON customer_addresses(customer_id) WHERE is_default=1;
-                CREATE TABLE IF NOT EXISTS customer_state (customer_id INTEGER PRIMARY KEY REFERENCES customers(id) ON DELETE CASCADE, document TEXT NOT NULL, revision INTEGER NOT NULL DEFAULT 0);
-            ''')
-            columns = {row['name'] for row in db().execute('PRAGMA table_info(orders)')}
-            if 'customer_id' not in columns:
-                db().execute('ALTER TABLE orders ADD COLUMN customer_id INTEGER REFERENCES customers(id)')
-            db().execute('CREATE INDEX IF NOT EXISTS customer_order_history ON orders(customer_id,created_at)')
-            db().commit()
+        if not app.config['DATABASE_URL']:
+            with app.app_context():
+                db().executescript('''
+                    CREATE TABLE IF NOT EXISTS customers (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE NOT NULL COLLATE NOCASE, password_hash TEXT NOT NULL, nama TEXT NOT NULL, nohp TEXT NOT NULL, created_at INTEGER NOT NULL);
+                    CREATE TABLE IF NOT EXISTS customer_sessions (token TEXT PRIMARY KEY, customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE, expires_at INTEGER NOT NULL);
+                    CREATE TABLE IF NOT EXISTS customer_addresses (id INTEGER PRIMARY KEY AUTOINCREMENT, customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE, document TEXT NOT NULL, is_default INTEGER NOT NULL DEFAULT 0);
+                    CREATE UNIQUE INDEX IF NOT EXISTS customer_default_address ON customer_addresses(customer_id) WHERE is_default=1;
+                    CREATE TABLE IF NOT EXISTS customer_state (customer_id INTEGER PRIMARY KEY REFERENCES customers(id) ON DELETE CASCADE, document TEXT NOT NULL, revision INTEGER NOT NULL DEFAULT 0);
+                ''')
+                columns = {row['name'] for row in db().execute('PRAGMA table_info(orders)')}
+                if 'customer_id' not in columns:
+                    db().execute('ALTER TABLE orders ADD COLUMN customer_id INTEGER REFERENCES customers(id)')
+                db().execute('CREATE INDEX IF NOT EXISTS customer_order_history ON orders(customer_id,created_at)')
+                db().commit()
         self.register_routes()
 
     def csrf(self):
@@ -173,7 +174,7 @@ class CustomerAPI:
                 db().commit()
             except ValueError as error:
                 db().rollback();return fail(str(error))
-            except sqlite3.IntegrityError:
+            except INTEGRITY_ERRORS:
                 db().rollback();return fail('Email sudah terdaftar. Gunakan halaman masuk.',409)
             return jsonify(authenticated=True,customer=self.profile(self.current()),csrf=self.csrf()),201
 
@@ -315,7 +316,7 @@ class CustomerAPI:
         @app.get('/api/customer/orders')
         @self.required
         def customer_orders():
-            rows=db().execute('SELECT document,status FROM orders WHERE customer_id=? ORDER BY created_at DESC,rowid DESC',(g.customer['id'],)).fetchall()
+            rows=db().execute('SELECT document,status FROM orders WHERE customer_id=? ORDER BY created_at DESC,id DESC',(g.customer['id'],)).fetchall()
             return jsonify(orders=[dict(json.loads(row['document']),status=row['status']) for row in rows])
 
         @app.get('/api/customer/orders/<order_id>')

@@ -20,6 +20,8 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 from werkzeug.exceptions import HTTPException
 from werkzeug.security import check_password_hash, generate_password_hash
 from customer_api import CustomerAPI
+from database import PostgresDatabase, PostgresError
+from storage import LocalStorage, SupabaseStorage, StorageError
 
 ROOT = Path(__file__).resolve().parent
 ADMIN_ROOT = ROOT / 'admin-portal'
@@ -33,7 +35,14 @@ def create_app(config=None):
     app = Flask(__name__, static_folder=None)
     app.config.update(
         DATA_DIR=os.environ.get("ANREDSELLER_DATA_DIR", str(ROOT / "instance")),
-        MAX_CONTENT_LENGTH=6 * 1024 * 1024,
+        DATABASE_URL=os.environ.get('DATABASE_URL', ''),
+        DATABASE_SCHEMA='anredseller',
+        SESSION_SECRET=os.environ.get('ANREDSELLER_SESSION_SECRET', ''),
+        SUPABASE_URL=os.environ.get('SUPABASE_URL', ''),
+        SUPABASE_KEY=os.environ.get('SUPABASE_SECRET_KEY') or os.environ.get('SUPABASE_SERVICE_ROLE_KEY', ''),
+        SUPABASE_BUCKET=os.environ.get('SUPABASE_STORAGE_BUCKET', 'product-photos'),
+        SERVERLESS=bool(os.environ.get('VERCEL')),
+        MAX_CONTENT_LENGTH=4 * 1024 * 1024 + 64 * 1024,
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_COOKIE_SECURE=os.environ.get("ANREDSELLER_SECURE_COOKIES") == "1",
@@ -51,24 +60,41 @@ def create_app(config=None):
             raise ValueError('ADMIN_PORTAL_URL harus berupa origin HTTPS tanpa path.')
         if not app.config['ADMIN_GATEWAY_KEY']:
             raise ValueError('Portal terpisah membutuhkan ADMIN_GATEWAY_KEY di kedua server.')
-    directory = Path(app.config["DATA_DIR"])
-    directory.mkdir(parents=True, exist_ok=True)
-    (directory / "uploads").mkdir(exist_ok=True)
-    secret_file = directory / "session.key"
-    if not secret_file.exists():
-        try:
-            with secret_file.open("x") as out:
-                out.write(secrets.token_hex(32))
-            secret_file.chmod(0o600)
-        except FileExistsError:
-            pass
-    app.secret_key = secret_file.read_text().strip()
+    postgres = bool(app.config['DATABASE_URL'])
+    if app.config['SERVERLESS'] and not postgres:
+        raise ValueError('Vercel membutuhkan DATABASE_URL PostgreSQL; SQLite hanya untuk lokal.')
+    directory = Path(app.config['DATA_DIR'])
+    if postgres:
+        if len(app.config['SESSION_SECRET']) < 32:
+            raise ValueError('PostgreSQL membutuhkan ANREDSELLER_SESSION_SECRET minimal 32 karakter.')
+        app.secret_key = app.config['SESSION_SECRET']
+    else:
+        directory.mkdir(parents=True, exist_ok=True)
+        secret_file = directory / 'session.key'
+        if not secret_file.exists():
+            try:
+                with secret_file.open('x') as out:
+                    out.write(secrets.token_hex(32))
+                secret_file.chmod(0o600)
+            except FileExistsError:
+                pass
+        app.secret_key = app.config['SESSION_SECRET'] or secret_file.read_text().strip()
+    if postgres and not app.config['TESTING'] and not app.config['SUPABASE_URL']:
+        raise ValueError('PostgreSQL produksi membutuhkan Supabase Storage untuk foto.')
+    if app.config['SUPABASE_URL']:
+        photos = SupabaseStorage(app.config['SUPABASE_URL'], app.config['SUPABASE_KEY'],
+                                 app.config['SUPABASE_BUCKET'], app.config['TESTING'])
+    else:
+        photos = LocalStorage(directory)
 
     def db():
         if "database" not in g:
-            g.database = sqlite3.connect(directory / "store.sqlite3", timeout=15)
-            g.database.row_factory = sqlite3.Row
-            g.database.execute("PRAGMA foreign_keys=ON")
+            if postgres:
+                g.database = PostgresDatabase(app.config['DATABASE_URL'], app.config['DATABASE_SCHEMA'])
+            else:
+                g.database = sqlite3.connect(directory / "store.sqlite3", timeout=15)
+                g.database.row_factory = sqlite3.Row
+                g.database.execute("PRAGMA foreign_keys=ON")
         return g.database
 
     @app.teardown_appcontext
@@ -78,22 +104,23 @@ def create_app(config=None):
             connection.close()
 
     app.get_db = db
-    with app.app_context():
-        db().executescript("""
-            PRAGMA journal_mode=WAL;
-            CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY, value TEXT);
-            CREATE TABLE IF NOT EXISTS owners (id INTEGER PRIMARY KEY, email TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL);
-            CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY AUTOINCREMENT, document TEXT NOT NULL, published INTEGER NOT NULL DEFAULT 0, updated_at INTEGER NOT NULL);
-            CREATE TABLE IF NOT EXISTS orders (id TEXT PRIMARY KEY, document TEXT NOT NULL, status TEXT NOT NULL, idempotency_key TEXT UNIQUE NOT NULL, created_at INTEGER NOT NULL);
-            CREATE TABLE IF NOT EXISTS login_attempts (address TEXT NOT NULL, attempted_at INTEGER NOT NULL);
-            CREATE TABLE IF NOT EXISTS owner_sessions (token TEXT PRIMARY KEY, owner_id INTEGER NOT NULL REFERENCES owners(id), expires_at INTEGER NOT NULL);
-        """)
-        if not db().execute("SELECT 1 FROM metadata WHERE key='seeded'").fetchone():
-            for product in json.loads((ROOT / "data/products.seed.json").read_text()):
-                product.update(ukuran=[], warna=[], published=True, demo=True)
-                db().execute("INSERT INTO products(id, document, published, updated_at) VALUES(?,?,1,?)", (product["id"], json.dumps(product), int(time.time())))
-            db().execute("INSERT INTO metadata VALUES('seeded','1')")
-            db().commit()
+    if not postgres:
+        with app.app_context():
+            db().executescript("""
+                PRAGMA journal_mode=WAL;
+                CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY, value TEXT);
+                CREATE TABLE IF NOT EXISTS owners (id INTEGER PRIMARY KEY, email TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY AUTOINCREMENT, document TEXT NOT NULL, published INTEGER NOT NULL DEFAULT 0, updated_at INTEGER NOT NULL);
+                CREATE TABLE IF NOT EXISTS orders (id TEXT PRIMARY KEY, document TEXT NOT NULL, status TEXT NOT NULL, idempotency_key TEXT UNIQUE NOT NULL, created_at INTEGER NOT NULL);
+                CREATE TABLE IF NOT EXISTS login_attempts (address TEXT NOT NULL, attempted_at INTEGER NOT NULL);
+                CREATE TABLE IF NOT EXISTS owner_sessions (token TEXT PRIMARY KEY, owner_id INTEGER NOT NULL REFERENCES owners(id), expires_at INTEGER NOT NULL);
+            """)
+            if not db().execute("SELECT 1 FROM metadata WHERE key='seeded'").fetchone():
+                for product in json.loads((ROOT / "data/products.seed.json").read_text()):
+                    product.update(ukuran=[], warna=[], published=True, demo=True)
+                    db().execute("INSERT INTO products(id, document, published, updated_at) VALUES(?,?,1,?)", (product["id"], json.dumps(product), int(time.time())))
+                db().execute("INSERT INTO metadata VALUES('seeded','1')")
+                db().commit()
 
     def fail(message, status=400):
         response = jsonify(error=message)
@@ -145,16 +172,29 @@ def create_app(config=None):
             response.headers["Cache-Control"] = "no-store"
         return response
 
+    @app.errorhandler(StorageError)
+    def storage_error(error):
+        return fail(str(error), 503)
+
+    @app.errorhandler(PostgresError)
+    def database_error(error):
+        if app.testing:
+            raise error
+        return fail('Database belum dapat diakses. Periksa koneksi dan migrasi Supabase di pengaturan server.', 503)
+
     @app.errorhandler(HTTPException)
     def http_error(error):
         if request.path.startswith("/api/"):
-            messages = {413: "File terlalu besar. Batas unggahan 5 MB.", 404: "Data tidak ditemukan.", 405: "Metode tidak diizinkan."}
+            messages = {413: "File terlalu besar. Batas unggahan 4 MB.", 404: "Data tidak ditemukan.", 405: "Metode tidak diizinkan."}
             return fail(messages.get(error.code, "Permintaan tidak dapat diproses."), error.code)
         return error
 
     @app.get("/api/health")
     def health():
-        db().execute("SELECT 1").fetchone()
+        db().execute("SELECT key FROM metadata LIMIT 1").fetchone()
+        db().execute("SELECT id FROM products LIMIT 1").fetchone()
+        db().execute("SELECT id FROM customers LIMIT 1").fetchone()
+        db().execute("SELECT id FROM orders LIMIT 1").fetchone()
         return jsonify(status="ok")
 
     @app.get("/api/session")
@@ -229,14 +269,14 @@ def create_app(config=None):
         old_price = data.get("hargaAsli") or price
         if isinstance(old_price, bool) or not isinstance(old_price, int) or not price <= old_price <= 1_000_000_000:
             raise ValueError("Harga awal harus sama atau lebih besar dari harga jual.")
-        photos = data.get("gambarList", [])
-        if not isinstance(photos, list) or not 1 <= len(photos) <= 8:
+        photo_list = data.get("gambarList", [])
+        if not isinstance(photo_list, list) or not 1 <= len(photo_list) <= 8:
             raise ValueError("Unggah 1–8 foto produk.")
-        for photo in photos:
+        for photo in photo_list:
             if not isinstance(photo, str):
                 raise ValueError("Foto tidak valid.")
             if re.fullmatch(r"/uploads/[a-f0-9]{32}\.webp", photo):
-                exists = (directory / "uploads" / photo.rsplit("/", 1)[1]).is_file()
+                exists = photos.exists(photo.rsplit("/", 1)[1])
             elif re.fullmatch(r"assets/[a-zA-Z0-9_-]+\.(png|jpg|jpeg|webp|svg)", photo):
                 exists = (ROOT / photo).is_file()
             else:
@@ -252,7 +292,7 @@ def create_app(config=None):
             nama=text("nama", required=True), kategori=category, harga=price, hargaAsli=old_price,
             stok=number("stok", 0, 1_000_000), deskripsi=text("deskripsi", 10000, True), brand=text("brand", 80),
             label=text("label", 40), ukuran=options("ukuran"), warna=options("warna"),
-            gambarList=photos, gambar=photos[0], published=data.get("published") is True,
+            gambarList=photo_list, gambar=photo_list[0], published=data.get("published") is True,
             trending=data.get("trending") is True, rekomendasi=data.get("rekomendasi") is True,
             rating=(previous or {}).get("rating", 0), ulasan=(previous or {}).get("ulasan", 0), terjual=(previous or {}).get("terjual", 0),
             demo=(previous or {}).get("demo", False),
@@ -309,9 +349,9 @@ def create_app(config=None):
         photo = request.files.get("photo")
         if not photo:
             return fail("Pilih foto yang ingin diunggah.")
-        data = photo.read(5 * 1024 * 1024 + 1)
-        if len(data) > 5 * 1024 * 1024:
-            return fail("Foto maksimal 5 MB.", 413)
+        data = photo.read(4 * 1024 * 1024 + 1)
+        if len(data) > 4 * 1024 * 1024:
+            return fail("Foto maksimal 4 MB.", 413)
         try:
             with Image.open(io.BytesIO(data)) as image:
                 if image.format not in {"JPEG", "PNG", "WEBP"}:
@@ -322,7 +362,11 @@ def create_app(config=None):
                 image = ImageOps.exif_transpose(image).convert("RGB")
                 image.thumbnail((2000, 2000))
                 name = uuid.uuid4().hex + ".webp"
-                image.save(directory / "uploads" / name, "WEBP", quality=88)
+                output = io.BytesIO()
+                image.save(output, 'WEBP', quality=88)
+                if output.tell() > 4 * 1024 * 1024:
+                    return fail('Foto hasil konversi maksimal 4 MB. Gunakan gambar berukuran lebih kecil.', 413)
+                photos.put(name, output.getvalue())
         except (UnidentifiedImageError, OSError, ValueError, Image.DecompressionBombError):
             return fail("Foto tidak valid. Gunakan JPG, PNG, atau WebP maksimal 25 megapiksel.")
         return jsonify(url="/uploads/" + name), 201
@@ -422,7 +466,7 @@ def create_app(config=None):
     @app.get("/api/admin/orders")
     @owner_required
     def orders():
-        return jsonify(orders=[dict(json.loads(row["document"]),status=row["status"]) for row in db().execute("SELECT * FROM orders ORDER BY created_at DESC, rowid DESC").fetchall()])
+        return jsonify(orders=[dict(json.loads(row["document"]),status=row["status"]) for row in db().execute("SELECT * FROM orders ORDER BY created_at DESC, id DESC").fetchall()])
 
     @app.patch("/api/admin/orders/<order_id>")
     @owner_required
@@ -455,7 +499,13 @@ def create_app(config=None):
     def uploaded_file(filename):
         if not re.fullmatch(r"[a-f0-9]{32}\.webp", filename):
             return fail("Foto tidak ditemukan.", 404)
-        return send_from_directory(directory / "uploads", filename, max_age=86400)
+        data = photos.get(filename)
+        if data is None:
+            return fail('Foto tidak ditemukan.', 404)
+        response = app.response_class(data, mimetype='image/webp')
+        response.cache_control.public = True
+        response.cache_control.max_age = 86400
+        return response
 
     @app.get("/")
     def index():
@@ -506,15 +556,57 @@ def create_owner(app, email, password):
         connection.commit()
 
 
-app = create_app()
+def configuration_app():
+    """Keep public pages accessible while Vercel secrets are being configured.
+
+    No database is opened and every API fails closed with 503. This is not a
+    fallback SQLite store and cannot accept registrations or orders.
+    """
+    pending = Flask(__name__, static_folder=None)
+
+    @pending.route('/api/<path:path>', methods=['GET','POST','PUT','PATCH','DELETE'])
+    def unavailable_api(path):
+        return jsonify(error='Konfigurasi server belum lengkap. Lengkapi Environment Variables Vercel dan migrasi Supabase, lalu redeploy.'), 503
+
+    @pending.get('/', defaults={'filename':'index.html'})
+    @pending.get('/<path:filename>')
+    def public_page(filename):
+        pages = {'index.html','produk.html','detail.html','keranjang.html','checkout.html','konfirmasi.html','akun.html'}
+        parts = Path(filename).parts
+        if filename in pages or (parts and parts[0] in {'css','js','assets'} and not any(part.startswith('.') for part in parts)):
+            return send_from_directory(ROOT, filename)
+        abort(404)
+
+    @pending.after_request
+    def pending_headers(response):
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'DENY'
+        return response
+
+    return pending
+
+
+try:
+    app = create_app()
+except ValueError:
+    if not os.environ.get('VERCEL'):
+        raise
+    app = configuration_app()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=["run","create-admin","reset-password"], nargs="?", default="run")
+    parser.add_argument("command", choices=["run","create-admin","reset-password","init-db"], nargs="?", default="run")
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--host", default="127.0.0.1")
     args = parser.parse_args()
-    if args.command in {"create-admin", "reset-password"}:
+    if args.command == 'init-db':
+        if not app.config['DATABASE_URL']:
+            parser.error('Atur DATABASE_URL PostgreSQL terlebih dahulu.')
+        with app.app_context():
+            app.get_db().initialize()
+        print('Schema PostgreSQL berhasil disiapkan tanpa menghapus data.')
+    elif args.command in {"create-admin", "reset-password"}:
         email = input("Email pemilik: ").strip().lower()
         password = getpass.getpass("Kata sandi (minimal 12 karakter): ")
         if password != getpass.getpass("Ulangi kata sandi: "):
