@@ -88,3 +88,7 @@ ANREDSELLER_TEST_ADMIN_PORTAL=1 python3 tests/browser_smoke.py
 ```
 
 Pengujian browser membuka toko dan portal pada origin berbeda, menjalankan unggah → draf → terbit → pesanan → pembaruan dashboard, serta memeriksa bahwa API pembeli tidak tersedia pada portal admin. Data uji disimpan sementara dan dihapus setelah pengujian.
+
+## Tampilan toko dan media sosial
+
+Dashboard menyediakan menu **Tampilan toko** untuk sembilan foto publik (slider, kategori, banner dan halaman akun), **Media sosial** untuk tautan footer yang awalnya kosong, dan **Kontak WhatsApp** untuk dua nomor toko. Foto produk tetap di **Koleksi produk**. Setelah mengubah, simpan lalu muat ulang toko publik. Backend dan portal harus menggunakan commit terbaru; tidak memerlukan database, environment variable atau migrasi baru untuk pengaturan konten.

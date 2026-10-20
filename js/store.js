@@ -15,6 +15,19 @@ const storeIcons = {
 const icon = (name) =>
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${storeIcons[name] || ""}</svg>`;
 
+// A server-rendered snapshot makes photo removal effective before the first paint.
+const storeContentReady = (async () => {
+  const snapshot = document.getElementById("store-content");
+  if (snapshot) {
+    try { return JSON.parse(snapshot.textContent); } catch {}
+  }
+  try {
+    const response = await fetch("/api/store/content", { cache: "no-store" });
+    if (response.ok) return (await response.json()).content;
+  } catch {}
+  return null;
+})();
+
 // Destinations are public store settings; messages only leave the site on a user's click.
 const storeContactsReady = fetch("/api/store/contacts", {cache: "no-store"})
   .then(async (response) => {
@@ -85,7 +98,30 @@ if (navigation) {
 }
 const footer = document.getElementById("store-footer");
 if (footer)
-  footer.innerHTML = `<footer class="store-footer"><div class="footer-top"><div class="footer-invitation"><h2>Your next good find.</h2><p>Fashion yang kamu pilih.<br>Karakter yang kamu bawa.</p><a class="text-link" href="produk.html">Jelajahi katalog ${icon("bag")}</a></div><nav aria-label="Koleksi footer"><h3>Koleksi</h3><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><a href="produk.html?sort=diskon">Pilihan diskon</a></nav><nav aria-label="Bantuan footer"><h3>Di sini untukmu</h3><button type="button" data-support-open>Hubungi CS via WhatsApp</button><button data-dialog="help">Bantuan & FAQ</button><button data-dialog="shipping">Pengiriman</button><button data-dialog="reseller">Program reseller</button><button data-dialog="privacy">Privasi</button></nav><nav aria-label="Akun footer"><h3>Anredseller</h3><a href="akun.html">Akun & pesanan</a><button data-dialog="wishlist">Wishlist</button><button data-dialog="about">Tentang kami</button><a href="admin.html">Area pemilik</a></nav></div><a class="footer-wordmark" href="index.html" aria-label="Anredseller beranda">Anredseller</a><div class="footer-bottom"><span>© ${new Date().getFullYear()} Anredseller</span><span>Pembayaran dibantu via WhatsApp</span><a href="#main-content">Kembali ke atas ↑</a></div></footer>`;
+  footer.innerHTML = `<footer class="store-footer"><div class="footer-top"><div class="footer-invitation"><h2>Your next good find.</h2><p>Fashion yang kamu pilih.<br>Karakter yang kamu bawa.</p><a class="text-link" href="produk.html">Jelajahi katalog ${icon("bag")}</a></div><nav aria-label="Koleksi footer"><h3>Koleksi</h3><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><a href="produk.html?sort=diskon">Pilihan diskon</a></nav><nav aria-label="Bantuan footer"><h3>Di sini untukmu</h3><button type="button" data-support-open>Hubungi CS via WhatsApp</button><button data-dialog="help">Bantuan & FAQ</button><button data-dialog="shipping">Pengiriman</button><button data-dialog="reseller">Program reseller</button><button data-dialog="privacy">Privasi</button></nav><nav aria-label="Akun footer"><h3>Anredseller</h3><a href="akun.html">Akun & pesanan</a><button data-dialog="wishlist">Wishlist</button><button data-dialog="about">Tentang kami</button><a href="admin.html">Area pemilik</a></nav></div><nav class="footer-socials" id="footer-socials" aria-label="Media sosial Anredseller" hidden><span>Ikuti Anredseller</span><div id="footer-social-links"></div></nav><a class="footer-wordmark" href="index.html" aria-label="Anredseller beranda">Anredseller</a><div class="footer-bottom"><span>© ${new Date().getFullYear()} Anredseller</span><span>Pembayaran dibantu via WhatsApp</span><a href="#main-content">Kembali ke atas ↑</a></div></footer>`;
+
+storeContentReady.then(content => {
+  const section = document.getElementById("footer-socials");
+  if (!section || !content?.socials) return;
+  const labels = { instagram: "Instagram", tiktok: "TikTok", facebook: "Facebook", youtube: "YouTube", x: "X", threads: "Threads" };
+  const links = Object.entries(labels).filter(([key]) => content.socials[key]).map(([key,label]) => [label,content.socials[key]]);
+  if (content.socials.other_url) links.push([content.socials.other_label,content.socials.other_url]);
+  const container = document.getElementById("footer-social-links");
+  for (const [label,href] of links) {
+    try {
+      const url = new URL(href);
+      if (url.protocol !== "https:" || url.username || url.password) continue;
+      const link = document.createElement("a");
+      link.href = url.href;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = label + " ↗";
+      link.setAttribute("aria-label", label + " Anredseller, buka di tab baru");
+      container.appendChild(link);
+    } catch {}
+  }
+  section.hidden = !container.children.length;
+});
 
 const supportPanel = document.createElement("dialog");
 supportPanel.className = "support-dialog";
@@ -100,7 +136,13 @@ supportLauncher.dataset.supportOpen = "";
 supportLauncher.setAttribute("aria-haspopup", "dialog");
 supportLauncher.setAttribute("aria-controls", "support-dialog");
 supportLauncher.innerHTML = `${icon("chat")} <span>Hubungi CS</span>`;
-document.body.appendChild(supportLauncher);
+const footerSurface = footer?.querySelector(".store-footer");
+(footerSurface || document.body).appendChild(supportLauncher);
+if (footerSurface && "IntersectionObserver" in window) {
+  new IntersectionObserver(entries => {
+    supportLauncher.classList.toggle("support-docked", entries[0].isIntersecting);
+  }).observe(footerSurface);
+}
 supportPanel.querySelector(".support-close").addEventListener("click", () => supportPanel.close());
 document.addEventListener("click", async (event) => {
   if (!event.target.closest("[data-support-open]")) return;

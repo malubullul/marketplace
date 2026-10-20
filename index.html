@@ -15,15 +15,15 @@
   <body class="store-home archive-home">
     <div id="store-header"></div>
     <main>
-      <section class="campaign" id="campaign-carousel" aria-roledescription="carousel" aria-label="Kampanye Anredseller" tabindex="0">
+      <section class="campaign{% if not content.campaigns %} campaign-no-photo{% endif %}" id="campaign-carousel" aria-roledescription="carousel" aria-label="Kampanye Anredseller" tabindex="0">
         <div class="campaign-photo">
           <div class="campaign-image-outgoing" aria-hidden="true"></div>
           <img
             id="campaign-image"
-            src="assets/archive-campaign.webp"
+            {% if campaign.image %}src="{{ campaign.image }}"{% else %}hidden{% endif %}
             width="1672"
             height="941"
-            alt="Kampanye Anredseller: dua model mengenakan jaket suede cokelat di lounge bernuansa kayu gelap"
+            alt="{{ campaign.alt }}" style="object-position: {{ campaign.crop }}"
             fetchpriority="high"
             draggable="false"
           />
@@ -37,17 +37,16 @@
           </div>
         </div>
         <div class="campaign-copy">
-          <h1 id="campaign-title">The Archive.<br />Worn your way.</h1>
+          <h1 id="campaign-title">{{ campaign.heading[0] }}<br />{{ campaign.heading[1] }}</h1>
           <p id="campaign-description">
-            Fashion, sneakers, dan pilihan sehari-hari. Temukan yang terasa
-            seperti kamu.
+            {{ campaign.description }}
           </p>
-          <a id="campaign-shop-link" class="solid-link" href="produk.html?kategori=apparel"
+          <a id="campaign-shop-link" class="solid-link" href="{{ campaign.href }}"
             >Jelajahi koleksi <span aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5 19 19 5M5 5h14v14" /></svg></span></a
           >
         </div>
         <div class="campaign-pagination" data-ui hidden>
-          <span class="campaign-counter" aria-hidden="true"><span id="campaign-current">01</span><span class="campaign-counter-separator">/</span>05</span>
+          <span class="campaign-counter" aria-hidden="true"><span id="campaign-current">01</span><span class="campaign-counter-separator">/</span><span id="campaign-total">{{ "%02d"|format(content.campaigns|length) }}</span></span>
           <div class="campaign-selectors" role="group" aria-label="Pilih foto kampanye">
             <button type="button" data-campaign="0" aria-label="Lihat kampanye The Archive" aria-current="true"></button>
             <button type="button" data-campaign="1" aria-label="Lihat kampanye After Hours"></button>
@@ -131,8 +130,9 @@
             href="produk.html?kategori=sneakers"
             ><span class="editorial-label">The sneaker edit</span
             ><img
-              src="assets/shoe-3.png"
-              alt="Sneaker biru dan hitam"
+              {% if content.images.category_sneakers.src %}src="{{ content.images.category_sneakers.src }}"{% else %}hidden{% endif %}
+              style="object-position: {{ content.images.category_sneakers.position }}% center"
+              alt="{{ content.images.category_sneakers.alt }}"
               width="512"
               height="512"
               loading="lazy" />
@@ -155,8 +155,9 @@
             href="produk.html?kategori=apparel"
             ><span class="editorial-label">Everyday apparel</span
             ><img
-              src="assets/shirt.png"
-              alt="Kaos hitam essential"
+              {% if content.images.category_apparel.src %}src="{{ content.images.category_apparel.src }}"{% else %}hidden{% endif %}
+              style="object-position: {{ content.images.category_apparel.position }}% center"
+              alt="{{ content.images.category_apparel.alt }}"
               width="512"
               height="512"
               loading="lazy" />
@@ -177,7 +178,7 @@
           ></a>
         </div>
       </section>
-      <section class="reseller-banner" id="reseller">
+      <section class="reseller-banner{% if not content.images.reseller_banner.src %} without-store-photo{% endif %}" id="reseller">
         <div class="reseller-content">
           <h2>Good taste.<br />Shared.</h2>
           <div>
@@ -203,11 +204,12 @@
         </div>
         <img
           class="reseller-photo"
-          src="assets/archive-campaign.webp"
+          {% if content.images.reseller_banner.src %}src="{{ content.images.reseller_banner.src }}"{% else %}hidden{% endif %}
+              style="object-position: {{ content.images.reseller_banner.position }}% center"
           width="1672"
           height="941"
           loading="lazy"
-          alt="Detail layer suede dari kampanye Archive"
+          alt="{{ content.images.reseller_banner.alt }}"
         />
       </section>
       <section class="newsletter-edit">

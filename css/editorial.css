@@ -1532,3 +1532,24 @@ p {
   .product-review-form { padding: 16px 12px; }
   .product-rating-line { font-size: 11px; }
 }
+
+/* Optional social links continue the footer's typographic navigation. */
+.footer-socials { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 40px; margin-top: 36px; }
+.footer-socials[hidden] { display: none; }
+.footer-socials > span { color: var(--muted); font-size: 14px; }
+.footer-socials > div { display: flex; flex-wrap: wrap; gap: 8px 28px; }
+.footer-socials a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; color: var(--ink); }
+.footer-socials a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.editorial-card img[hidden], .reseller-photo[hidden], #campaign-image[hidden] { display: none; }
+.reseller-banner.without-store-photo { grid-template-columns: minmax(0,1fr); }
+.archive-home .campaign-no-photo { background: #303a2a; }
+.archive-home .campaign-no-photo .campaign-photo, .archive-home .campaign-no-photo::after { display: none; }
+@media(max-width: 760px) {
+  .archive-home .campaign-no-photo { padding: 136px 0 44px; min-height: 480px; }
+  .archive-home .campaign-no-photo .campaign-copy { margin-top: 0; }
+  .footer-socials { align-items: flex-start; flex-direction: column; gap: 8px; margin-top: 32px; }
+  .footer-socials > div { gap: 4px 24px; }
+}
+/* Dock CS in the footer's reserved space so it cannot cover its title or social links. */
+.store-footer { position: relative; }
+.support-launcher.support-docked { position: absolute; bottom: 24px; right: var(--page-gutter); }

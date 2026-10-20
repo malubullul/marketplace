@@ -1,9 +1,9 @@
 // A deliberately manual campaign carousel: no timer moves the customer's view.
-(() => {
+(async () => {
   const carousel = document.getElementById("campaign-carousel");
   if (!carousel) return;
 
-  const slides = [
+  const defaults = [
     {
       name: "The Archive", image: "assets/archive-campaign.webp",
       heading: ["The Archive.", "Worn your way."],
@@ -46,6 +46,15 @@
     },
   ];
 
+  const content = await storeContentReady;
+  const slides = content?.campaigns || defaults;
+  if (!slides.length) {
+    carousel.classList.add("campaign-no-photo");
+    carousel.dataset.campaignIndex = "-1";
+    return;
+  }
+  carousel.querySelector(".campaign-selectors").innerHTML = slides.map((slide,index) => `<button type="button" data-campaign="${index}" aria-label="Lihat kampanye ${h(slide.name)}"${index === 0 ? ' aria-current="true"' : ''}></button>`).join("");
+  document.getElementById("campaign-total").textContent = String(slides.length).padStart(2,"0");
   const photo = carousel.querySelector(".campaign-photo");
   const image = document.getElementById("campaign-image");
   const outgoing = carousel.querySelector(".campaign-image-outgoing");
@@ -147,9 +156,9 @@
 
   carousel.dataset.campaignIndex = "0";
   carousel.classList.add("campaign-ready");
-  carousel.querySelector(".campaign-arrows").hidden = false;
-  carousel.querySelector(".campaign-pagination").hidden = false;
-  const preloadNext = () => load(slides[1]).catch(() => {});
+  carousel.querySelector(".campaign-arrows").hidden = slides.length < 2;
+  carousel.querySelector(".campaign-pagination").hidden = slides.length < 2;
+  const preloadNext = () => { if (slides[1]) load(slides[1]).catch(() => {}); };
   if ("requestIdleCallback" in window) requestIdleCallback(preloadNext, {timeout: 2000});
   else setTimeout(preloadNext, 1200);
 })();

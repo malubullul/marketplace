@@ -43,3 +43,7 @@ Email dan respons bersifat sama untuk alamat terdaftar/belum terdaftar; batas pe
 Rating memerlukan pembelian milik sesi pembeli dengan status selesai; ID/nama pembeli dari payload tidak menentukan pemilik ulasan. Satu rating per akun/produk ditegakkan oleh primary key. Ringkasan dan jumlah terjual dihitung dari tabel ulasan/item pesanan, bukan angka yang dapat dikirim dari editor produk. API publik menyamarkan nama dan tidak memuat email, ID akun atau nomor pesanan.
 
 Verifikasi rating/pemulihan: **104 tes backend lolos tanpa skip** pada SQLite/PostgreSQL; browser fitur baru lolos pada kedua backend, 231 pemeriksaan responsif regresi dan 15 layout fitur baru per backend lolos. Pengirim email memakai fixture lokal. Belum mengirim email produksi atau memigrasikan Supabase pengguna.
+
+## Pengaturan tampilan dan media sosial
+
+Kontrol konten memakai sesi pemilik/CSRF serta allowlist gateway yang sama; akun pembeli tidak memperoleh hak edit. Foto harus berasal dari aset bawaan yang diizinkan atau upload yang diperiksa server. URL gambar eksternal tidak diterima. Tautan sosial dibatasi HTTPS/domain platform dan tidak diambil oleh backend; label/deskripsi diperlakukan sebagai teks dan penutup script pada snapshot JSON di-escape. Versi pengaturan diperiksa dalam transaksi untuk mencegah tab/perangkat menimpa perubahan terbaru. Data disimpan di metadata privat yang sudah ada, tanpa tabel atau hak Data API baru. Lihat [panduan konten dan hasil pengujian](STORE_CONTENT.md).

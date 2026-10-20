@@ -15,7 +15,7 @@ import uuid
 from collections import Counter
 from urllib.parse import urlsplit
 
-from flask import Flask, abort, g, jsonify, redirect, request, send_from_directory, session
+from flask import Flask, abort, g, jsonify, redirect, render_template_string, request, send_from_directory, session
 from PIL import Image, ImageOps, UnidentifiedImageError
 from werkzeug.exceptions import HTTPException
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -24,9 +24,22 @@ from product_reviews import ProductReviews
 from password_recovery import PasswordRecovery
 from database import PostgresDatabase, PostgresError
 from storage import LocalStorage, SupabaseStorage, StorageError
+from store_content import CAMPAIGNS, StoreContent, default_content, public_content
 
 ROOT = Path(__file__).resolve().parent
 ADMIN_ROOT = ROOT / 'admin-portal'
+
+
+def public_html(filename, content=None):
+    content = content if content is not None else public_content(default_content())
+    campaign = content['campaigns'][0] if content['campaigns'] else dict(CAMPAIGNS[0], image='', alt='', crop='50% center')
+    html = render_template_string((ROOT / filename).read_text(), content=content, campaign=campaign)
+    # JSON is data, never executable HTML. Escape script terminators even in owner-written alt text.
+    encoded = json.dumps(content).replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026')
+    html = html.replace('</head>', '<script type="application/json" id="store-content">'+encoded+'</script></head>')
+    response = Flask.response_class(html, mimetype='text/html')
+    response.headers['Cache-Control'] = 'no-store'
+    return response
 CATEGORIES = {"apparel", "sneakers", "essentials"}
 ORDER_STATES = {"baru", "diproses", "dikirim", "selesai", "dibatalkan"}
 COUPONS = {"HEMAT10": 10, "ANRED15": 15, "SALE20": 20}
@@ -267,6 +280,8 @@ def create_app(config=None):
         session.pop("sid", None)
         session.pop("csrf", None)
         return jsonify(ok=True)
+
+    content_settings = StoreContent(app, db, owner_required, fail, body, photos)
 
     def products(include_drafts=False):
         rows = db().execute("SELECT * FROM products" + ("" if include_drafts else " WHERE published=1") + " ORDER BY id DESC").fetchall()
@@ -585,11 +600,11 @@ def create_app(config=None):
 
     @app.get("/")
     def index():
-        return send_from_directory(ROOT, "index.html")
+        return public_html('index.html', public_content(content_settings.read()))
 
     @app.get("/akun")
     def customer_page():
-        return send_from_directory(ROOT,"akun.html")
+        return public_html('akun.html', public_content(content_settings.read()))
 
     @app.get("/admin")
     def admin_page():
@@ -613,7 +628,9 @@ def create_app(config=None):
             return send_from_directory(ADMIN_ROOT / 'static', filename)
         pages = {"index.html","produk.html","detail.html","keranjang.html","checkout.html","konfirmasi.html","akun.html"}
         parts = Path(filename).parts
-        if filename in pages or (parts and parts[0] in {"css","js","assets"} and not any(part.startswith(".") for part in parts)):
+        if filename in pages:
+            return public_html(filename, public_content(content_settings.read()))
+        if parts and parts[0] in {"css","js","assets"} and not any(part.startswith(".") for part in parts):
             return send_from_directory(ROOT, filename)
         return fail("Halaman tidak ditemukan.", 404)
 
@@ -649,7 +666,9 @@ def configuration_app():
     def public_page(filename):
         pages = {'index.html','produk.html','detail.html','keranjang.html','checkout.html','konfirmasi.html','akun.html'}
         parts = Path(filename).parts
-        if filename in pages or (parts and parts[0] in {'css','js','assets'} and not any(part.startswith('.') for part in parts)):
+        if filename in pages:
+            return public_html(filename)
+        if parts and parts[0] in {'css','js','assets'} and not any(part.startswith('.') for part in parts):
             return send_from_directory(ROOT, filename)
         abort(404)
 

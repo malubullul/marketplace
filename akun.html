@@ -14,7 +14,8 @@
     <div id="store-header"></div>
     <main class="account-main">
       <section id="customer-auth" hidden class="account-auth-layout">
-        <div class="account-editorial">
+        <div class="account-editorial{% if not content.images.account_editorial.src %} without-store-photo{% endif %}">
+          {% if content.images.account_editorial.src %}<img class="account-editorial-photo" src="{{ content.images.account_editorial.src }}" alt="{{ content.images.account_editorial.alt }}" style="object-position: {{ content.images.account_editorial.position }}% center" />{% endif %}
           <div>
             <h2>Good finds.<br />Kept for you.</h2>
             <p>

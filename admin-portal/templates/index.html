@@ -62,6 +62,8 @@
           ><button class="nav-button" data-page="orders">
             Pesanan masuk <span id="orders-count">0</span>
           </button>
+          <button class="nav-button" data-page="appearance">Tampilan toko</button>
+          <button class="nav-button" data-page="socials">Media sosial</button>
           <button class="nav-button" data-page="settings">Kontak WhatsApp</button>
         </nav>
         <div class="sidebar-bottom">
@@ -208,6 +210,25 @@
             <p class="notice">Pesanan baru tetap menunggu pembayaran. Setelah transfer diperiksa, ubah status pesanan menjadi Diproses. Membuka WhatsApp tidak mengonfirmasi pembayaran.</p>
             <p id="contacts-result" role="status" hidden></p>
             <button type="submit" class="button primary" id="save-contacts">Simpan kontak</button>
+          </form>
+        </section>
+        <section id="appearance-page" hidden>
+          <div class="page-heading"><div><h1>Tampilan toko<span>.</span></h1><p>Atur foto yang menyambut pelanggan di toko publik.</p></div><button type="button" class="button secondary" data-reload-content>Muat ulang pengaturan</button></div>
+          <p class="settings-inline-note">Foto produk: <button type="button" class="settings-text-link" data-open-products>Koleksi produk →</button></p>
+          <form id="site-images-form" class="site-settings-sheet">
+            <div class="settings-save-row"><div><p>JPG, PNG, atau WebP · maks. 4 MB.<br>Gunakan foto lebar untuk slider.</p></div><button type="submit" class="button primary" id="save-site-images" disabled>Simpan perubahan gambar</button></div>
+            <p id="site-images-result" class="notice" role="status" hidden></p>
+            <div id="site-image-settings"><p role="status">Memuat pengaturan gambar…</p></div>
+            <button type="submit" class="button secondary" id="save-site-images-bottom" disabled>Simpan perubahan gambar</button>
+          </form>
+        </section>
+        <section id="socials-page" hidden>
+          <div class="page-heading"><div><h1>Media sosial<span>.</span></h1><p>Hubungkan pelanggan dengan akun resmi Anredseller.</p></div><button type="button" class="button secondary" data-reload-content>Muat ulang pengaturan</button></div>
+          <form id="site-socials-form" class="site-settings-sheet">
+            <div class="settings-save-row"><div><h2>Ikuti Anredseller</h2><p>Tautan tampil di footer, di bawah menu dan di atas tulisan besar Anredseller. Kolom kosong tidak ditampilkan.</p></div></div>
+            <div id="site-social-settings"><p role="status">Memuat media sosial…</p></div>
+            <p id="site-socials-result" class="notice" role="status" hidden></p>
+            <button type="submit" class="button primary" id="save-site-socials" disabled>Simpan media sosial</button>
           </form>
         </section>
       </main>

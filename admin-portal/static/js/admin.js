@@ -82,7 +82,7 @@ async function openDashboard(email) {
   $("login-view").hidden = true;
   $("dashboard").hidden = false;
   await refresh();
-  showPage(["products", "orders", "settings"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "products");
+  showPage(["products", "orders", "settings", "appearance", "socials"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "products");
 }
 async function refresh() {
   try {
@@ -151,20 +151,31 @@ function renderOrders() {
     .join("");
   $("orders-empty").hidden = orders.length > 0;
 }
+function scrollActiveNavigation() {
+  const navigation = document.querySelector(".sidebar nav");
+  const active = navigation.querySelector(".nav-button.active");
+  if (active && navigation.scrollWidth > navigation.clientWidth + 1)
+    navigation.scrollLeft = Math.max(0, active.offsetLeft - navigation.offsetLeft - 10);
+}
+window.addEventListener("resize", scrollActiveNavigation);
 function showPage(name) {
   activePage = name;
   history.replaceState({}, "", "#" + name);
-  document.querySelector(".stats").hidden = name === "settings";
+  document.querySelector(".stats").hidden = !["products", "orders"].includes(name);
   $("products-page").hidden = name !== "products";
   $("orders-page").hidden = name !== "orders";
   $("settings-page").hidden = name !== "settings";
+  $("appearance-page").hidden = name !== "appearance";
+  $("socials-page").hidden = name !== "socials";
+  if (["appearance", "socials"].includes(name) && !siteContentState) loadSiteSettings();
   $("page-breadcrumb").textContent =
-    {products: "KOLEKSI", orders: "PESANAN", settings: "KONTAK WHATSAPP"}[name];
+    {products: "KOLEKSI", orders: "PESANAN", settings: "KONTAK WHATSAPP", appearance: "TAMPILAN TOKO", socials: "MEDIA SOSIAL"}[name];
   document
     .querySelectorAll("[data-page]")
     .forEach((button) =>
       button.classList.toggle("active", button.dataset.page === name),
     );
+  scrollActiveNavigation();
 }
 function productError(text) {
   const error = $("product-error");
@@ -437,6 +448,7 @@ document.addEventListener("click", async (event) => {
   }
   const nav = event.target.closest("[data-page]");
   if (nav) showPage(nav.dataset.page);
+  if (event.target.closest("[data-open-products]")) showPage("products");
   const orderButton = event.target.closest("[data-order]");
   if (orderButton)
     openOrder(orders.find((o) => o.nomor === orderButton.dataset.order));
@@ -514,4 +526,108 @@ $("contacts-form").addEventListener("submit", async (event) => {
     result.hidden = false;
     button.disabled = false;
   }
+});
+
+// Public presentation settings use the same authenticated backend as products.
+let siteContentState = null, siteSlots = [], sitePlatforms = [], siteLoading = false;
+let siteUploading = false, siteSaving = false;
+const siteDirty = { images: false, socials: false };
+function siteResult(section, text, error = false) {
+  const result = $("site-" + section + "-result");
+  result.textContent = text;
+  result.className = "notice" + (error ? " error" : "");
+  result.hidden = !text;
+}
+function siteButtons() {
+  document.querySelectorAll('#site-images-form input,#site-socials-form input').forEach(input => {
+    input.disabled = !siteContentState || siteUploading || siteSaving || siteLoading;
+  });
+  for (const id of ["save-site-images", "save-site-images-bottom", "save-site-socials"])
+    $(id).disabled = !siteContentState || siteUploading || siteSaving || siteLoading;
+  document.querySelectorAll('[data-site-upload],[data-site-remove],[data-site-restore]').forEach(button => {
+    button.disabled = siteUploading || siteSaving || (button.hasAttribute('data-site-remove') && !siteContentState?.images[button.dataset.siteRemove].src);
+  });
+}
+async function loadSiteSettings(force = false) {
+  if (siteLoading || siteUploading || siteSaving) return;
+  if (force && (siteDirty.images || siteDirty.socials) && !confirm("Muat ulang pengaturan dan batalkan perubahan gambar/media sosial yang belum disimpan?")) return;
+  siteLoading = true;siteButtons();
+  try {
+    const data = await api("/api/admin/content");
+    siteContentState = data.content;siteSlots = data.slots;sitePlatforms = data.platforms;
+    siteDirty.images = siteDirty.socials = false;
+    renderSiteImages();renderSiteSocials();
+    siteResult("images", "");siteResult("socials", "");
+  } catch (error) {message(error.message, true);}
+  finally {siteLoading = false;siteButtons();}
+}
+function renderSiteImages() {
+  $("site-image-settings").innerHTML = siteSlots.map(slot => {
+    const image = siteContentState.images[slot.id];
+    return `<article class="site-photo-setting" data-site-slot="${slot.id}"><div class="site-photo-preview${slot.id === 'account_editorial' ? ' account-photo-preview' : ''}">${image.src ? `<img src="${esc(image.src)}" alt="${esc(image.alt)}" style="object-position:${image.position}% center">` : '<span>Foto tidak ditampilkan</span>'}</div><div class="site-photo-fields"><h3>${esc(slot.label)}</h3><div class="site-photo-actions"><button type="button" class="button secondary" data-site-upload="${slot.id}">${image.src ? 'Ganti foto' : 'Unggah foto'}</button><input type="file" id="site-file-${slot.id}" data-site-file="${slot.id}" accept="image/jpeg,image/png,image/webp" hidden><button type="button" class="settings-text-link" data-site-remove="${slot.id}"${!image.src ? ' disabled' : ''}>Hapus dari tampilan</button><button type="button" class="settings-text-link" data-site-restore="${slot.id}">Pakai gambar awal</button></div><label for="site-alt-${slot.id}">Deskripsi gambar</label><input type="text" id="site-alt-${slot.id}" data-site-alt="${slot.id}" maxlength="240" value="${esc(image.alt)}"><label for="site-position-${slot.id}">Fokus gambar: <output id="site-focus-${slot.id}">${image.position}%</output></label><div class="site-focus-control"><span>Kiri</span><input id="site-position-${slot.id}" type="range" min="0" max="100" value="${image.position}" data-site-position="${slot.id}" aria-label="Fokus ${esc(slot.label)}"><span>Kanan</span></div></div></article>`;
+  }).join("");
+}
+function renderSiteSocials() {
+  const socials = siteContentState.socials;
+  $("site-social-settings").innerHTML = `<div class="site-social-grid">${sitePlatforms.map(platform => `<div><label for="site-social-${platform.id}">${esc(platform.label)}</label><input id="site-social-${platform.id}" name="${platform.id}" type="url" inputmode="url" maxlength="2048" placeholder="https://…" value="${esc(socials[platform.id])}" autocomplete="off"></div>`).join("")}</div><div class="site-other-social"><h3>Tautan lainnya</h3><p>Untuk akun atau halaman lain, misalnya Linktree atau Pinterest.</p><label for="site-social-other_label">Nama yang tampil di footer</label><input id="site-social-other_label" name="other_label" maxlength="40" value="${esc(socials.other_label)}" placeholder="Contoh: Pinterest"><label for="site-social-other_url">Tautan HTTPS</label><input id="site-social-other_url" name="other_url" type="url" inputmode="url" maxlength="2048" value="${esc(socials.other_url)}" placeholder="https://…" autocomplete="off"></div>`;
+}
+async function saveSiteSection(section, event) {
+  event.preventDefault();
+  if (!siteContentState || siteUploading || siteSaving) return;
+  const value = section === "images" ? structuredClone(siteContentState.images) : Object.fromEntries([...sitePlatforms.map(p => p.id),"other_label","other_url"].map(key => [key,$("site-social-"+key).value]));
+  siteSaving = true;siteButtons();siteResult(section, "");
+  try {
+    const data = await api("/api/admin/content", {method:"PUT", body:{section, version:siteContentState.version, [section]:value}});
+    siteContentState.version = data.content.version;
+    siteContentState[section] = data.content[section];siteDirty[section] = false;
+    siteResult(section, section === "images" ? "Gambar tersimpan. Muat ulang toko publik untuk melihat perubahan." : "Media sosial tersimpan. Tautan yang terisi kini tampil di footer toko publik.");
+  } catch (error) {siteResult(section, error.message, true);}
+  finally {siteSaving = false;siteButtons();}
+}
+$("site-images-form").addEventListener("submit", event => saveSiteSection("images",event));
+$("site-socials-form").addEventListener("submit", event => saveSiteSection("socials",event));
+$("site-socials-form").addEventListener("input", () => {siteDirty.socials = true;siteResult("socials","Perubahan belum disimpan.");});
+$("site-images-form").addEventListener("input", event => {
+  if (!siteContentState || siteSaving) return;
+  const alt = event.target.dataset.siteAlt, position = event.target.dataset.sitePosition;
+  if (alt) siteContentState.images[alt].alt = event.target.value;
+  if (position) {
+    const value = Number(event.target.value);siteContentState.images[position].position = value;
+    $("site-focus-"+position).textContent = value+"%";
+    document.querySelector(`[data-site-slot="${position}"] img`)?.style.setProperty("object-position",value+"% center");
+  }
+  if (alt || position) {siteDirty.images = true;siteResult("images","Perubahan belum disimpan.");}
+});
+document.addEventListener("click", event => {
+  if (event.target.closest("[data-reload-content]")) loadSiteSettings(true);
+  if (!siteContentState || siteUploading || siteSaving) return;
+  const upload = event.target.closest("[data-site-upload]");
+  if (upload) $("site-file-"+upload.dataset.siteUpload).click();
+  const remove = event.target.closest("[data-site-remove]"), restore = event.target.closest("[data-site-restore]");
+  if (remove || restore) {
+    const key = remove ? remove.dataset.siteRemove : restore.dataset.siteRestore;
+    if (remove) siteContentState.images[key].src = "";
+    else siteContentState.images[key] = structuredClone(siteSlots.find(slot => slot.id === key).default_image);
+    siteDirty.images = true;renderSiteImages();siteButtons();siteResult("images","Perubahan belum disimpan.");
+  }
+});
+document.addEventListener("change", async event => {
+  const key = event.target.dataset.siteFile;
+  if (!key || !event.target.files.length || siteUploading || siteSaving) return;
+  const file = event.target.files[0];event.target.value = "";
+  if (!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 4*1024*1024) {
+    siteResult("images","Gunakan JPG, PNG, atau WebP maksimal 4 MB.",true);return;
+  }
+  siteUploading = true;siteButtons();siteResult("images","Mengunggah foto…");
+  try {
+    const form = new FormData();form.append("photo",file);
+    const uploaded = await api("/api/admin/uploads",{method:"POST",body:form});
+    siteContentState.images[key].src = uploaded.url;
+    if (!siteContentState.images[key].alt.trim()) siteContentState.images[key].alt = siteSlots.find(slot => slot.id === key).label;
+    siteDirty.images = true;renderSiteImages();siteResult("images","Foto berhasil diunggah. Simpan perubahan gambar untuk menerbitkannya.");
+  } catch(error) {siteResult("images",error.message,true);}
+  finally {siteUploading = false;siteButtons();}
+});
+window.addEventListener("beforeunload", event => {
+  if (dirty || siteDirty.images || siteDirty.socials || siteUploading) {event.preventDefault();event.returnValue="";}
 });

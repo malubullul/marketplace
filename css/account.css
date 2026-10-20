@@ -886,3 +886,9 @@
     font-size: 26px;
   }
 }
+
+/* A removable account photograph; no CSS fallback can restore a deleted image. */
+.account-editorial { position: relative; isolation: isolate; overflow: hidden; background: #35402f; }
+.account-editorial-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+.account-editorial::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, #0e0c08a8, transparent 85%); /* taste-skill-ignore: neutral scrim over the owner-managed account photograph. */ }
+.account-editorial.without-store-photo::after { display: none; }

@@ -47,6 +47,7 @@ Opening HTML directly or running `python -m http.server` provides a static examp
 - Server-validated orders, authoritative prices, stock reservation and idempotent order submission.
 - Owner order view, status changes and one-time stock restoration on cancellation.
 - WhatsApp payment handoff with order reference and server-calculated total; separate customer-service chat and owner-editable contact numbers. See [WhatsApp guide](docs/WHATSAPP.md).
+- Owner-managed campaign/category/banner/account photos and optional social links in the footer. See [content management](docs/STORE_CONTENT.md).
 - Existing keyboard accessibility, wishlist and responsive navigation.
 
 ## Operational limits
