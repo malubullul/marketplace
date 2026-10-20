@@ -180,6 +180,28 @@ def create_app(config=None):
     def database_error(error):
         if app.testing:
             raise error
+        # Classify diagnostics, but NEVER log the exception text or database URL:
+        # connection errors can contain sensitive connection details.
+        message = str(error).lower()
+        sqlstate = getattr(error, 'sqlstate', None)
+        if sqlstate == '28P01' or 'password authentication failed' in message:
+            category = 'authentication'
+        elif 'tenant or user not found' in message or 'database does not exist' in message:
+            category = 'pooler_configuration'
+        elif 'certificate verify failed' in message or 'certificate validation failed' in message:
+            category = 'tls_certificate'
+        elif 'could not translate host name' in message or 'name or service not known' in message:
+            category = 'dns'
+        elif 'timeout' in message or 'connection refused' in message or 'no route to host' in message:
+            category = 'network'
+        elif sqlstate == '42P01':
+            category = 'schema_missing'
+        elif sqlstate == '42501':
+            category = 'permissions'
+        else:
+            category = 'unknown'
+        app.logger.error('PostgreSQL connection diagnostic: class=%s sqlstate=%s category=%s',
+                         type(error).__name__, sqlstate or 'none', category)
         return fail('Database belum dapat diakses. Periksa koneksi dan migrasi Supabase di pengaturan server.', 503)
 
     @app.errorhandler(HTTPException)
