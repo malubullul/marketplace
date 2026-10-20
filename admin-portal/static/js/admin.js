@@ -22,7 +22,7 @@ const categoryNames = {
   essentials: "Essentials",
 };
 const statusNames = {
-  baru: "Baru",
+  baru: "Menunggu pembayaran",
   diproses: "Diproses",
   dikirim: "Dikirim",
   selesai: "Selesai",
@@ -82,15 +82,19 @@ async function openDashboard(email) {
   $("login-view").hidden = true;
   $("dashboard").hidden = false;
   await refresh();
+  showPage(["products", "orders", "settings"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "products");
 }
 async function refresh() {
   try {
-    const [catalog, incoming] = await Promise.all([
+    const [catalog, incoming, contactData] = await Promise.all([
       api("/api/admin/products"),
       api("/api/admin/orders"),
+      api("/api/admin/contacts"),
     ]);
     products = catalog.products;
     orders = incoming.orders;
+    $("payment-whatsapp").value = contactData.contacts.payment_whatsapp;
+    $("support-whatsapp").value = contactData.contacts.support_whatsapp;
     renderProducts();
     renderOrders();
     renderStats();
@@ -149,10 +153,13 @@ function renderOrders() {
 }
 function showPage(name) {
   activePage = name;
+  history.replaceState({}, "", "#" + name);
+  document.querySelector(".stats").hidden = name === "settings";
   $("products-page").hidden = name !== "products";
   $("orders-page").hidden = name !== "orders";
+  $("settings-page").hidden = name !== "settings";
   $("page-breadcrumb").textContent =
-    name === "products" ? "KOLEKSI" : "PESANAN";
+    {products: "KOLEKSI", orders: "PESANAN", settings: "KONTAK WHATSAPP"}[name];
   document
     .querySelectorAll("[data-page]")
     .forEach((button) =>
@@ -445,6 +452,11 @@ document.addEventListener("change", async (event) => {
     select.value = order.status;
     return;
   }
+  if (order.status === "baru" && ["diproses", "dikirim", "selesai"].includes(value) &&
+      !confirm("Sudah memeriksa transfer pelanggan? Lanjutkan hanya setelah pembayaran dikonfirmasi.")) {
+    select.value = order.status;
+    return;
+  }
   select.disabled = true;
   try {
     await api("/api/admin/orders/" + order.nomor, {
@@ -462,7 +474,7 @@ document.addEventListener("change", async (event) => {
 });
 function openOrder(order) {
   $("order-details").innerHTML =
-    `<span class="eyebrow">RINCIAN PESANAN</span><h2 id="order-title">${esc(order.nomor)}</h2><span class="badge new">${statusNames[order.status]}</span><div class="order-info"><div><span>Penerima</span><strong>${esc(order.nama_penerima || order.nama)}</strong></div><div><span>Email / Nomor HP</span><strong>${esc(order.email)} / ${esc(order.nohp)}</strong></div><div><span>Alamat pengiriman</span><strong>${esc(order.alamat)}, ${esc(order.kota)}, ${esc(order.provinsi)} ${esc(order.kodepos)}</strong></div><div><span>Catatan pelanggan</span><strong>${esc(order.catatan) || "Tidak ada catatan"}</strong></div><div><span>Pembayaran</span><strong>Konfirmasi manual dengan pelanggan</strong></div></div><div class="order-items">${order.items.map((item) => `<div class="order-item"><img src="${esc(item.gambar)}" alt="${esc(item.nama)}"><div><strong>${esc(item.nama)}</strong><small>${esc([item.ukuran, item.warna].filter(Boolean).join(" / "))} · ${item.jumlah} pcs</small></div><span>${money(item.harga * item.jumlah)}</span></div>`).join("")}</div><div class="order-info"><div><span>Subtotal / Ongkir / Diskon</span><strong>${money(order.subtotal)} / ${money(order.ongkir)} / −${money(order.diskon)}</strong></div></div><div class="order-total">Total ${money(order.total)}</div>`;
+    `<span class="eyebrow">RINCIAN PESANAN</span><h2 id="order-title">${esc(order.nomor)}</h2><span class="badge new">${statusNames[order.status]}</span><div class="order-info"><div><span>Penerima</span><strong>${esc(order.nama_penerima || order.nama)}</strong></div><div><span>Email / Nomor HP</span><strong>${esc(order.email)} / ${esc(order.nohp)}</strong></div><div><span>Alamat pengiriman</span><strong>${esc(order.alamat)}, ${esc(order.kota)}, ${esc(order.provinsi)} ${esc(order.kodepos)}</strong></div><div><span>Catatan pelanggan</span><strong>${esc(order.catatan) || "Tidak ada catatan"}</strong></div><div><span>Pembayaran</span><strong>Transfer dibantu lewat WhatsApp pembayaran</strong></div></div><div class="order-items">${order.items.map((item) => `<div class="order-item"><img src="${esc(item.gambar)}" alt="${esc(item.nama)}"><div><strong>${esc(item.nama)}</strong><small>${esc([item.ukuran, item.warna].filter(Boolean).join(" / "))} · ${item.jumlah} pcs</small></div><span>${money(item.harga * item.jumlah)}</span></div>`).join("")}</div><div class="order-info"><div><span>Subtotal / Ongkir / Diskon</span><strong>${money(order.subtotal)} / ${money(order.ongkir)} / −${money(order.diskon)}</strong></div></div><div class="order-total">Total ${money(order.total)}</div>`;
   $("order-dialog").showModal();
 }
 async function initializePortal() {
@@ -479,3 +491,26 @@ async function initializePortal() {
   await sessionInfo();
 }
 initializePortal();
+
+$("contacts-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const result = $("contacts-result"), button = $("save-contacts");
+  result.hidden = true;
+  button.disabled = true;
+  try {
+    const data = await api("/api/admin/contacts", {method: "PUT", body: {
+      payment_whatsapp: $("payment-whatsapp").value,
+      support_whatsapp: $("support-whatsapp").value,
+    }});
+    $("payment-whatsapp").value = data.contacts.payment_whatsapp;
+    $("support-whatsapp").value = data.contacts.support_whatsapp;
+    result.textContent = "Kontak tersimpan. Tautan WhatsApp di toko mengikuti nomor ini.";
+    result.className = "notice";
+  } catch (error) {
+    result.textContent = error.message;
+    result.className = "notice error";
+  } finally {
+    result.hidden = false;
+    button.disabled = false;
+  }
+});

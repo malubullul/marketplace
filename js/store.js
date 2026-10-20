@@ -14,6 +14,27 @@ const storeIcons = {
 };
 const icon = (name) =>
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${storeIcons[name] || ""}</svg>`;
+
+// Destinations are public store settings; messages only leave the site on a user's click.
+const storeContactsReady = fetch("/api/store/contacts", {cache: "no-store"})
+  .then(async (response) => {
+    if (!response.ok) throw new Error("Kontak belum tersedia.");
+    return (await response.json()).contacts || {};
+  })
+  .catch(() => ({}));
+function whatsAppUrl(number, text) {
+  if (typeof number !== "string" || !/^[1-9][0-9]{7,14}$/.test(number)) return null;
+  return "https://wa.me/" + number + "?text=" + encodeURIComponent(text);
+}
+function paymentWhatsAppUrl(contacts, order) {
+  const items = order.items.slice(0, 10).map((item) =>
+    `- ${item.nama.slice(0, 100)}${[item.ukuran, item.warna].filter(Boolean).length ? " (" + [item.ukuran, item.warna].filter(Boolean).join(" / ") + ")" : ""} x${item.jumlah}`);
+  if (order.items.length > 10) items.push(`- dan ${order.items.length - 10} produk lainnya`);
+  return whatsAppUrl(contacts.payment_whatsapp,
+    ["Halo Anredseller, saya ingin membayar pesanan:", order.nomor, "", ...items, "",
+     "Total pesanan: " + formatHarga(order.total),
+     "Mohon instruksi transfer dan konfirmasi pembayaran. Terima kasih."].join("\n"));
+}
 const header = document.getElementById("store-header");
 if (header)
   header.innerHTML = `<div class="announcement"><span>A little upgrade for your everyday.</span><a href="produk.html?sort=terbaru">Discover the new collection <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></div><header class="store-header"><div class="store-header-inner"><button class="mobile-menu icon-button" aria-label="Buka menu" aria-expanded="false">${icon("menu")}</button><nav class="desktop-nav" aria-label="Navigasi utama"><a href="produk.html">Shop all</a><a href="produk.html?sort=terbaru">New arrivals <span class="nav-dot"></span></a><button data-dialog="about">Our story</button></nav><a class="wordmark" href="index.html" aria-label="Anredseller Beranda">Anredseller<span>•</span></a><div class="store-actions"><button class="icon-button" data-dialog="search" aria-label="Cari produk">${icon("search")}</button><a class="icon-button customer-account-link" href="akun.html" aria-label="Akun pembeli">${icon("user")}</a><a class="icon-button cart-link" href="keranjang.html" aria-label="Buka keranjang">${icon("bag")}<span class="badge-keranjang">0</span></a></div></div><nav class="store-subnav" aria-label="Kategori"><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><span></span><a href="produk.html?sort=terlaris">Best sellers</a><a href="produk.html?sort=diskon" class="sale-link">The good deals <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></nav></header>`;
@@ -68,7 +89,41 @@ if (navigation) {
 }
 const footer = document.getElementById("store-footer");
 if (footer)
-  footer.innerHTML = `<footer class="store-footer"><div class="footer-top"><div class="footer-invitation"><h2>Your next good find.</h2><p>Fashion yang kamu pilih.<br>Karakter yang kamu bawa.</p><a class="text-link" href="produk.html">Jelajahi katalog ${icon("bag")}</a></div><nav aria-label="Koleksi footer"><h3>Koleksi</h3><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><a href="produk.html?sort=diskon">Pilihan diskon</a></nav><nav aria-label="Bantuan footer"><h3>Di sini untukmu</h3><button data-dialog="help">Bantuan & FAQ</button><button data-dialog="shipping">Pengiriman</button><button data-dialog="reseller">Program reseller</button><button data-dialog="privacy">Privasi</button></nav><nav aria-label="Akun footer"><h3>Anredseller</h3><a href="akun.html">Akun & pesanan</a><button data-dialog="wishlist">Wishlist</button><button data-dialog="about">Tentang kami</button><a href="admin.html">Area pemilik</a></nav></div><a class="footer-wordmark" href="index.html" aria-label="Anredseller beranda">Anredseller</a><div class="footer-bottom"><span>© ${new Date().getFullYear()} Anredseller</span><span>Pembayaran dikonfirmasi oleh toko</span><a href="#main-content">Kembali ke atas ↑</a></div></footer>`;
+  footer.innerHTML = `<footer class="store-footer"><div class="footer-top"><div class="footer-invitation"><h2>Your next good find.</h2><p>Fashion yang kamu pilih.<br>Karakter yang kamu bawa.</p><a class="text-link" href="produk.html">Jelajahi katalog ${icon("bag")}</a></div><nav aria-label="Koleksi footer"><h3>Koleksi</h3><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><a href="produk.html?sort=diskon">Pilihan diskon</a></nav><nav aria-label="Bantuan footer"><h3>Di sini untukmu</h3><button type="button" data-support-open>Hubungi CS via WhatsApp</button><button data-dialog="help">Bantuan & FAQ</button><button data-dialog="shipping">Pengiriman</button><button data-dialog="reseller">Program reseller</button><button data-dialog="privacy">Privasi</button></nav><nav aria-label="Akun footer"><h3>Anredseller</h3><a href="akun.html">Akun & pesanan</a><button data-dialog="wishlist">Wishlist</button><button data-dialog="about">Tentang kami</button><a href="admin.html">Area pemilik</a></nav></div><a class="footer-wordmark" href="index.html" aria-label="Anredseller beranda">Anredseller</a><div class="footer-bottom"><span>© ${new Date().getFullYear()} Anredseller</span><span>Pembayaran dibantu via WhatsApp</span><a href="#main-content">Kembali ke atas ↑</a></div></footer>`;
+
+const supportPanel = document.createElement("dialog");
+supportPanel.className = "support-dialog";
+supportPanel.id = "support-dialog";
+supportPanel.setAttribute("aria-labelledby", "support-title");
+supportPanel.innerHTML = `<button class="support-close" type="button" aria-label="Tutup bantuan">×</button><span class="payment-step-label">ANREDSELLER CUSTOMER SERVICE</span><h2 id="support-title">Bisa kami bantu?</h2><p>Tanya soal produk, ukuran, pengiriman, atau pesananmu lewat WhatsApp CS.</p><a id="support-whatsapp-link" class="whatsapp-action" target="_blank" rel="noopener noreferrer" aria-disabled="true">Menyiapkan WhatsApp…</a><p id="support-availability" class="payment-note" role="status"></p><div class="support-payment-note">Ingin membayar pesanan?<br><a href="akun.html#orders">Buka pesanan untuk menghubungi admin pembayaran →</a></div>`;
+document.body.appendChild(supportPanel);
+const supportLauncher = document.createElement("button");
+supportLauncher.type = "button";
+supportLauncher.className = "support-launcher";
+supportLauncher.dataset.supportOpen = "";
+supportLauncher.setAttribute("aria-haspopup", "dialog");
+supportLauncher.setAttribute("aria-controls", "support-dialog");
+supportLauncher.innerHTML = `${icon("chat")} <span>Hubungi CS</span>`;
+document.body.appendChild(supportLauncher);
+supportPanel.querySelector(".support-close").addEventListener("click", () => supportPanel.close());
+document.addEventListener("click", async (event) => {
+  if (!event.target.closest("[data-support-open]")) return;
+  if (!supportPanel.open) supportPanel.showModal();
+  const contacts = await storeContactsReady;
+  const link = document.getElementById("support-whatsapp-link");
+  const url = whatsAppUrl(contacts.support_whatsapp, "Halo CS Anredseller, saya ingin bertanya tentang produk atau pesanan.");
+  if (url) {
+    link.href = url;
+    link.removeAttribute("aria-disabled");
+    link.innerHTML = `${icon("chat")} Chat CS via WhatsApp`;
+    document.getElementById("support-availability").textContent = "Percakapan akan dilanjutkan di WhatsApp. Kirim pesanmu untuk memulai.";
+  } else {
+    link.removeAttribute("href");
+    link.setAttribute("aria-disabled", "true");
+    link.textContent = "WhatsApp CS belum tersedia";
+    document.getElementById("support-availability").textContent = "Kontak CS belum tersedia. Coba kembali nanti.";
+  }
+});
 document
   .querySelectorAll("[data-icon]")
   .forEach((el) => (el.innerHTML = icon(el.dataset.icon)));
@@ -87,7 +142,7 @@ const info = {
   help: [
     "How can we help?",
     "Cari produk melalui ikon pencarian, pilih koleksi, lalu tambahkan favoritmu ke keranjang. Pesanan dapat dicoba sampai konfirmasi.",
-    "Pesanan dikirim ke toko untuk dikonfirmasi. Pembayaran dan pengiriman belum diproses otomatis.",
+    "Setelah checkout, lanjutkan pembayaran melalui tombol WhatsApp pada rincian pesanan. Admin pembayaran memberikan instruksi transfer dan memeriksa bukti pembayaran. Untuk pertanyaan belanja, hubungi nomor CS yang terpisah.",
   ],
   shipping: [
     "From us, to your everyday.",

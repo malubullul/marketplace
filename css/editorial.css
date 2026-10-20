@@ -1380,3 +1380,65 @@ p {
 .archive-announcement{color:var(--paper)}
 .editorial-card>img{right:4%}
 .apparel-edit>img{right:4%}
+
+/* WhatsApp payment and assistance retain the store's stone and olive palette. */
+.whatsapp-action {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 14px 20px;
+  background: var(--olive);
+  color: #fff;
+  font: 500 15px/1.5 var(--font-text);
+  text-align: center;
+  text-decoration: none;
+  border: 0;
+  border-radius: 0;
+  overflow-wrap: anywhere;
+}
+.whatsapp-action svg, .support-launcher svg { width: 22px; height: 22px; flex: none; }
+.whatsapp-action:hover { background: #26331f; color: #fff; }
+.whatsapp-action[aria-disabled="true"] { background: #dce0d6; color: #4b5144; cursor: default; }
+.payment-next-step { padding: 28px; background: var(--stone); margin: 24px 0 32px; text-align: left; }
+.payment-step-label { font-size: 12px; font-weight: 500; letter-spacing: .04em; }
+.payment-next-step h2 { font-size: 30px; line-height: 1.1; margin: 14px 0; }
+.payment-next-step > p { font-size: 15px; margin: 16px 0; }
+.payment-next-step .payment-note, .payment-note { font-size: 13px; line-height: 1.6; color: #4d5845; }
+.payment-next-step .payment-note { margin-bottom: 0; }
+.support-inline { font: inherit; text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; color: var(--olive); padding: 6px 0; min-height: 44px; cursor: pointer; }
+.checkout-contact-note, .confirmation-help { font-size: 14px; margin: 14px 0; }
+.order-confirmation .konfirmasi-wrapper { max-width: 760px; margin: 48px auto; text-align: left; }
+.order-confirmation .konfirmasi-judul { font-family: var(--font-text); font-weight: 500; font-size: 30px; line-height: 1.1; }
+.order-confirmation .konfirmasi-sub { color: #4d5845; }
+.store-subnav a:last-child { color: var(--olive); }
+.order-confirmation .konfirmasi-nomor { background: var(--stone); border-radius: 0; padding: 20px 24px; }
+.order-confirmation .konfirmasi-nomor p { color: var(--ink); }
+.order-confirmation .konfirmasi-nomor strong { font-size: clamp(17px, 3vw, 22px); font-weight: 500; letter-spacing: .02em; overflow-wrap: anywhere; }
+.order-confirmation .konfirmasi-detail { border: 0; border-radius: 0; background: #fff; padding: 24px; }
+.confirmation-details-title { font-size: 22px; margin: 32px 0 16px; }
+.order-confirmation .btn-kembali-belanja { display: inline-block; padding: 12px 0; background: none; color: var(--ink); font-weight: 400; text-decoration: underline; border-radius: 0; margin-left: 20px; }
+.order-history-link { display: inline-block; padding: 12px 0; text-decoration: underline; }
+.support-launcher { display: flex; align-items: center; gap: 8px; position: fixed; right: 24px; bottom: max(20px, env(safe-area-inset-bottom)); z-index: 90; min-height: 48px; padding: 12px 18px; background: var(--olive); border: 0; color: white; font: 500 14px/1.4 var(--font-text); cursor: pointer; }
+.order-confirmation .support-launcher, .checkout-page .support-launcher { display: none; }
+.support-dialog { position: fixed; inset: auto 24px 84px auto; margin: 0; padding: 32px; width: 380px; max-width: calc(100vw - 32px); max-height: calc(100dvh - 112px); overflow: auto; background: var(--paper); color: var(--ink); border: 0; border-radius: 0; }
+.support-dialog::backdrop { background: #12160f66; }
+.support-dialog h2 { font-size: 32px; line-height: 1.1; margin: 24px 0 16px; }
+.support-dialog > p { font-size: 15px; margin: 16px 0; }
+.support-dialog .payment-step-label { display: block; max-width: calc(100% - 28px); }
+.support-close { position: absolute; right: 8px; top: 8px; min-width: 44px; min-height: 44px; font: 400 28px/1 var(--font-text); cursor: pointer; background: none; border: 0; color: var(--ink); }
+.support-payment-note { font-size: 14px; padding-top: 20px; margin-top: 24px; border-top: 1px solid #cbd0c4; }
+.support-payment-note a { display: block; margin-top: 6px; text-decoration: underline; text-underline-offset: 3px; }
+.store-footer { padding-bottom: 84px; }
+@media (max-width: 600px) {
+  .payment-next-step { padding: 24px 20px; }
+  .payment-next-step h2 { font-size: 28px; }
+  .whatsapp-action { padding: 14px 16px; }
+  .support-launcher { right: 16px; }
+  .support-dialog { right: 16px; padding: 28px 24px; }
+  .order-confirmation .konfirmasi-wrapper { padding: 0 20px 32px; margin: 32px auto; }
+  .order-confirmation .konfirmasi-judul { font-size: 28px; }
+  .order-confirmation .konfirmasi-detail { padding: 20px; }
+  .order-confirmation .btn-kembali-belanja { display: block; margin-left: 0; }
+}

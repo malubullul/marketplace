@@ -4,7 +4,7 @@ let accountAddresses = [],
   editingAddress = null,
   currentAccountPanel = "profile";
 const accountStatus = {
-  baru: "Menunggu konfirmasi",
+  baru: "Menunggu pembayaran",
   diproses: "Diproses",
   dikirim: "Dikirim",
   selesai: "Selesai",
@@ -428,11 +428,11 @@ function showCustomerOrder(order) {
       "Alamat",
       [order.alamat, order.kota, order.provinsi, order.kodepos].join(", "),
     ],
-    ["Pembayaran", "Dikonfirmasi manual oleh toko"],
+    ["Pembayaran", "Dibantu melalui WhatsApp pembayaran"],
     ["Catatan", order.catatan || "Tidak ada catatan"],
   ];
   accountElement("customer-order-details").innerHTML =
-    `<span class="eyebrow">RINCIAN PESANAN</span><h2 id="customer-order-title">${h(order.nomor)}</h2><span class="account-badge">${accountStatus[order.status]}</span>${rows.map(([label, value]) => `<div class="account-receipt-row"><span>${h(label)}</span>${h(value)}</div>`).join("")}<div class="account-receipt-items">${order.items.map((item) => `<div class="customer-order-items"><img src="${productImage(item.gambar)}" alt="${h(item.nama)}"><div><strong>${h(item.nama)}</strong><small>${h([item.ukuran, item.warna].filter(Boolean).join(" / "))} · ${item.jumlah} pcs</small></div><span>${formatHarga(item.harga * item.jumlah)}</span></div>`).join("")}</div><div class="account-receipt-row"><span>Subtotal / Ongkir / Diskon</span>${formatHarga(order.subtotal)} / ${formatHarga(order.ongkir)} / −${formatHarga(order.diskon)}</div><div class="account-receipt-total">${formatHarga(order.total)}</div>`;
+    `<span class="eyebrow">RINCIAN PESANAN</span><h2 id="customer-order-title">${h(order.nomor)}</h2><span class="account-badge">${accountStatus[order.status]}</span>${rows.map(([label, value]) => `<div class="account-receipt-row"><span>${h(label)}</span>${h(value)}</div>`).join("")}<div class="account-receipt-items">${order.items.map((item) => `<div class="customer-order-items"><img src="${productImage(item.gambar)}" alt="${h(item.nama)}"><div><strong>${h(item.nama)}</strong><small>${h([item.ukuran, item.warna].filter(Boolean).join(" / "))} · ${item.jumlah} pcs</small></div><span>${formatHarga(item.harga * item.jumlah)}</span></div>`).join("")}</div><div class="account-receipt-row"><span>Subtotal / Ongkir / Diskon</span>${formatHarga(order.subtotal)} / ${formatHarga(order.ongkir)} / −${formatHarga(order.diskon)}</div><div class="account-receipt-total">${formatHarga(order.total)}</div>${order.status === "baru" ? `<a class="whatsapp-action" href="konfirmasi.html?order=${encodeURIComponent(order.nomor)}">Lanjut pembayaran</a>` : ""}`;
   accountElement("customer-order-dialog").showModal();
 }
 window.addEventListener("customer:state", () => {

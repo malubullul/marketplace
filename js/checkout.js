@@ -2,8 +2,6 @@
 // CHECKOUT.JS — Logic Halaman Checkout
 // ============================================================
 
-let metodeBayarDipilih = "manual";
-
 document.addEventListener("DOMContentLoaded", async () => {
   await buyerReady;
   if (!(await requireBuyer())) return;
@@ -66,15 +64,6 @@ function renderRingkasanCheckout() {
   }
 
   document.getElementById("co-total").textContent = formatHarga(total);
-}
-
-// ── Pilih Metode Bayar ─────────────────────────────────────
-function pilihMetode(el, metode) {
-  document
-    .querySelectorAll(".metode-item")
-    .forEach((m) => m.classList.remove("aktif"));
-  el.classList.add("aktif");
-  metodeBayarDipilih = metode;
 }
 
 // ── Validasi Form ──────────────────────────────────────────
@@ -203,7 +192,7 @@ async function prosesCheckout() {
     errorEl.textContent = error.message;
     errorEl.focus();
     btn.disabled = false;
-    btn.textContent = "Kirim pesanan ke toko";
+    btn.textContent = "Buat pesanan & lanjut pembayaran";
   }
 }
 

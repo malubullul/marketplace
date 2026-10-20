@@ -9,110 +9,16 @@
       content="Pesananmu telah berhasil dibuat di Anredseller. Terima kasih telah berbelanja!"
     />
     <link rel="stylesheet" href="css/style.css" />
-    <style>
-      @keyframes bounceIn {
-        0% {
-          transform: scale(0);
-          opacity: 0;
-        }
-        60% {
-          transform: scale(1.2);
-          opacity: 1;
-        }
-        80% {
-          transform: scale(0.9);
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
-      .konfirmasi-ikon {
-        animation: bounceIn 0.7s 0.3s ease both;
-      }
-
-      @keyframes confetti {
-        0% {
-          transform: translateY(-100vh) rotate(0deg);
-          opacity: 1;
-        }
-        100% {
-          transform: translateY(100vh) rotate(720deg);
-          opacity: 0;
-        }
-      }
-      .confetti-piece {
-        position: fixed;
-        top: -20px;
-        width: 10px;
-        height: 10px;
-        border-radius: 2px;
-        animation: confetti 3s ease-in forwards;
-        pointer-events: none;
-        z-index: 9999;
-      }
-
-      .timeline {
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-      }
-      .timeline-item {
-        display: flex;
-        gap: 14px;
-        align-items: flex-start;
-        position: relative;
-      }
-      .timeline-item:not(:last-child)::before {
-        content: "";
-        position: absolute;
-        left: 15px;
-        top: 32px;
-        width: 2px;
-        height: calc(100% - 8px);
-        background: var(--abu-border);
-      }
-      .timeline-dot {
-        width: 32px;
-        height: 32px;
-        border-radius: var(--radius-full);
-        background: var(--hijau);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        flex-shrink: 0;
-        z-index: 1;
-      }
-      .timeline-dot.pending {
-        background: var(--abu-border);
-        color: var(--abu-teks);
-      }
-      .timeline-konten {
-        padding: 4px 0 20px;
-      }
-      .timeline-judul {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--teks-hitam);
-      }
-      .timeline-sub {
-        font-size: 12px;
-        color: var(--abu-teks);
-        margin-top: 2px;
-      }
-    </style>
     <link rel="stylesheet" href="css/store.css" />
     <link rel="stylesheet" href="css/editorial.css" />
   </head>
-  <body>
+  <body class="order-confirmation">
     <!-- TOP BAR -->
     <div id="store-header"></div>
 
     <!-- KONFIRMASI -->
-    <div class="konfirmasi-wrapper">
-      <div class="konfirmasi-ikon"></div>
-      <h1 class="konfirmasi-judul">Pesanan Terkirim!</h1>
+    <main class="konfirmasi-wrapper">
+      <h1 class="konfirmasi-judul">Pesanan berhasil dibuat.</h1>
       <p class="konfirmasi-sub" id="konfirmasi-sub">
         Terima kasih telah berbelanja di Anredseller.<br />
         Pemilik toko akan meninjau pesananmu.
@@ -124,20 +30,29 @@
         <strong id="nomor-pesanan">Memuat…</strong>
       </div>
 
+      <section id="payment-next-step" class="payment-next-step" hidden aria-labelledby="payment-heading">
+        <span class="payment-step-label">LANGKAH BERIKUTNYA</span>
+        <h2 id="payment-heading">Selesaikan pembayaran.</h2>
+        <p>Hubungi admin pembayaran untuk instruksi transfer, lalu kirim bukti pembayaran di percakapan yang sama.</p>
+        <a id="payment-whatsapp-link" class="whatsapp-action" target="_blank" rel="noopener noreferrer" aria-disabled="true">Menyiapkan pembayaran…</a>
+        <p id="payment-whatsapp-note" class="payment-note" role="status">Nomor pesanan dan total akan disiapkan dalam pesan WhatsApp. Periksa lalu kirim pesannya.</p>
+      </section>
+      <h2 class="confirmation-details-title">Rincian pesanan</h2>
       <!-- Detail Pesanan -->
       <div class="konfirmasi-detail" id="detail-pesanan">
         <!-- Diisi JS -->
       </div>
 
       <div class="checkout-notice">
-        Status: <strong>Menunggu konfirmasi toko</strong><br />Pesanan sudah
-        tercatat. Pembayaran dan jadwal pengiriman perlu dikonfirmasi langsung
-        dengan toko. Simpan nomor pesanan ini.
+        Status: <strong id="confirmation-status">Memuat pesanan…</strong><br />
+        <span id="confirmation-status-note">Pesananmu disimpan di akun. Simpan nomor pesanan ini.</span>
       </div>
+      <p class="confirmation-help">Pertanyaan produk atau pengiriman? <button class="support-inline" type="button" data-support-open>Hubungi CS</button></p>
+      <a href="akun.html#orders" class="order-history-link">Lihat pesanan saya</a>
       <a href="produk.html" class="btn-kembali-belanja"
         >Lanjut melihat koleksi</a
       >
-    </div>
+    </main>
 
     <!-- REKOMENDASI -->
     <div class="container" style="padding-bottom: 60px">
@@ -145,7 +60,7 @@
         class="section-header"
         style="border-top: 2px solid var(--abu-border); padding-top: 28px"
       >
-        <h2 class="section-judul">💡 Kamu Mungkin Juga Suka</h2>
+        <h2 class="section-judul">Pilihan lainnya untukmu</h2>
         <a href="produk.html" class="lihat-semua">Lihat semua →</a>
       </div>
       <div class="grid-produk" id="grid-rekomendasi-konfirmasi"></div>

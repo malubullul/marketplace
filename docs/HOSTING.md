@@ -73,7 +73,7 @@ Stok adalah total persediaan gabungan semua pilihan ukuran dan warna, bukan stok
 
 ## Alur pengunjung dan pesanan
 
-Pengunjung membuka katalog → daftar/masuk akun pembeli → memilih produk, ukuran/warna, serta jumlah → keranjang → checkout memakai alamat tersimpan atau alamat baru → **Kirim pesanan ke toko**.
+Pengunjung membuka katalog → daftar/masuk akun pembeli → memilih produk, ukuran/warna, serta jumlah → keranjang → checkout memakai alamat tersimpan atau alamat baru → **Buat pesanan & lanjut pembayaran** → WhatsApp pembayaran. Nomor pembayaran dan CS dapat diganti lewat **Admin → Kontak WhatsApp → Simpan kontak**; lihat [panduan WhatsApp](WHATSAPP.md).
 
 Katalog tetap dapat dibuka tanpa login. Menyimpan wishlist/keranjang dan checkout membutuhkan akun. Pembeli dapat mendaftar langsung melalui `/akun`; pendaftaran tidak membuat akun admin. Profil, hingga 10 alamat, alamat utama, wishlist, keranjang dan riwayat pesanan disimpan di database yang sama untuk seluruh perangkat. Email dan nama pemesan diambil dari akun yang terautentikasi; alamat pengiriman dapat ditujukan kepada penerima lain.
 

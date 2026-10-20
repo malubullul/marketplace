@@ -28,6 +28,7 @@ ADMIN_ROOT = ROOT / 'admin-portal'
 CATEGORIES = {"apparel", "sneakers", "essentials"}
 ORDER_STATES = {"baru", "diproses", "dikirim", "selesai", "dibatalkan"}
 COUPONS = {"HEMAT10": 10, "ANRED15": 15, "SALE20": 20}
+DEFAULT_STORE_CONTACTS = {'payment_whatsapp': '6287729766809', 'support_whatsapp': '6282335963140'}
 Image.MAX_IMAGE_PIXELS = 25_000_000
 
 
@@ -273,6 +274,48 @@ def create_app(config=None):
     def admin_products():
         return jsonify(products=products(True))
 
+    def store_contacts():
+        row = db().execute("SELECT value FROM metadata WHERE key='store_contacts'").fetchone()
+        saved = json.loads(row['value']) if row else DEFAULT_STORE_CONTACTS
+        # Only phone numbers can become public destinations, never arbitrary URLs.
+        return {key: saved.get(key, '') if isinstance(saved.get(key), str)
+                and re.fullmatch(r'[1-9][0-9]{7,14}', saved[key]) else ''
+                for key in ('payment_whatsapp', 'support_whatsapp')}
+
+    @app.get('/api/store/contacts')
+    def public_contacts():
+        return jsonify(contacts=store_contacts())
+
+    @app.get('/api/admin/contacts')
+    @owner_required
+    def admin_contacts():
+        return jsonify(contacts=store_contacts())
+
+    @app.put('/api/admin/contacts')
+    @owner_required
+    def update_contacts():
+        data = body()
+        keys = {'payment_whatsapp', 'support_whatsapp'}
+        if set(data) != keys:
+            return fail('Isi nomor WhatsApp pembayaran dan customer service.')
+        normalized = {}
+        for key in keys:
+            value = data[key]
+            if not isinstance(value, str) or len(value) > 40:
+                return fail('Nomor WhatsApp tidak valid.')
+            value = value.strip()
+            if value and not re.fullmatch(r'\+?[0-9][0-9 ()-]*', value):
+                return fail('Gunakan nomor telepon, misalnya 08… atau +62…. Jangan masukkan tautan.')
+            number = re.sub(r'[^0-9]', '', value)
+            if number.startswith('0'):
+                number = '62' + number[1:]
+            if number and not re.fullmatch(r'[1-9][0-9]{7,14}', number):
+                return fail('Nomor WhatsApp harus memiliki 8–15 digit termasuk kode negara.')
+            normalized[key] = number
+        db().execute("INSERT INTO metadata(key,value) VALUES('store_contacts',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (json.dumps(normalized),))
+        db().commit()
+        return jsonify(contacts=normalized)
+
     def validated_product(data, previous=None):
         def text(key, maximum=150, required=False):
             value = data.get(key, "")
@@ -474,7 +517,7 @@ def create_app(config=None):
             discount = subtotal * COUPONS.get(coupon, 0) // 100
             shipping = 0 if subtotal >= 200000 else 15000
             order_id = "ANR-" + secrets.token_hex(6).upper()
-            order = dict(customer, nomor=order_id, tanggal=time.strftime("%Y-%m-%d"), created_at=int(time.time()), items=items, subtotal=subtotal, diskon=discount, ongkir=shipping, total=subtotal-discount+shipping, kurir="Dikonfirmasi oleh toko", metode="manual", status="baru", catatan=str(data.get("catatan", ""))[:1000])
+            order = dict(customer, nomor=order_id, tanggal=time.strftime("%Y-%m-%d"), created_at=int(time.time()), items=items, subtotal=subtotal, diskon=discount, ongkir=shipping, total=subtotal-discount+shipping, kurir="Dikonfirmasi oleh toko", metode="whatsapp", status="baru", catatan=str(data.get("catatan", ""))[:1000])
             if data.get("save_address") is True and address_id is None:
                 customers.save_address(customer_id, dict(customer,label="Alamat checkout"))
             db().execute("INSERT INTO orders(id,document,status,idempotency_key,created_at,customer_id) VALUES(?,?,?,?,?,?)", (order_id, json.dumps(order), "baru", order_key, int(time.time()), customer_id))

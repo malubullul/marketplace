@@ -76,6 +76,8 @@ Jika memakai opsi ini, unggah isi folder hasil ekstrak ke root repository baru, 
 
 ## Menjalankan secara lokal
 
+Untuk mengganti nomor pembayaran/CS, masuk lalu buka **Kontak WhatsApp → Simpan kontak**. Pengaturan disimpan oleh backend toko, bukan di browser atau database admin terpisah. Lihat [panduan WhatsApp](../docs/WHATSAPP.md).
+
 Gunakan Python 3.12+, buat virtualenv lalu pasang dependensi. Muat variabel melalui shell/IDE; atur backend ke loopback server toko dan `ANREDSELLER_SECURE_COOKIES=0` hanya untuk uji HTTP lokal. Kedua server harus memakai kunci yang sama. Jalankan `python app.py` dari folder ini; portal mendengarkan port 8001. Akun pemilik tetap dibuat pada backend toko.
 
 Di repository marketplace, pengujian terisolasi tidak memerlukan kredensial nyata:

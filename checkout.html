@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="css/store.css" />
     <link rel="stylesheet" href="css/editorial.css" />
   </head>
-  <body>
+  <body class="checkout-page">
     <div id="store-header"></div>
     <div class="page-banner">
       <div class="container page-banner-dalam">
@@ -165,12 +165,13 @@
             </div>
           </section>
           <section class="form-section">
-            <h2 class="form-section-judul">Konfirmasi pembayaran</h2>
+            <h2 class="form-section-judul">Pembayaran via WhatsApp</h2>
             <p class="checkout-notice">
-              Pesanan disimpan di akunmu dan dikirim ke toko untuk ditinjau.
-              Pembayaran dan pengiriman dikonfirmasi terpisah. Tidak ada
-              penagihan otomatis dari halaman ini.
+              Buat pesanan terlebih dahulu, lalu hubungi admin pembayaran lewat
+              WhatsApp untuk instruksi transfer dan kirim bukti pembayaran.
+              Pesanan tetap menunggu pembayaran sampai transfer diperiksa toko.
             </p>
+            <p class="checkout-contact-note">Ada pertanyaan produk atau pengiriman? <button type="button" class="support-inline" data-support-open>Hubungi CS</button></p>
           </section>
           <p id="checkout-error" role="alert" tabindex="-1"></p>
           <button
@@ -178,7 +179,7 @@
             class="btn-lanjut-checkout"
             onclick="prosesCheckout()"
           >
-            Kirim pesanan ke toko
+            Buat pesanan & lanjut pembayaran
           </button>
         </div>
         <aside>

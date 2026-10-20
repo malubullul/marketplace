@@ -69,6 +69,20 @@ class AdminPortalTests(unittest.TestCase):
             self.assertEqual(self.public.get(path).status_code, 401)
         self.assertEqual(self.client.get('/api/health').json['status'], 'ok')
 
+    def test_contacts_configuration_uses_authenticated_admin_gateway(self):
+        self.assertEqual(self.client.get('/api/admin/contacts').status_code, 401)
+        headers = self.login()
+        payload = {'payment_whatsapp':'081234567890', 'support_whatsapp':'+62 823 4567 8901'}
+        self.assertEqual(self.client.put('/api/admin/contacts', json=payload).status_code, 403)
+        response = self.client.put('/api/admin/contacts', json=payload, headers=headers)
+        self.assertEqual(response.status_code, 200, response.json)
+        expected = {'payment_whatsapp':'6281234567890', 'support_whatsapp':'6282345678901'}
+        self.assertEqual(self.public.get('/api/store/contacts').json['contacts'], expected)
+        self.assertEqual(self.client.get('/api/admin/contacts').json['contacts'], expected)
+        self.assertEqual(self.public.put('/api/admin/contacts', json=payload, headers=headers).status_code, 401)
+        self.assertEqual(self.client.put('/api/admin/contacts', json=payload,
+            headers={**headers, 'Origin':'https://untrusted.example.test'}).status_code, 403)
+
     def test_login_csrf_cookie_and_logout_revocation(self):
         self.assertEqual(self.client.get('/api/admin/products').status_code, 401)
         self.assertEqual(self.client.post('/api/login', json={}).status_code, 403)

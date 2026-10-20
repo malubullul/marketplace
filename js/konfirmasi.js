@@ -15,11 +15,32 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (error) {
     document.getElementById("konfirmasi-sub").textContent = error.message;
     document.getElementById("nomor-pesanan").textContent = "—";
+    document.getElementById("confirmation-status").textContent = "Pesanan belum dapat dimuat";
+    document.getElementById("confirmation-status-note").textContent = "Muat ulang halaman atau buka Pesanan saya untuk mencoba kembali.";
     return;
   }
   document.getElementById("nomor-pesanan").textContent = order.nomor;
   document.getElementById("konfirmasi-sub").textContent =
-    `Terima kasih, ${order.nama}. Pesananmu sudah dikirim ke toko dan menunggu konfirmasi.`;
+    `Terima kasih, ${order.nama}. Rincian pesananmu tersimpan di akun.`;
+  const statuses = {baru: "Menunggu pembayaran", diproses: "Diproses", dikirim: "Dikirim", selesai: "Selesai", dibatalkan: "Dibatalkan"};
+  document.getElementById("confirmation-status").textContent = statuses[order.status] || order.status;
+  document.getElementById("confirmation-status-note").textContent = order.status === "baru"
+    ? "Membuka WhatsApp atau mengirim bukti transfer belum mengubah status. Toko akan memeriksa pembayaranmu."
+    : "Untuk pertanyaan mengenai pesanan ini, hubungi customer service.";
+  if (order.status === "baru") {
+    document.getElementById("payment-next-step").hidden = false;
+    const link = document.getElementById("payment-whatsapp-link");
+    const contacts = await storeContactsReady;
+    const url = paymentWhatsAppUrl(contacts, order);
+    if (url) {
+      link.href = url;
+      link.removeAttribute("aria-disabled");
+      link.innerHTML = `${icon("chat")} Lanjut pembayaran via WhatsApp`;
+    } else {
+      link.textContent = "WhatsApp pembayaran belum tersedia";
+      document.getElementById("payment-whatsapp-note").textContent = "Kontak pembayaran belum tersedia. Pesanan tetap tersimpan; hubungi CS atau cek kembali nanti.";
+    }
+  }
   const fields = [
     ["Nama penerima", order.nama_penerima || order.nama],
     ["Email", order.email],
@@ -28,7 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       "Alamat pengiriman",
       [order.alamat, order.kota, order.provinsi, order.kodepos].join(", "),
     ],
-    ["Pembayaran", "Konfirmasi manual dengan toko"],
+    ["Pembayaran", "Transfer melalui instruksi WhatsApp pembayaran"],
     [
       "Tanggal pesanan",
       new Date(order.created_at * 1000).toLocaleString("id-ID"),
