@@ -1,3 +1,11 @@
+// Keep recovery credentials in memory only and erase the fragment before any request.
+const recoveryFlow = location.hash.startsWith("#reset=");
+let recoveryToken = recoveryFlow ? location.hash.slice(7) : "";
+if (recoveryFlow) history.replaceState({}, "", location.pathname + location.search);
+// Pasting a recovery link into an already-open account page is a hash navigation.
+window.addEventListener("hashchange", () => {
+  if (location.hash.startsWith("#reset=")) location.reload();
+});
 const accountElement = (id) => document.getElementById(id);
 let accountAddresses = [],
   accountOrders = [],
@@ -42,6 +50,12 @@ function showAuth(mode = "login") {
   accountElement("account-loading").hidden = true;
   accountElement("buyer-login-form").hidden = mode !== "login";
   accountElement("buyer-register-form").hidden = mode !== "register";
+  accountElement("buyer-forgot-form").hidden = mode !== "forgot";
+  accountElement("buyer-reset-form").hidden = mode !== "reset";
+  accountElement("show-forgot-password").hidden = mode !== "login";
+  document.querySelector(".auth-tabs").hidden = ["forgot", "reset"].includes(mode);
+  accountElement("recovery-availability").hidden = !!buyerSession.password_recovery;
+  accountElement("buyer-forgot-form").querySelector('[type="submit"]').disabled = !buyerSession.password_recovery;
   accountElement("show-login").classList.toggle("selected", mode === "login");
   accountElement("show-register").classList.toggle(
     "selected",
@@ -56,12 +70,70 @@ function showAuth(mode = "login") {
     String(mode === "register"),
   );
   accountElement("auth-title").textContent =
-    mode === "login" ? "Masuk ke Anredseller." : "Buat akunmu.";
+    ({ login: "Masuk ke Anredseller.", register: "Buat akunmu.", forgot: "Lupa kata sandi?", reset: "Kata sandi baru." })[mode];
 }
 accountElement("show-login").addEventListener("click", () => showAuth("login"));
 accountElement("show-register").addEventListener("click", () =>
   showAuth("register"),
 );
+accountElement("show-forgot-password").addEventListener("click", () => {
+  accountElement("buyer-forgot-email").value = accountElement("buyer-login-email").value;
+  showAuth("forgot");
+  accountElement("buyer-forgot-email").focus();
+});
+document.querySelectorAll("[data-auth-login]").forEach(button => button.addEventListener("click", () => {
+  recoveryToken = "";
+  showAuth("login");
+  accountElement("buyer-login-email").focus();
+}));
+document.querySelectorAll("[data-auth-forgot]").forEach(button => button.addEventListener("click", () => {
+  recoveryToken = "";
+  showAuth("forgot");
+}));
+accountElement("buyer-forgot-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  const button = event.currentTarget.querySelector('[type="submit"]');
+  button.disabled = true;
+  formError("buyer-forgot-error", "");
+  accountElement("buyer-forgot-success").hidden = true;
+  try {
+    const result = await customerRequest("/forgot-password", { method: "POST", body: { email: accountElement("buyer-forgot-email").value } });
+    const message = accountElement("buyer-forgot-success");
+    message.textContent = result.message + " Tautan berlaku 30 menit.";
+    message.hidden = false;
+    button.textContent = "Kirim ulang tautan";
+  } catch (error) {
+    formError("buyer-forgot-error", error.message);
+  } finally {
+    button.disabled = false;
+  }
+});
+accountElement("buyer-reset-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  formError("buyer-reset-error", "");
+  if (accountElement("buyer-reset-password").value !== accountElement("buyer-reset-confirm").value) {
+    formError("buyer-reset-error", "Kedua kata sandi harus sama.");
+    return;
+  }
+  const button = event.currentTarget.querySelector('[type="submit"]');
+  button.disabled = true;
+  try {
+    const data = await customerRequest("/reset-password", { method: "POST", body: { token: recoveryToken, password: accountElement("buyer-reset-password").value } });
+    recoveryToken = "";
+    buyerSession.csrf = data.csrf;
+    clearBuyerBrowserData();
+    signalCustomerAuthChange();
+    event.target.reset();
+    button.hidden = true;
+    event.target.querySelectorAll("input").forEach(input => input.disabled = true);
+    const message = accountElement("buyer-reset-success");
+    message.textContent = "Kata sandi sudah diperbarui. Silakan masuk dengan kata sandi barumu.";
+    message.hidden = false;
+  } catch (error) {
+    formError("buyer-reset-error", error.message);
+    button.disabled = false;
+  }
+});
 for (const mode of ["login", "register"]) {
   accountElement("buyer-" + mode + "-form").addEventListener(
     "submit",
@@ -432,7 +504,7 @@ function showCustomerOrder(order) {
     ["Catatan", order.catatan || "Tidak ada catatan"],
   ];
   accountElement("customer-order-details").innerHTML =
-    `<span class="eyebrow">RINCIAN PESANAN</span><h2 id="customer-order-title">${h(order.nomor)}</h2><span class="account-badge">${accountStatus[order.status]}</span>${rows.map(([label, value]) => `<div class="account-receipt-row"><span>${h(label)}</span>${h(value)}</div>`).join("")}<div class="account-receipt-items">${order.items.map((item) => `<div class="customer-order-items"><img src="${productImage(item.gambar)}" alt="${h(item.nama)}"><div><strong>${h(item.nama)}</strong><small>${h([item.ukuran, item.warna].filter(Boolean).join(" / "))} · ${item.jumlah} pcs</small></div><span>${formatHarga(item.harga * item.jumlah)}</span></div>`).join("")}</div><div class="account-receipt-row"><span>Subtotal / Ongkir / Diskon</span>${formatHarga(order.subtotal)} / ${formatHarga(order.ongkir)} / −${formatHarga(order.diskon)}</div><div class="account-receipt-total">${formatHarga(order.total)}</div>${order.status === "baru" ? `<a class="whatsapp-action" href="konfirmasi.html?order=${encodeURIComponent(order.nomor)}">Lanjut pembayaran</a>` : ""}`;
+    `<span class="eyebrow">RINCIAN PESANAN</span><h2 id="customer-order-title">${h(order.nomor)}</h2><span class="account-badge">${accountStatus[order.status]}</span>${rows.map(([label, value]) => `<div class="account-receipt-row"><span>${h(label)}</span>${h(value)}</div>`).join("")}<div class="account-receipt-items">${order.items.map((item) => `<div class="customer-order-items"><img src="${productImage(item.gambar)}" alt="${h(item.nama)}"><div><strong>${h(item.nama)}</strong><small>${h([item.ukuran, item.warna].filter(Boolean).join(" / "))} · ${item.jumlah} pcs</small></div><span>${formatHarga(item.harga * item.jumlah)}</span></div>`).join("")}</div><div class="account-receipt-row"><span>Subtotal / Ongkir / Diskon</span>${formatHarga(order.subtotal)} / ${formatHarga(order.ongkir)} / −${formatHarga(order.diskon)}</div><div class="account-receipt-total">${formatHarga(order.total)}</div>${order.status === "selesai" ? `<div class="order-review-links"><h3>Bagaimana produk pilihanmu?</h3><p>Beri rating untuk membantu pembeli lain.</p>${[...new Map(order.items.map(item => [item.id,item])).values()].map(item => `<a class="account-button secondary" href="detail.html?id=${item.id}#ulasan">Nilai ${h(item.nama)} →</a>`).join("")}</div>` : ""}${order.status === "baru" ? `<a class="whatsapp-action" href="konfirmasi.html?order=${encodeURIComponent(order.nomor)}">Lanjut pembayaran</a>` : ""}`;
   accountElement("customer-order-dialog").showModal();
 }
 window.addEventListener("customer:state", () => {
@@ -449,7 +521,13 @@ window.addEventListener("customer:state", () => {
     );
     return;
   }
-  if (!buyerSession.authenticated) {
+  if (recoveryFlow) {
+    showAuth("reset");
+    if (!/^[A-Za-z0-9_-]{43}$/.test(recoveryToken)) {
+      formError("buyer-reset-error", "Tautan tidak valid. Minta tautan pemulihan baru.");
+      accountElement("buyer-reset-form").querySelector('[type="submit"]').disabled = true;
+    }
+  } else if (!buyerSession.authenticated) {
     showAuth();
   } else {
     await loadAccount();

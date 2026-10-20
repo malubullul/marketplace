@@ -20,6 +20,8 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 from werkzeug.exceptions import HTTPException
 from werkzeug.security import check_password_hash, generate_password_hash
 from customer_api import CustomerAPI
+from product_reviews import ProductReviews
+from password_recovery import PasswordRecovery
 from database import PostgresDatabase, PostgresError
 from storage import LocalStorage, SupabaseStorage, StorageError
 
@@ -50,6 +52,9 @@ def create_app(config=None):
         PERMANENT_SESSION_LIFETIME=30 * 86400,
         ADMIN_GATEWAY_KEY=os.environ.get('ANREDSELLER_ADMIN_GATEWAY_KEY', ''),
         ADMIN_PORTAL_URL=os.environ.get('ANREDSELLER_ADMIN_PORTAL_URL', '').rstrip('/'),
+        PUBLIC_URL=os.environ.get('ANREDSELLER_PUBLIC_URL', ''),
+        RESEND_API_KEY=os.environ.get('RESEND_API_KEY', ''),
+        EMAIL_FROM=os.environ.get('ANREDSELLER_EMAIL_FROM', ''),
     )
     app.config.update(config or {})
     if app.config['ADMIN_GATEWAY_KEY'] and len(app.config['ADMIN_GATEWAY_KEY']) < 32:
@@ -140,6 +145,8 @@ def create_app(config=None):
         return data
 
     customers = CustomerAPI(app, db, fail, body)
+    reviews = ProductReviews(app, db, customers, fail, body)
+    PasswordRecovery(app, db, customers, fail, body)
 
     def authenticated_owner():
         sid = session.get("sid", "")
@@ -263,7 +270,8 @@ def create_app(config=None):
 
     def products(include_drafts=False):
         rows = db().execute("SELECT * FROM products" + ("" if include_drafts else " WHERE published=1") + " ORDER BY id DESC").fetchall()
-        return [dict(json.loads(row["document"]), id=row["id"], published=bool(row["published"]), version=str(row["updated_at"])) for row in rows]
+        metrics = reviews.metrics()
+        return [dict(json.loads(row["document"]), id=row["id"], published=bool(row["published"]), version=str(row["updated_at"]), metrics_ready=reviews.ready(), **metrics.get(row['id'], dict(rating=0, ulasan=0, terjual=0))) for row in rows]
 
     @app.get("/api/products")
     def public_products():
@@ -359,7 +367,7 @@ def create_app(config=None):
             label=text("label", 40), ukuran=options("ukuran"), warna=options("warna"),
             gambarList=photo_list, gambar=photo_list[0], published=data.get("published") is True,
             trending=data.get("trending") is True, rekomendasi=data.get("rekomendasi") is True,
-            rating=(previous or {}).get("rating", 0), ulasan=(previous or {}).get("ulasan", 0), terjual=(previous or {}).get("terjual", 0),
+            rating=0, ulasan=0, terjual=0,
             demo=(previous or {}).get("demo", False),
             spesifikasi={"Bahan": text("bahan", 120), "Perawatan": text("perawatan", 500)},
             bahan=text("bahan", 120), perawatan=text("perawatan", 500),
@@ -397,7 +405,7 @@ def create_app(config=None):
         version = time.time_ns()
         db().execute("UPDATE products SET document=?,published=?,updated_at=? WHERE id=?", (json.dumps(product), product["published"], version, product_id))
         db().commit()
-        return jsonify(product=dict(product, id=product_id, version=str(version)))
+        return jsonify(product=dict(product, id=product_id, version=str(version), **reviews.metrics().get(product_id, dict(rating=0, ulasan=0, terjual=0))))
 
     @app.delete("/api/admin/products/<int:product_id>")
     @owner_required
@@ -521,6 +529,9 @@ def create_app(config=None):
             if data.get("save_address") is True and address_id is None:
                 customers.save_address(customer_id, dict(customer,label="Alamat checkout"))
             db().execute("INSERT INTO orders(id,document,status,idempotency_key,created_at,customer_id) VALUES(?,?,?,?,?,?)", (order_id, json.dumps(order), "baru", order_key, int(time.time()), customer_id))
+            if reviews.ready():
+                for product_id, quantity in quantities.items():
+                    db().execute('INSERT INTO order_items(order_id,product_id,quantity) VALUES(?,?,?)', (order_id, product_id, quantity))
             customers.consume_cart(customer_id,items)
             db().commit()
             return jsonify(order=order,state=customers.resolved_state(customer_id)), 201

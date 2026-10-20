@@ -160,7 +160,8 @@ class CustomerAPI:
         @app.get('/api/customer/session')
         def customer_session():
             customer=self.current()
-            return jsonify(authenticated=bool(customer),customer=self.profile(customer) if customer else None,csrf=self.csrf())
+            recovery = app.extensions['password_recovery']
+            return jsonify(authenticated=bool(customer),customer=self.profile(customer) if customer else None,csrf=self.csrf(),password_recovery=app.extensions['recovery_mailer'].enabled and recovery.ready())
 
         @app.post('/api/customer/register')
         def customer_register():
@@ -248,6 +249,8 @@ class CustomerAPI:
                 db().rollback();return fail('Kata sandi saat ini salah.',400)
             db().execute('UPDATE customers SET password_hash=? WHERE id=?',(generate_password_hash(password),customer['id']))
             db().execute('DELETE FROM customer_sessions WHERE customer_id=?',(customer['id'],))
+            if app.extensions['password_recovery'].ready():
+                db().execute('DELETE FROM password_resets WHERE customer_id=?',(customer['id'],))
             self.start_session(customer['id']);db().commit()
             return jsonify(ok=True,csrf=self.csrf())
 

@@ -38,7 +38,8 @@ Opening HTML directly or running `python -m http.server` provides a static examp
 - Shared [product photo galleries](docs/PRODUCT_GALLERY.md): upload four photos at once, choose the cover, then browse with arrows/swipe on cards and arrows/thumbnails on product details.
 - Validated image uploads, WebP conversion and a private Supabase bucket; local disk is available for development.
 - Draft/published visibility, stale-edit conflict detection, PostgreSQL support and local SQLite support.
-- Customer registration/login, profile editing and password changes that revoke other devices.
+- Customer registration/login, profile editing, password changes, and single-use email recovery through Resend that revokes existing sessions.
+- Verified buyer ratings with editable reviews and sold-unit counts based on completed orders. See [ratings and recovery setup](docs/REVIEWS_AND_RECOVERY.md).
 - Private saved addresses with a default shipping address and automatic checkout prefilling.
 - Server-backed wishlist and variant cart shared across the customer's devices.
 - Authenticated checkout and order history scoped to the buyer account; account identity is checked by the server.
@@ -50,9 +51,9 @@ Opening HTML directly or running `python -m http.server` provides a static examp
 
 ## Operational limits
 
-Payments, email and shipping are not automated. Orders await the owner's manual confirmation. Stock is total per product, not separate stock for each variant. Customer accounts are implemented; email verification, recovery via email, and reseller pricing tiers are not implemented. Initial example products and photography must be replaced or unpublished before launch; see [asset sources](assets/SOURCES.md).
+Payments and shipping are not automated. Recovery emails require a verified Resend sender and server configuration. Orders await the owner's manual confirmation. Stock is total per product, not separate stock for each variant. Customer accounts are implemented; email verification at registration and reseller pricing tiers are not implemented. Initial example products and photography must be replaced or unpublished before launch; see [asset sources](assets/SOURCES.md).
 
-Vercel stores data in Supabase PostgreSQL and photos in private Supabase Storage; session signing uses a stable environment secret. Apply [database](migrations/001_supabase.sql) and [bucket](migrations/002_supabase_storage.sql) migrations before connecting the production projects. The application does not create cloud tables or seed demonstration products during cold starts. PostgreSQL serializes application transactions using one advisory lock per schema, suitable for a small store rather than high marketplace traffic. SQLite deployments require one store instance and a persistent disk.
+Vercel stores data in Supabase PostgreSQL and photos in private Supabase Storage; session signing uses a stable environment secret. Apply [database](migrations/001_supabase.sql), [ratings/recovery](migrations/004_reviews_recovery.sql) and [bucket](migrations/002_supabase_storage.sql) migrations before connecting the production projects. The application does not create cloud tables or seed demonstration products during cold starts. PostgreSQL serializes application transactions using one advisory lock per schema, suitable for a small store rather than high marketplace traffic. SQLite deployments require one store instance and a persistent disk.
 
 ## Validation
 

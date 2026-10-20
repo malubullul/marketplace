@@ -855,6 +855,26 @@
 .account-page .sale-link {
   color: #4d5943;
 }
+.auth-text-action {
+  display: block;
+  min-height: 44px;
+  margin: 6px 0;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: #414c36;
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.recovery-description { color: #62665c; line-height: 1.6; margin-bottom: 20px; }
+.recovery-success { color: #35452b; line-height: 1.6; margin: 16px 0; }
+.order-review-links { margin: 24px 0; }
+.order-review-links h3 { font-size: 18px; margin: 0 0 6px; }
+.order-review-links p { margin: 0 0 14px; }
+.order-review-links a { margin: 8px 0; white-space: normal; overflow-wrap: anywhere; }
 .account-page .announcement {
   color: var(--paper);
 }

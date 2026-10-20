@@ -58,6 +58,7 @@
               Masuk ke akun
             </button>
           </form>
+          <button type="button" id="show-forgot-password" class="auth-text-action">Lupa kata sandi?</button>
           <form id="buyer-register-form" hidden>
             <label for="buyer-register-name">Nama lengkap</label
             ><input
@@ -108,6 +109,29 @@
             <button class="account-button primary" type="submit">
               Buat akun pembeli
             </button>
+          </form>
+          <form id="buyer-forgot-form" hidden>
+            <p class="recovery-description">Masukkan email akunmu. Kami akan mengirim tautan untuk membuat kata sandi baru.</p>
+            <p id="recovery-availability" class="recovery-description" hidden>Pemulihan email belum aktif. Hubungi CS untuk bantuan akun.</p>
+            <label for="buyer-forgot-email">Email akun</label>
+            <input id="buyer-forgot-email" type="email" autocomplete="email" maxlength="150" required />
+            <p id="buyer-forgot-error" class="account-error" role="alert" tabindex="-1"></p>
+            <p id="buyer-forgot-success" class="recovery-success" role="status" hidden></p>
+            <button class="account-button primary" type="submit">Kirim tautan pemulihan</button>
+            <button type="button" class="auth-text-action" data-support-open>Butuh bantuan CS?</button>
+            <button type="button" class="auth-text-action" data-auth-login>Kembali ke masuk</button>
+          </form>
+          <form id="buyer-reset-form" hidden>
+            <p class="recovery-description">Gunakan 12–128 karakter. Setelah disimpan, semua perangkat akan keluar dari akunmu.</p>
+            <label for="buyer-reset-password">Kata sandi baru</label>
+            <input id="buyer-reset-password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required />
+            <label for="buyer-reset-confirm">Ulangi kata sandi baru</label>
+            <input id="buyer-reset-confirm" type="password" autocomplete="new-password" minlength="12" maxlength="128" required />
+            <p id="buyer-reset-error" class="account-error" role="alert" tabindex="-1"></p>
+            <p id="buyer-reset-success" class="recovery-success" role="status" hidden></p>
+            <button class="account-button primary" type="submit">Simpan kata sandi baru</button>
+            <button type="button" class="auth-text-action" data-auth-forgot>Minta tautan baru</button>
+            <button type="button" class="auth-text-action" data-auth-login>Kembali ke masuk</button>
           </form>
           <p class="auth-help">
             Akun ini untuk pembeli.

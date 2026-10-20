@@ -71,7 +71,7 @@ Admin critique: the actual product list is the dominant block, totals come from 
 - Genuine catalogue controls and product objects carry `data-ui`, as allowed for real interface fragments.
 - Small product metadata and several display sizes are intentional commerce/brand roles. No suitable authentic campaign footage exists, so no unrelated stock video was inserted. Reduced-motion users get the complete still page.
 - Existing generated campaign and product assets are documented in [SOURCES.md](../assets/SOURCES.md). No newly found photographs or clips require credits.
-- Replace demo products, prices, images and sample reviews with the owner's actual merchandise before launch. The reseller program and email delivery still need business configuration.
+- Replace demo products, prices and images with the owner's actual merchandise before launch. Sample reviews and synthetic sold/rating counters have been replaced with verified purchase data; see [ratings and recovery](REVIEWS_AND_RECOVERY.md). The reseller program and email delivery still need business configuration.
 
 ## Verification
 

@@ -16,7 +16,7 @@ Peninjauan sebelumnya menggunakan skill Trail of Bits [sharp-edges](../.agents/s
 
 ## Batas
 
-Verifikasi email dan pemulihan kata sandi melalui email/SMS belum tersedia. Pemantauan penyalahgunaan, kebijakan proxy/rate limiting di hosting, dan backup perlu dioperasikan sesuai kebutuhan produksi.
+Verifikasi email saat pendaftaran dan pemulihan melalui SMS belum tersedia. Pemulihan kata sandi melalui email tersedia setelah Resend diaktifkan; lihat [panduan rating dan pemulihan](REVIEWS_AND_RECOVERY.md). Pemantauan penyalahgunaan, kebijakan proxy/rate limiting di hosting, dan backup perlu dioperasikan sesuai kebutuhan produksi.
 
 Pengujian memakai database dan akun sementara; tidak mengubah data Supabase produksi. Hasil verifikasi saat penghapusan Google:
 
@@ -33,3 +33,13 @@ Pengaturan dua nomor membutuhkan sesi pemilik, CSRF, serta gateway portal admin 
 Pesan pembayaran dibuat dari pesanan yang dibaca melalui endpoint privat pemilik pesanan, berisi referensi, produk dan total. Alamat, email dan nomor HP pembeli tidak dimasukkan otomatis ke pesan. Pesan hanya disiapkan saat tautan diklik; situs tidak mengirim pesan lewat API WhatsApp. Klik tautan tidak mengubah status pesanan atau menandakan pembayaran lunas.
 
 Verifikasi backend terbaru: **73 tes lolos tanpa skip**, mencakup SQLite dan PostgreSQL sementara, otorisasi pengaturan, CSRF, normalisasi, penyimpanan ulang, penolakan URL berbahaya, dan jalur gateway admin. Lihat [panduan dan verifikasi WhatsApp](WHATSAPP.md).
+
+## Rating dan pemulihan email
+
+Peninjauan kembali memakai skill Trail of Bits `sharp-edges` untuk konfigurasi pengirim, token sekali pakai, pencabutan sesi, dan kegagalan provider. URL reset menggunakan origin tetap dan fragmen yang segera dihapus; tidak menerima origin dari header permintaan. Token memiliki masa hidup tetap 30 menit dan disimpan sebagai hash. Perubahan password dan konsumsi token berada dalam satu transaksi, termasuk pada permintaan bersamaan.
+
+Email dan respons bersifat sama untuk alamat terdaftar/belum terdaftar; batas pengiriman berlaku per IP dan digest alamat. Token untuk alamat belum terdaftar tidak dapat mengubah akun. Tidak ada kredensial provider atau data pribadi penerima dalam log kegagalan. Domain pengirim harus terverifikasi sebelum menerima pelanggan umum.
+
+Rating memerlukan pembelian milik sesi pembeli dengan status selesai; ID/nama pembeli dari payload tidak menentukan pemilik ulasan. Satu rating per akun/produk ditegakkan oleh primary key. Ringkasan dan jumlah terjual dihitung dari tabel ulasan/item pesanan, bukan angka yang dapat dikirim dari editor produk. API publik menyamarkan nama dan tidak memuat email, ID akun atau nomor pesanan.
+
+Verifikasi rating/pemulihan: **104 tes backend lolos tanpa skip** pada SQLite/PostgreSQL; browser fitur baru lolos pada kedua backend, 231 pemeriksaan responsif regresi dan 15 layout fitur baru per backend lolos. Pengirim email memakai fixture lokal. Belum mengirim email produksi atau memigrasikan Supabase pengguna.

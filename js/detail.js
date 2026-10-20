@@ -25,6 +25,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderDetail(produkAktif);
   renderProdukSerupa(produkAktif);
   initSearch();
+  await initProductReviews(produkAktif);
+  if (location.hash === "#ulasan") {
+    gantiTab("ulasan", document.getElementById("reviews-tab"));
+    document.getElementById("reviews-tab").scrollIntoView({ block: "start" });
+  }
 });
 
 // ── Render Detail ──────────────────────────────────────────
@@ -60,11 +65,6 @@ function renderDetail(p) {
     )
     .join("");
 
-  // Ulasan sample
-  const ulasanSample = p.demo
-    ? generateUlasanSample(p)
-    : "<p>Belum ada ulasan untuk produk ini.</p>";
-
   const wrapper = document.getElementById("detail-wrapper");
   wrapper.innerHTML = `
     <!-- GALERI -->
@@ -77,7 +77,7 @@ function renderDetail(p) {
       <div class="detail-badge-kategori">${katObj?.icon || ""} ${katObj?.nama || ""}</div>
       <h1 class="detail-nama">${h(p.nama)}</h1>
       
-      <div class="detail-meta">
+      <div class="detail-meta" id="product-review-metrics">
         <div class="detail-rating">
           ${renderBintang(p.rating)}
           <span style="font-size:13px;font-weight:600;color:var(--teks-hitam)">${p.rating}</span>
@@ -142,7 +142,7 @@ function renderDetail(p) {
         <div class="tabs-header">
           <button class="tab-btn aktif" onclick="gantiTab('deskripsi', this)">Deskripsi</button>
           <button class="tab-btn" onclick="gantiTab('spesifikasi', this)">Spesifikasi</button>
-          <button class="tab-btn" onclick="gantiTab('ulasan', this)">Ulasan (${p.ulasan.toLocaleString("id-ID")})</button>
+          <button class="tab-btn" id="reviews-tab" onclick="gantiTab('ulasan', this)">Ulasan (${p.ulasan.toLocaleString("id-ID")})</button>
         </div>
 
         <!-- Tab Deskripsi -->
@@ -157,7 +157,7 @@ function renderDetail(p) {
 
         <!-- Tab Ulasan -->
         <div class="tab-konten" id="tab-ulasan">
-          ${ulasanSample}
+          <p role="status">Memuat ulasan pembeli…</p>
         </div>
       </div>
     </div>
@@ -221,71 +221,6 @@ function renderProdukSerupa(p) {
   }
   el.innerHTML = serupa.map((x, i) => renderKartuProduk(x, i)).join("");
   updateIkonWishlist();
-}
-
-// ── Generate Ulasan Sample ────────────────────────────────
-function generateUlasanSample(p) {
-  const nama = ["Budi S.", "Siti R.", "Andi P.", "Dewi K.", "Fajar M."];
-  const komentar = [
-    "Produk sangat bagus, sesuai deskripsi! Packaging aman, pengiriman cepat.",
-    "Kualitasnya memuaskan, harga juga sepadan. Recommended!",
-    "Sudah beli 2 kali, tidak mengecewakan. Seller terpercaya.",
-    "Barang original, persis seperti foto. Sangat puas dengan pembelian ini.",
-    "Pengiriman cepat, barang rapih dikemas. Pasti beli lagi.",
-  ];
-  const tanggal = [
-    "18 Okt 2024",
-    "15 Okt 2024",
-    "10 Okt 2024",
-    "5 Okt 2024",
-    "1 Okt 2024",
-  ];
-  const ratings = [5, 5, 4, 5, 4];
-
-  const distribusi = { 5: 60, 4: 25, 3: 10, 2: 3, 1: 2 };
-
-  let html = `
-    <div class="ulasan-ringkasan">
-      <div>
-        <div class="ulasan-angka-besar">${p.rating}</div>
-        <div class="ulasan-bintang-besar" style="color:var(--bintang)">${renderBintang(p.rating)}</div>
-        <div class="ulasan-total-teks">${p.ulasan.toLocaleString("id-ID")} ulasan</div>
-      </div>
-      <div class="ulasan-bar">
-        ${[5, 4, 3, 2, 1]
-          .map(
-            (n) => `
-          <div class="ulasan-bar-row">
-            <span class="ulasan-bar-label">${n}</span>
-            <div class="ulasan-bar-track">
-              <div class="ulasan-bar-fill" style="width:${distribusi[n]}%"></div>
-            </div>
-            <span class="ulasan-bar-persen">${distribusi[n]}%</span>
-          </div>
-        `,
-          )
-          .join("")}
-      </div>
-    </div>
-  `;
-
-  for (let i = 0; i < 5; i++) {
-    html += `
-      <div class="ulasan-item">
-        <div class="ulasan-header">
-          <div class="ulasan-avatar">${nama[i][0]}</div>
-          <div>
-            <div class="ulasan-nama">${nama[i]}</div>
-            <div style="color:var(--bintang);font-size:13px">${"★".repeat(ratings[i])}${"☆".repeat(5 - ratings[i])}</div>
-          </div>
-          <div class="ulasan-tanggal">${tanggal[i]}</div>
-        </div>
-        <div class="ulasan-teks">${komentar[i]}</div>
-      </div>
-    `;
-  }
-
-  return html;
 }
 
 // ── Search ─────────────────────────────────────────────────
