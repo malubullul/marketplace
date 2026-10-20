@@ -8,6 +8,8 @@ Reviewed with [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-
 
 The public interface uses plain HTML, CSS and JavaScript; the owner dashboard and shared catalog/order API use Flask and SQLite. Do not add a framework or Tailwind solely because a skill supports it. Search recommendations supplement the user's reference; they do not replace it. The broad luxury-commerce search returned an Apple-specific Liquid Glass style that does not fit this site, so it was rejected. Targeted minimalism and web accessibility guidance was used instead.
 
+The canonical owner UI now lives in `admin-portal/templates/index.html` and `admin-portal/static/`. The store backend serves those same files in local single-domain mode, while the standalone portal serves them on the owner domain. Keep one UI implementation so mobile fixes apply to both. Store links use `/portal-config` to reach the configured public store.
+
 Useful searches from this review:
 
 ```sh

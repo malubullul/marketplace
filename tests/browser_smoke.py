@@ -11,21 +11,37 @@ ROOT=Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix='anredseller-browser-') as directory:
     password=secrets.token_urlsafe(24)
     buyer_password=secrets.token_urlsafe(24)
-    source='''import json,sys
-from server import app,create_owner
+    separate=os.environ.get('ANREDSELLER_TEST_ADMIN_PORTAL')=='1'
+    source='''import json,sys,secrets,threading
+from server import create_app,create_owner
 from werkzeug.serving import make_server
 credentials=json.loads(sys.stdin.readline())
+settings={}
+if credentials['separate']:
+    settings={'ADMIN_GATEWAY_KEY':secrets.token_urlsafe(40),'ADMIN_PORTAL_URL':'https://owner.example.test'}
+app=create_app(settings)
 create_owner(app,credentials["email"],credentials["password"])
 http=make_server("127.0.0.1",0,app,threaded=True)
-print(http.server_port,flush=True)
+ports={'store':http.server_port}
+if credentials['separate']:
+    sys.path.insert(0,'admin-portal')
+    from app import create_app as create_portal
+    portal=create_portal({'BACKEND_URL':f'http://127.0.0.1:{http.server_port}',
+                          'SHOP_URL':f'http://127.0.0.1:{http.server_port}',
+                          'ADMIN_GATEWAY_KEY':settings['ADMIN_GATEWAY_KEY'],'SECURE_COOKIES':False})
+    owner_http=make_server('127.0.0.1',0,portal,threaded=True)
+    ports['admin']=owner_http.server_port
+    app.config['ADMIN_PORTAL_URL']=f'http://localhost:{owner_http.server_port}'
+    threading.Thread(target=owner_http.serve_forever,daemon=True).start()
+print(json.dumps(ports),flush=True)
 http.serve_forever()
 '''
     with open(Path(directory)/'server.log','w') as log:
         process=subprocess.Popen([str(ROOT/'.venv/bin/python'),'-c',source],cwd=ROOT,env={**os.environ,'ANREDSELLER_DATA_DIR':directory},stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=log,text=True)
-        process.stdin.write(json.dumps({'email':'owner@example.test','password':password})+'\n');process.stdin.flush()
-        port=process.stdout.readline().strip()
-        if not port.isdigit():raise RuntimeError('Test server did not start')
-        base='http://127.0.0.1:'+port+'/'
+        process.stdin.write(json.dumps({'email':'owner@example.test','password':password,'separate':separate})+'\n');process.stdin.flush()
+        ports=json.loads(process.stdout.readline())
+        base='http://127.0.0.1:'+str(ports['store'])+'/'
+        admin_base=('http://localhost:'+str(ports['admin'])+'/') if separate else base
         try:
             with sync_playwright() as p:
                 browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True)
@@ -33,7 +49,12 @@ http.serve_forever()
                 public_context=browser.new_context(viewport={'width':390,'height':844},reduced_motion='reduce')
                 owner=admin_context.new_page();shopper=public_context.new_page();errors=[]
                 owner.on('pageerror',lambda e:errors.append(str(e)));shopper.on('pageerror',lambda e:errors.append(str(e)))
-                owner.goto(base+'admin.html',wait_until='networkidle')
+                owner.goto(admin_base+('' if separate else 'admin.html'),wait_until='networkidle')
+                if separate:
+                    assert owner.locator('[data-store-link]').first.get_attribute('href')==base.rstrip('/')
+                    assert public_context.request.get(base+'api/session').status==401
+                    assert admin_context.request.get(admin_base+'api/customer/session').status==404
+                    assert admin_context.request.get(admin_base+'produk.html').status==404
                 owner.locator('#login-email').fill('owner@example.test');owner.locator('#login-password').fill(password);owner.locator('#login-button').click();owner.locator('#dashboard').wait_for(state='visible')
                 owner.locator('#add-product').click()
                 for field,value in {'product-name':'Jaket Suede Uji','product-description':'Jaket nyaman <b>suede</b> dengan detail premium.','product-brand':'Anredseller','product-price':'299000','product-stock':'4','product-sizes':'S, M','product-colors':'Hitam, Cokelat','product-material':'Suede sintetis'}.items():owner.locator('#'+field).fill(value)
@@ -83,7 +104,7 @@ http.serve_forever()
                 screenshots=Path(os.environ.get('ANREDSELLER_SCREENSHOT_DIR','/tmp/anredseller-browser'));screenshots.mkdir(exist_ok=True)
                 owner.screenshot(path=str(screenshots/'admin-desktop.png'),full_page=True)
                 owner.set_viewport_size({'width':390,'height':844});owner.screenshot(path=str(screenshots/'admin-mobile.png'),full_page=True)
-                owner.locator('#logout-button').click();owner.locator('#login-view').wait_for(state='visible');assert admin_context.request.get(base+'api/admin/products').status==401
+                owner.locator('#logout-button').click();owner.locator('#login-view').wait_for(state='visible');assert admin_context.request.get(admin_base+'api/admin/products').status==401
                 device.goto(base+'akun.html#orders',wait_until='networkidle');device.get_by_role('button',name='Lihat rincian',exact=True).wait_for();device.get_by_role('button',name='Lihat rincian',exact=True).click();device.locator('#customer-order-dialog').wait_for(state='visible');assert order_number in device.locator('#customer-order-details').inner_text();device.locator('#close-customer-order').click()
                 assert device_context.request.get(base+'api/admin/orders').status==401
                 other_context=browser.new_context(viewport={'width':390,'height':844},reduced_motion='reduce');other=other_context.new_page();other.on('pageerror',lambda e:errors.append(str(e)));other.goto(base+'akun.html',wait_until='networkidle');other.locator('#show-register').click()
@@ -100,6 +121,7 @@ http.serve_forever()
                 shopper.goto(base+'akun.html',wait_until='networkidle');shopper.locator('#customer-logout').click();shopper.locator('#customer-auth').wait_for(state='visible');assert public_context.request.get(base+'api/customer/orders').status==401
                 assert device_context.request.get(base+'api/customer/orders').status==200
                 assert not errors,errors
+                if separate:print('PASS: independent admin/public origins, admin-only routes, backend gateway protection, cookie login, photo upload, publishing and shared buyer orders')
                 browser.close()
                 print('PASS: owner product management; customer signup/login, saved address, wishlist, cross-device cart, authenticated checkout, private order history, account isolation, responsive account/dashboard and independent logout')
         finally:

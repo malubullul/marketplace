@@ -8,6 +8,14 @@ Anredseller sekarang memiliki dua sisi yang memakai database server yang sama:
 
 GitHub menyimpan kode. GitHub Pages dan membuka file HTML langsung tidak menjalankan database atau API; keduanya hanya memberikan pratinjau statis. Gunakan hosting yang dapat menjalankan Python dan menyediakan penyimpanan permanen.
 
+## Domain admin terpisah
+
+Proyek [admin-portal](../admin-portal/README.md) siap dipasang sebagai repository dan layanan Python tersendiri. Domain toko melayani pembeli, sedangkan domain admin membuka login pemilik di halaman utama. Database, akun pemilik, foto dan pesanan tetap berada pada satu backend toko.
+
+Atur `ANREDSELLER_ADMIN_GATEWAY_KEY` dengan rahasia acak yang sama pada kedua hosting. Pada hosting toko, tambahkan `ANREDSELLER_ADMIN_PORTAL_URL` berisi origin HTTPS admin. Pada hosting admin, isi `ANREDSELLER_BACKEND_URL` dan `ANREDSELLER_SHOP_URL` berisi origin HTTPS toko. Jangan menaruh kunci di kode atau Git. Rincian deploy dan struktur repository tersedia dalam panduan portal.
+
+Jika mode ini diaktifkan, `/admin` serta `/admin.html` pada domain toko menjadi pengalihan menuju portal. File UI admin tidak disajikan dari toko dan API pemilik menolak permintaan tanpa kunci antarlayanan. Portal tetap memerlukan login pemilik dan CSRF; mengetahui domain admin tidak memberi akses pengelolaan. Akun pembeli dan checkout tidak dilayani portal admin. Mode satu domain tetap tersedia ketika variabel pemisahan belum diisi.
+
 ## Menjalankan di komputer/server
 
 Gunakan Python 3.12 atau lebih baru.

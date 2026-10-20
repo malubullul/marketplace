@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="robots" content="noindex,nofollow" />
     <title>Admin — Anredseller</title>
-    <link rel="stylesheet" href="css/admin.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
   </head>
   <body>
     <section id="login-view" class="login-view">
       <div class="login-editorial">
-        <a href="index.html" class="brand">ANREDSELLER</a>
+        <a href="/" data-store-link class="brand">ANREDSELLER</a>
         <div>
           <span class="eyebrow">THE OWNER'S SPACE</span>
           <h1>Your collection.<br />Your next chapter.</h1>
@@ -19,13 +19,13 @@
         <span class="eyebrow">CURATED BY YOU.</span>
       </div>
       <div class="login-panel">
-        <a href="index.html" class="back-link">← Kembali ke toko</a>
+        <a href="/" data-store-link class="back-link">← Kembali ke toko</a>
         <div class="login-content">
           <span class="eyebrow">AREA PEMILIK TOKO</span>
           <h2>Selamat datang<br />kembali.</h2>
           <p>Masuk untuk mengelola koleksi dan pesanan Anredseller.</p>
           <div id="setup-notice" class="notice" hidden>
-            Akun pemilik belum dibuat. Di terminal server, jalankan
+            Akun pemilik belum dibuat. Di terminal server toko, jalankan
             <code>python server.py create-admin</code>, lalu tentukan email dan
             kata sandi pribadi kamu.
           </div>
@@ -50,7 +50,7 @@
             </button>
           </form>
           <small
-            >Pengunjung dapat melihat katalog dan memesan tanpa login.</small
+            >Portal khusus pemilik. Pembeli berbelanja melalui toko publik.</small
           >
         </div>
       </div>
@@ -67,7 +67,7 @@
           </button>
         </nav>
         <div class="sidebar-bottom">
-          <a href="index.html" target="_blank" rel="noopener"
+          <a href="/" data-store-link target="_blank" rel="noopener"
             >Lihat toko publik →</a
           ><span id="owner-email"></span
           ><button id="logout-button">Keluar akun</button>
@@ -399,6 +399,6 @@
       </button>
       <div id="order-details"></div>
     </dialog>
-    <script src="js/admin.js"></script>
+    <script src="/js/admin.js"></script>
   </body>
 </html>

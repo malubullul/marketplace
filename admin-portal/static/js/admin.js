@@ -465,4 +465,17 @@ function openOrder(order) {
     `<span class="eyebrow">RINCIAN PESANAN</span><h2 id="order-title">${esc(order.nomor)}</h2><span class="badge new">${statusNames[order.status]}</span><div class="order-info"><div><span>Penerima</span><strong>${esc(order.nama_penerima || order.nama)}</strong></div><div><span>Email / Nomor HP</span><strong>${esc(order.email)} / ${esc(order.nohp)}</strong></div><div><span>Alamat pengiriman</span><strong>${esc(order.alamat)}, ${esc(order.kota)}, ${esc(order.provinsi)} ${esc(order.kodepos)}</strong></div><div><span>Catatan pelanggan</span><strong>${esc(order.catatan) || "Tidak ada catatan"}</strong></div><div><span>Pembayaran</span><strong>Konfirmasi manual dengan pelanggan</strong></div></div><div class="order-items">${order.items.map((item) => `<div class="order-item"><img src="${esc(item.gambar)}" alt="${esc(item.nama)}"><div><strong>${esc(item.nama)}</strong><small>${esc([item.ukuran, item.warna].filter(Boolean).join(" / "))} · ${item.jumlah} pcs</small></div><span>${money(item.harga * item.jumlah)}</span></div>`).join("")}</div><div class="order-info"><div><span>Subtotal / Ongkir / Diskon</span><strong>${money(order.subtotal)} / ${money(order.ongkir)} / −${money(order.diskon)}</strong></div></div><div class="order-total">Total ${money(order.total)}</div>`;
   $("order-dialog").showModal();
 }
-sessionInfo();
+async function initializePortal() {
+  try {
+    const config = await api('/portal-config');
+    if (config.shop_url) {
+      document.querySelectorAll('[data-store-link]').forEach((link) => {
+        link.href = config.shop_url;
+      });
+    }
+  } catch (error) {
+    // Session errors below provide the connection status to the owner.
+  }
+  await sessionInfo();
+}
+initializePortal();

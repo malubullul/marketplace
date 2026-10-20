@@ -13,14 +13,16 @@ import sqlite3
 import time
 import uuid
 from collections import Counter
+from urllib.parse import urlsplit
 
-from flask import Flask, abort, g, jsonify, request, send_from_directory, session
+from flask import Flask, abort, g, jsonify, redirect, request, send_from_directory, session
 from PIL import Image, ImageOps, UnidentifiedImageError
 from werkzeug.exceptions import HTTPException
 from werkzeug.security import check_password_hash, generate_password_hash
 from customer_api import CustomerAPI
 
 ROOT = Path(__file__).resolve().parent
+ADMIN_ROOT = ROOT / 'admin-portal'
 CATEGORIES = {"apparel", "sneakers", "essentials"}
 ORDER_STATES = {"baru", "diproses", "dikirim", "selesai", "dibatalkan"}
 COUPONS = {"HEMAT10": 10, "ANRED15": 15, "SALE20": 20}
@@ -36,8 +38,19 @@ def create_app(config=None):
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_COOKIE_SECURE=os.environ.get("ANREDSELLER_SECURE_COOKIES") == "1",
         PERMANENT_SESSION_LIFETIME=30 * 86400,
+        ADMIN_GATEWAY_KEY=os.environ.get('ANREDSELLER_ADMIN_GATEWAY_KEY', ''),
+        ADMIN_PORTAL_URL=os.environ.get('ANREDSELLER_ADMIN_PORTAL_URL', '').rstrip('/'),
     )
     app.config.update(config or {})
+    if app.config['ADMIN_GATEWAY_KEY'] and len(app.config['ADMIN_GATEWAY_KEY']) < 32:
+        raise ValueError('ADMIN_GATEWAY_KEY harus minimal 32 karakter.')
+    if app.config['ADMIN_PORTAL_URL']:
+        portal = urlsplit(app.config['ADMIN_PORTAL_URL'])
+        local = portal.scheme == 'http' and portal.hostname in {'localhost', '127.0.0.1', '::1'}
+        if not portal.netloc or (portal.scheme != 'https' and not local) or portal.username or portal.password or portal.path or portal.query or portal.fragment:
+            raise ValueError('ADMIN_PORTAL_URL harus berupa origin HTTPS tanpa path.')
+        if not app.config['ADMIN_GATEWAY_KEY']:
+            raise ValueError('Portal terpisah membutuhkan ADMIN_GATEWAY_KEY di kedua server.')
     directory = Path(app.config["DATA_DIR"])
     directory.mkdir(parents=True, exist_ok=True)
     (directory / "uploads").mkdir(exist_ok=True)
@@ -114,6 +127,13 @@ def create_app(config=None):
                 return fail("Sesi formulir tidak valid. Muat ulang halaman.", 403)
             return func(*args, **kwargs)
         return wrapped
+
+    @app.before_request
+    def admin_gateway():
+        protected = request.path in {'/api/session', '/api/login', '/api/logout'} or request.path.startswith('/api/admin/')
+        key = app.config['ADMIN_GATEWAY_KEY']
+        if protected and key and not secrets.compare_digest(request.headers.get('X-Anredseller-Admin-Key', '').encode(), key.encode()):
+            return fail('Akses admin harus melalui portal pemilik.', 401)
 
     @app.after_request
     def headers(response):
@@ -447,11 +467,25 @@ def create_app(config=None):
 
     @app.get("/admin")
     def admin_page():
-        return send_from_directory(ROOT, "admin.html")
+        if app.config['ADMIN_PORTAL_URL']:
+            return redirect(app.config['ADMIN_PORTAL_URL'] + '/', code=302)
+        return send_from_directory(ADMIN_ROOT / 'templates', 'index.html')
+
+    @app.get('/portal-config')
+    def local_admin_config():
+        if app.config['ADMIN_PORTAL_URL']:
+            abort(404)
+        return jsonify(shop_url='/')
 
     @app.get("/<path:filename>")
     def static_file(filename):
-        pages = {"index.html","produk.html","detail.html","keranjang.html","checkout.html","konfirmasi.html","admin.html","akun.html"}
+        if filename == 'admin.html':
+            return admin_page()
+        if filename in {'css/admin.css', 'js/admin.js'}:
+            if app.config['ADMIN_PORTAL_URL']:
+                abort(404)
+            return send_from_directory(ADMIN_ROOT / 'static', filename)
+        pages = {"index.html","produk.html","detail.html","keranjang.html","checkout.html","konfirmasi.html","akun.html"}
         parts = Path(filename).parts
         if filename in pages or (parts and parts[0] in {"css","js","assets"} and not any(part.startswith(".") for part in parts)):
             return send_from_directory(ROOT, filename)
