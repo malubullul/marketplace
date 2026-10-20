@@ -8,11 +8,18 @@ Anredseller sekarang memiliki dua sisi yang memakai database server yang sama:
 
 GitHub menyimpan kode. GitHub Pages dan membuka file HTML langsung tidak menjalankan database atau API; keduanya hanya memberikan pratinjau statis. Gunakan hosting yang dapat menjalankan Python dan menyediakan penyimpanan permanen.
 
-## Domain admin terpisah
+## Satu repository, dua layanan dan domain
 
-Proyek [admin-portal](../admin-portal/README.md) siap dipasang sebagai repository dan layanan Python tersendiri. Domain toko melayani pembeli, sedangkan domain admin membuka login pemilik di halaman utama. Database, akun pemilik, foto dan pesanan tetap berada pada satu backend toko.
+Toko dan [admin-portal](../admin-portal/README.md) memakai repository `malubullul/marketplace` dan branch `main` yang sama. Tidak perlu repository admin baru, branch terpisah, atau unggah ZIP. Satu push ke `main` dapat memperbarui kedua layanan hosting.
 
-Atur `ANREDSELLER_ADMIN_GATEWAY_KEY` dengan rahasia acak yang sama pada kedua hosting. Pada hosting toko, tambahkan `ANREDSELLER_ADMIN_PORTAL_URL` berisi origin HTTPS admin. Pada hosting admin, isi `ANREDSELLER_BACKEND_URL` dan `ANREDSELLER_SHOP_URL` berisi origin HTTPS toko. Jangan menaruh kunci di kode atau Git. Rincian deploy dan struktur repository tersedia dalam panduan portal.
+| Layanan | Folder sumber | Branch | Contoh domain |
+| --- | --- | --- | --- |
+| Toko publik | Root repository | `main` | `anredseller.com` |
+| Portal admin | `admin-portal` | `main` | `admin.anredseller.com` |
+
+Alamat di tabel hanya contoh, belum merupakan domain yang dipasang. Domain toko melayani pembeli, sedangkan domain admin membuka login pemilik di halaman utama. Database, akun pemilik, foto dan pesanan tetap berada pada satu backend toko. Portal admin tidak membuat salinan database.
+
+Blueprint root membuat environment group `anredseller-admin-connection` yang menghasilkan satu `ANREDSELLER_ADMIN_GATEWAY_KEY` acak dan memasangkannya ke kedua layanan. Nilai rahasia tidak ditulis ke repository. Isi dua URL ketika menghubungkan hosting: `ANREDSELLER_ADMIN_PORTAL_URL` pada toko untuk alamat HTTPS admin, dan `ANREDSELLER_BACKEND_URL` pada admin untuk alamat HTTPS toko. Tombol **Lihat toko** mengikuti alamat backend ini; `ANREDSELLER_SHOP_URL` hanya perlu diisi bila alamat publiknya berbeda. Bila memakai hosting selain Render, buat satu rahasia acak minimal 32 karakter dan pasang nilai yang sama pada kedua layanan.
 
 Jika mode ini diaktifkan, `/admin` serta `/admin.html` pada domain toko menjadi pengalihan menuju portal. File UI admin tidak disajikan dari toko dan API pemilik menolak permintaan tanpa kunci antarlayanan. Portal tetap memerlukan login pemilik dan CSRF; mengetahui domain admin tidak memberi akses pengelolaan. Akun pembeli dan checkout tidak dilayani portal admin. Mode satu domain tetap tersedia ketika variabel pemisahan belum diisi.
 
@@ -39,16 +46,17 @@ Atur `ANREDSELLER_SECURE_COOKIES=1` pada deployment HTTPS. Jangan aktifkan opsi 
 
 ## Opsi pemasangan: Render
 
-`render.yaml` adalah konfigurasi siap ditinjau untuk satu web service Python dan persistent disk. Ini belum membuat atau mempublikasikan layanan. Paket Starter dan persistent disk menggunakan layanan berbayar; tinjau biaya di Render sebelum membuatnya.
+`render.yaml` di **root repository** mendefinisikan dua web service Python pada branch `main`, satu environment group bersama, dan persistent disk hanya untuk toko. Ini belum membuat atau mempublikasikan layanan. Dua layanan Starter dan disk toko menggunakan layanan berbayar; tinjau total biaya di Render sebelum membuatnya.
 
-1. Hubungkan repositori `malubullul/marketplace` dengan layanan Render milikmu.
-2. Buat Blueprint dari `render.yaml`, periksa biaya, kemudian deploy jika sudah sesuai.
-3. Sesudah server aktif, buka Shell layanan tersebut dan jalankan `python server.py create-admin` untuk membuat akun pemilik. Masukkan email dan kata sandi pribadi langsung di terminal layanan.
-4. Buka alamat layanan dengan akhiran `/admin` untuk login. Alamat utama adalah toko publik.
-5. Isi produk asli, foto, kebijakan pembayaran, dan informasi kontak sebelum mulai menerima pelanggan. Contoh produk di database dapat diedit, dijadikan draf, atau dihapus melalui dashboard.
-6. Domain sendiri dapat ditambahkan melalui pengaturan hosting. HTTPS harus aktif agar cookie admin bekerja sesuai konfigurasi produksi.
+1. Hubungkan repository `malubullul/marketplace` ke Blueprint Render milikmu. Pilih branch `main` dan berkas `render.yaml` di root. Jangan membuat Blueprint kedua dari `admin-portal/render.yaml`; berkas itu hanya untuk opsi ekspor lama.
+2. Tinjau dua layanan `anredseller` dan `anredseller-admin` beserta biayanya. Folder root dan perintah startup masing-masing sudah diatur dalam Blueprint.
+3. Isi `ANREDSELLER_ADMIN_PORTAL_URL` pada layanan toko dan `ANREDSELLER_BACKEND_URL` pada layanan admin dengan origin HTTPS yang benar, tanpa path. Gunakan domain yang akan dipasang atau URL bawaan hosting yang benar dari dashboard. Bila URL bawaan baru diketahui sesudah layanan dibuat, lengkapi pengaturan lalu deploy ulang; layanan admin belum sehat sebelum URL backend terisi dan backend aktif.
+4. Gunakan kunci dari environment group yang sama pada kedua layanan. Jangan membuat kunci berbeda per layanan atau menaruh nilainya di Git. Server toko dapat mulai lebih dahulu; portal admin membutuhkan backend yang sudah tersedia.
+5. Pada Shell **layanan toko**, jalankan `python server.py create-admin` jika akun pemilik belum ada. Masukkan email dan kata sandi pribadi langsung di terminal layanan. Portal memakai akun tersebut, bukan akun GitHub.
+6. Tambahkan domain toko pada layanan publik dan domain/subdomain admin pada layanan admin, lalu ikuti instruksi DNS dan HTTPS hosting. Jika URL berubah, perbarui dua variabel URL pada langkah 3. Buka domain admin langsung untuk login; `/admin` di toko mengarah ke sana.
+7. Isi produk asli, foto, kebijakan pembayaran, dan informasi kontak sebelum mulai menerima pelanggan. Uji terbitkan produk dari admin → terlihat di toko → buat pesanan sebagai pembeli → muncul di admin. Push berikutnya ke `main` memicu pembaruan kedua layanan.
 
-Konfigurasi build memakai `pip install -r requirements.txt`, start memakai Gunicorn, dan health check memakai `/api/health`. Jalankan hanya satu instance dengan disk SQLite ini. Scaling ke beberapa mesin membutuhkan database dan penyimpanan objek bersama; jangan menjalankan beberapa instance dengan salinan database masing-masing.
+Kedua layanan memakai `pip install -r requirements.txt` dari foldernya masing-masing, Gunicorn, serta health check `/api/health`. Toko menjalankan `server:app`; admin menjalankan `app:app` dari `admin-portal`. Portal tidak memerlukan persistent disk. Jalankan hanya satu instance toko dengan disk SQLite ini. Scaling toko ke beberapa mesin membutuhkan database dan penyimpanan objek bersama; jangan menjalankan beberapa instance dengan salinan database masing-masing.
 
 ## Menyimpan produk
 

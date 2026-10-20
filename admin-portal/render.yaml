@@ -1,3 +1,5 @@
+# Optional standalone export only. The repository root render.yaml deploys
+# both services from main; use that Blueprint for the one-repository setup.
 services:
   - type: web
     name: anredseller-admin

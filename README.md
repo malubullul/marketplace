@@ -10,7 +10,7 @@ A fashion storefront with a separate owner dashboard, persistent product catalog
 | Visitor | `/` and `/produk.html`    | Browse published products, search the catalog and choose size/color without logging in |
 | Buyer | `/akun` | Register/log in, manage profile and addresses, save cart/wishlist across devices, checkout and view private order history |
 
-The owner portal is also a standalone Python project in [admin-portal](admin-portal/README.md), ready for a separate repository and domain. Its server connects to the same store backend. Configure the gateway key and portal URL to redirect `/admin` and restrict owner API access to that portal; no second catalog database is needed.
+The public store and [owner portal](admin-portal/README.md) deploy from this **one repository and the same `main` branch**, using two hosting services and two domains. The root [render.yaml](render.yaml) defines both: the store runs from the repository root and admin runs from `admin-portal/`. A shared generated gateway key connects them; product data stays in the store backend. Configure the two service URLs to redirect `/admin` and restrict owner API access to the portal. No separate repository, branch, ZIP upload or second database is required.
 
 Published products are loaded from the server database in every browser. Saving a cart or wishlist and placing an order require a buyer account. Drafts require owner authentication. Order details are available to the authenticated buyer who placed the order and to the owner. Data is not stored only in the owner's browser.
 
@@ -49,7 +49,7 @@ Opening HTML directly or running `python -m http.server` provides a static examp
 
 Payments, email and shipping are not automated. Orders await the owner's manual confirmation. Stock is total per product, not separate stock for each variant. Customer accounts are implemented; email verification, recovery via email, and reseller pricing tiers are not implemented. Initial example products and photography must be replaced or unpublished before launch; see [asset sources](assets/SOURCES.md).
 
-SQLite and uploaded images require a persistent disk. The supplied deployment runs one instance with one Gunicorn worker and four threads. Multiple application instances require shared database/object storage.
+SQLite and uploaded images require a persistent disk on the store service. The store backend runs one instance with one Gunicorn worker and four threads; admin is a separate stateless service. Multiple store instances require shared database/object storage.
 
 ## Validation
 

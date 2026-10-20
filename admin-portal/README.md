@@ -1,6 +1,6 @@
 # Anredseller Admin
 
-Portal khusus pemilik toko yang siap dipasang di repository dan domain sendiri. Halaman utama langsung membuka login admin; tidak berisi katalog pembeli, pendaftaran pembeli, atau checkout.
+Portal khusus pemilik toko pada domain sendiri, memakai **repository `marketplace` dan branch `main` yang sama** dengan toko publik. Halaman utama langsung membuka login admin; tidak berisi katalog pembeli, pendaftaran pembeli, atau checkout.
 
 Fitur: login/keluar pemilik, tambah/edit/hapus produk, unggah dan urutkan foto, stok, ukuran/warna, simpan draf/terbitkan produk, rincian pesanan dan pembaruan status. Tampilannya mengikuti dashboard Anredseller, termasuk ukuran HP.
 
@@ -15,46 +15,45 @@ Portal ini menjalankan Python/Flask dan meneruskan API admin yang diizinkan ke s
 
 Domain admin boleh memakai subdomain seperti `seller.tokomu.com` atau domain terpisah. GitHub menyimpan kode; **GitHub Pages saja tidak dapat menjalankan portal ini**.
 
-## Isi repository admin baru
+## Sumber kode dan hosting
 
-Unggah **isi** folder `Anredseller-Admin` dari ZIP ke root repository baru. File `app.py`, `requirements.txt`, dan `render.yaml` harus berada langsung di root, bersama folder `static/` dan `templates/`.
+Gunakan satu repository dan dua layanan hosting:
 
-Jika memakai checkout marketplace, proyek ini berada di `admin-portal/`. Buat ulang ZIP dari root marketplace dengan:
+| Layanan | Folder dalam repository | Branch | Modul startup |
+| --- | --- | --- | --- |
+| Toko publik | Root | `main` | `server:app` |
+| Admin | `admin-portal` | `main` | `app:app` |
 
-```sh
-python3 scripts/export_admin.py /tmp/Anredseller-Admin.zip
-```
-
-Tidak ada kata sandi bawaan, database, foto pelanggan, `.env` asli, atau kunci rahasia dalam paket.
+Blueprint [render.yaml di root](../render.yaml) mengatur kedua layanan dan pembaruan otomatis dari `main`. Tidak perlu membuat repository/branch admin baru atau mengunggah ZIP. File `render.yaml` di folder admin ini hanya untuk opsi ekspor mandiri, bukan Blueprint yang dipakai pada konfigurasi satu repository.
 
 ## Menghubungkan dua layanan
 
-Server toko perlu memakai versi marketplace yang mendukung portal admin terpisah. Isi variabel berikut melalui pengaturan hosting, bukan dalam file yang diunggah ke GitHub.
+Server toko memakai kode backend pada repository yang sama. Blueprint root membuat satu kunci acak lewat environment group dan memasangkannya ke kedua layanan. Isi URL layanan melalui pengaturan hosting, bukan dalam file yang diunggah ke GitHub. Tabel ini juga berlaku bila mengatur hosting secara manual.
 
 | Tempat | Variabel | Isi |
 | --- | --- | --- |
 | Hosting admin | `ANREDSELLER_BACKEND_URL` | Origin HTTPS server toko, misalnya `https://tokomu.com` |
-| Hosting admin | `ANREDSELLER_SHOP_URL` | Origin HTTPS toko publik untuk tombol **Lihat toko** |
-| Kedua hosting | `ANREDSELLER_ADMIN_GATEWAY_KEY` | Rahasia acak yang sama, minimal 32 karakter |
+| Hosting admin | `ANREDSELLER_SHOP_URL` | Opsional; default mengikuti backend. Isi hanya jika alamat toko publik berbeda |
+| Kedua hosting | `ANREDSELLER_ADMIN_GATEWAY_KEY` | Otomatis dari environment group Blueprint; bila manual, pakai rahasia sama minimal 32 karakter |
 | Hosting toko | `ANREDSELLER_ADMIN_PORTAL_URL` | Origin HTTPS admin, misalnya `https://seller.tokomu.com` |
 | Kedua hosting | `ANREDSELLER_SECURE_COOKIES` | `1` untuk HTTPS |
 
 Origin berarti alamat tanpa path, query, username, atau password. URL HTTP hanya diterima untuk loopback saat pengembangan lokal. `.env.example` merupakan daftar pengaturan; aplikasi tidak memuat file `.env` secara otomatis.
 
-Buat rahasia acak di terminal pribadi atau secret manager dan simpan langsung ke pengaturan hosting. Jangan memasukkan nilainya ke Git, chat, atau JavaScript. Ini adalah kunci antarlayanan, bukan kata sandi pemilik. Rahasia yang berbeda pada kedua layanan menyebabkan koneksi ditolak.
+Pada Blueprint, pertahankan kunci yang dihasilkan environment group yang sama. Pada hosting manual, buat rahasia acak di terminal pribadi atau secret manager dan simpan langsung ke pengaturan hosting. Jangan memasukkan nilainya ke Git, chat, atau JavaScript. Ini adalah kunci antarlayanan, bukan kata sandi pemilik. Rahasia yang berbeda pada kedua layanan menyebabkan koneksi ditolak.
 
 Setelah kedua pengaturan aktif, `/admin` dan `/admin.html` di domain toko mengarahkan pemilik ke domain admin. UI admin lama tidak disajikan di domain toko dan API pemilik memerlukan koneksi dari portal. URL publik dan akun pembeli tetap berjalan di server toko. Tanpa pengaturan tersebut, marketplace mempertahankan mode satu domain untuk pengembangan.
 
 ## Pemasangan hosting
 
-1. Buat repository GitHub admin dan unggah isi paket seperti struktur di atas.
-2. Hubungkan repository itu ke web service Python di hosting. `render.yaml` menyediakan contoh Render Starter berbayar; tinjau biaya sebelum membuat layanan. Jika memakai folder dalam repository marketplace, tetapkan root directory `admin-portal`.
-3. Isi pengaturan admin dan toko dari tabel, lalu deploy kedua versi. Gunakan satu instance backend toko dengan persistent disk untuk SQLite/foto. Portal admin tidak memerlukan disk database.
-4. Tambahkan domain admin dan aktifkan HTTPS melalui hosting. Sebelum domain sendiri siap, alamat HTTPS bawaan hosting dapat dipakai pada konfigurasi.
+1. Hubungkan repository `malubullul/marketplace`, branch `main`, ke Blueprint **root** `render.yaml`. Tidak perlu repository kedua. Tinjau biaya dua layanan Starter dan disk toko sebelum membuat layanan.
+2. Blueprint memakai root repository untuk toko dan `admin-portal` untuk admin, serta kunci koneksi bersama. Isi URL admin pada pengaturan toko dan URL backend pada pengaturan admin.
+3. Deploy kedua layanan. Gunakan satu instance backend toko dengan persistent disk untuk SQLite/foto. Portal admin tidak memerlukan disk database. Admin baru sehat setelah URL backend terisi dan server toko dapat dihubungi.
+4. Pasang domain publik pada layanan toko dan domain/subdomain admin pada layanan admin, lalu aktifkan HTTPS. Sebelum domain sendiri siap, alamat HTTPS bawaan hosting yang benar dapat dipakai. Perbarui variabel URL bila alamat berubah. Push ke `main` memicu pembaruan kedua layanan.
 5. Buat akun pemilik **di terminal server toko** dengan `python server.py create-admin`, jika belum ada. Gunakan akun pemilik yang sudah ada bila sebelumnya dibuat. Tidak ada pendaftaran admin publik.
 6. Buka domain admin dan login. Terbitkan produk lalu periksa di toko publik. Buat pesanan melalui akun pembeli dan pastikan muncul pada **Pesanan masuk**.
 
-Perintah hosting dari root repository admin:
+Perintah hosting dijalankan dari folder `admin-portal`:
 
 ```sh
 pip install -r requirements.txt
@@ -62,6 +61,16 @@ gunicorn --no-control-socket --workers 1 --threads 4 --timeout 60 --bind 0.0.0.0
 ```
 
 Health check: `/api/health`. Respons sehat membutuhkan koneksi ke backend yang tersedia. Pengaturan kosong menghasilkan 503, bukan sukses semu. Jika kunci tidak cocok atau server toko belum diperbarui, login tidak akan bekerja.
+
+## Opsi ekspor mandiri
+
+Paket ZIP lama tetap dapat dibuat bila suatu saat ingin memindahkan admin ke repository terpisah. Ini opsional dan tidak digunakan oleh konfigurasi utama satu repository. Jalankan dari root marketplace:
+
+```sh
+python3 scripts/export_admin.py /tmp/Anredseller-Admin.zip
+```
+
+Jika memakai opsi ini, unggah isi folder hasil ekstrak ke root repository baru, lalu gunakan `render.yaml` di dalam paket dan isi kunci/URL secara manual. Paket tidak berisi kata sandi bawaan, database, data pelanggan, `.env` asli, atau kunci rahasia. Untuk konfigurasi satu repository, ikuti [panduan hosting utama](../docs/HOSTING.md).
 
 ## Menjalankan secara lokal
 

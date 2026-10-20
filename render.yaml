@@ -1,19 +1,49 @@
+envVarGroups:
+  - name: anredseller-admin-connection
+    envVars:
+      - key: ANREDSELLER_ADMIN_GATEWAY_KEY
+        generateValue: true
+
 services:
   - type: web
     name: anredseller
     runtime: python
     plan: starter
+    branch: main
+    autoDeployTrigger: commit
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn --no-control-socket --workers 1 --threads 4 --timeout 60 --bind 0.0.0.0:$PORT server:app
     healthCheckPath: /api/health
     envVars:
+      - fromGroup: anredseller-admin-connection
       - key: PYTHON_VERSION
         value: 3.12.14
       - key: ANREDSELLER_DATA_DIR
         value: /var/data/anredseller
       - key: ANREDSELLER_SECURE_COOKIES
         value: "1"
+      - key: ANREDSELLER_ADMIN_PORTAL_URL
+        sync: false
     disk:
       name: anredseller-data
       mountPath: /var/data/anredseller
       sizeGB: 1
+
+  - type: web
+    name: anredseller-admin
+    runtime: python
+    plan: starter
+    branch: main
+    rootDir: admin-portal
+    autoDeployTrigger: commit
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --no-control-socket --workers 1 --threads 4 --timeout 60 --bind 0.0.0.0:$PORT app:app
+    healthCheckPath: /api/health
+    envVars:
+      - fromGroup: anredseller-admin-connection
+      - key: PYTHON_VERSION
+        value: 3.12.14
+      - key: ANREDSELLER_SECURE_COOKIES
+        value: "1"
+      - key: ANREDSELLER_BACKEND_URL
+        sync: false
