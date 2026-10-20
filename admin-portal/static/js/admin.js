@@ -173,6 +173,7 @@ function productError(text) {
   if (text) error.focus();
 }
 function renderPhotos() {
+  $("photo-count").textContent = `${photos.length} dari 8 foto${photos.length ? ' · foto pertama menjadi sampul' : ''}`;
   $("photo-grid").innerHTML = photos
     .map(
       (url, index) =>

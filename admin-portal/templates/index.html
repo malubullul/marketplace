@@ -361,10 +361,11 @@
           </div>
           <aside class="editor-photos">
             <h3>Foto produk <span>*</span></h3>
-            <p>Foto pertama menjadi sampul katalog.</p>
+            <p>Pilih 4 foto sekaligus untuk menunjukkan sisi depan, belakang, dan detail produk. Foto pertama menjadi sampul; foto lainnya bisa digeser pembeli di katalog dan detail produk.</p>
+            <p id="photo-count" class="photo-count" role="status">0 dari 8 foto</p>
             <label id="upload-zone" class="upload-zone" for="product-photos"
               ><span class="upload-plus">+</span
-              ><strong>Pilih atau tarik foto ke sini</strong
+              ><strong>Pilih beberapa foto atau tarik ke sini</strong
               ><small
                 >JPG, PNG, WebP · maksimal 4 MB/foto<br />Hingga 8 foto
                 produk</small
@@ -372,6 +373,7 @@
                 id="product-photos"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
+                aria-describedby="photo-count"
                 multiple
             /></label>
             <p id="upload-status" role="status"></p>

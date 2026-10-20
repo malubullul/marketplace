@@ -35,6 +35,7 @@ Opening HTML directly or running `python -m http.server` provides a static examp
 - Five-photo editorial [homepage campaign](docs/CAMPAIGN_SLIDER.md) with arrows, touch swipe, keyboard navigation and reduced-motion support.
 - Owner login, server-revoked sessions, password hashing, CSRF protection and login throttling.
 - Product editor: name, description, category, brand, price/discount, total stock, sizes, colors, materials/care and up to eight images.
+- Shared [product photo galleries](docs/PRODUCT_GALLERY.md): upload four photos at once, choose the cover, then browse with arrows/swipe on cards and arrows/thumbnails on product details.
 - Validated image uploads, WebP conversion and a private Supabase bucket; local disk is available for development.
 - Draft/published visibility, stale-edit conflict detection, PostgreSQL support and local SQLite support.
 - Customer registration/login, profile editing and password changes that revoke other devices.

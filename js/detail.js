@@ -51,17 +51,6 @@ function renderDetail(p) {
         ? `<span class="stok-indikator stok-menipis"></span><span style="color:var(--bintang)">Tersisa ${p.stok} item</span>`
         : `<span class="stok-indikator stok-ada"></span><span style="color:var(--hijau)">Stok Tersedia (${p.stok})</span>`;
 
-  // Galeri thumbs
-  const thumbsHtml = p.gambarList
-    .map(
-      (img, i) => `
-    <div class="galeri-thumb-item ${i === 0 ? "aktif" : ""}" onclick="gantiGambar('${productImage(img)}', this)">
-      <img src="${productImage(img)}" alt="${h(p.nama)} ${i + 1}" loading="lazy">
-    </div>
-  `,
-    )
-    .join("");
-
   // Spesifikasi
   const spekHtml = Object.entries(p.spesifikasi || {})
     .map(
@@ -80,10 +69,7 @@ function renderDetail(p) {
   wrapper.innerHTML = `
     <!-- GALERI -->
     <div class="detail-galeri fade-in">
-      <div class="galeri-utama">
-        <img src="${productImage(p.gambarList[0])}" alt="${h(p.nama)}" id="gambar-utama">
-      </div>
-      ${p.gambarList.length > 1 ? `<div class="galeri-thumb">${thumbsHtml}</div>` : ""}
+      ${renderProductGallery(p, true)}
     </div>
 
     <!-- INFO -->
@@ -176,15 +162,6 @@ function renderDetail(p) {
       </div>
     </div>
   `;
-}
-
-// ── Galeri ─────────────────────────────────────────────────
-function gantiGambar(src, el) {
-  document.getElementById("gambar-utama").src = src;
-  document
-    .querySelectorAll(".galeri-thumb-item")
-    .forEach((t) => t.classList.remove("aktif"));
-  el.classList.add("aktif");
 }
 
 // ── Jumlah ─────────────────────────────────────────────────

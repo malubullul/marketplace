@@ -1550,3 +1550,4 @@ th:nth-child(3) {
   .contacts-form { padding: 24px 20px; }
   .contacts-form > button { width: 100%; }
 }
+.photo-count { color: #35402f; font-size: 13px; font-weight: 500; margin: 12px 0; }
