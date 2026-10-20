@@ -719,3 +719,248 @@
     width: 100%;
   }
 }
+
+/* Account entry and security share the store's editorial type and quiet surfaces. */
+.auth-social {
+  margin-top: 28px;
+}
+.auth-content .google-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 52px;
+  padding: 14px 18px;
+  background: #fff;
+  color: #252a23;
+  border: 1px solid #aeb5a6;
+  border-radius: 0;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.16s ease;
+}
+.auth-content .google-button:hover:not(:disabled) {
+  background: #f5f6f3;
+}
+.auth-content .google-button:disabled {
+  cursor: not-allowed;
+  color: #62665c;
+  background: #f5f6f3;
+  opacity: 1;
+  border-color: #c7cdbf;
+}
+.google-mark {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+.auth-provider-note {
+  font-size: 13px !important;
+  color: #62665c;
+  margin: 12px 0 0;
+  line-height: 1.6;
+}
+.auth-provider-note:empty {
+  display: none;
+}
+.auth-email-label {
+  font-size: 14px;
+  color: #62665c;
+  text-align: center;
+  margin: 24px 0 0;
+}
+.auth-tabs {
+  margin-top: 28px;
+}
+.auth-content form {
+  margin-top: 8px;
+}
+.password-field {
+  position: relative;
+}
+.account-page .password-field input {
+  padding-right: 54px;
+}
+.password-toggle {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  bottom: 2px;
+  width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  color: #4d5845;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.password-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+.account-security {
+  padding: 28px;
+  margin-top: 24px;
+  background: #e9ece3;
+}
+.account-security h2 {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  margin: 0;
+}
+.account-security > p {
+  font-size: 14px;
+  margin: 14px 0;
+  color: #62665c;
+}
+.auth-methods {
+  margin: 24px 0;
+}
+.auth-methods > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 10px 0;
+  font-size: 14px;
+  align-items: center;
+}
+.auth-methods dt {
+  color: #252a23;
+}
+.auth-methods dd {
+  margin: 0;
+  color: #35402f;
+  font-weight: 500;
+  text-align: right;
+}
+.security-dialog {
+  padding: 32px;
+  width: 480px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  background: #f5f6f3;
+  border: 0;
+  border-radius: 0;
+}
+.security-dialog::backdrop {
+  background: #12160f99;
+}
+.security-dialog h2 {
+  font-size: 28px;
+  line-height: 1.1;
+  margin: 0 0 18px;
+}
+.security-dialog form > p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #62665c;
+}
+.security-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+@media (max-width: 600px) {
+  .auth-content .google-button {
+    font-size: 14px;
+    min-height: 52px;
+  }
+  .auth-social {
+    margin-top: 24px;
+  }
+  .account-security {
+    padding: 24px;
+  }
+  .auth-methods > div {
+    font-size: 13px;
+  }
+  .security-dialog {
+    padding: 28px 22px;
+  }
+  .security-dialog-actions .account-button {
+    flex: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-content .google-button {
+    transition: none;
+  }
+}
+
+.account-editorial h2 {
+  font-family: Switzer, Arial, sans-serif;
+  font-size: clamp(36px, 4vw, 58px);
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 1.02;
+  margin: 20px 0;
+}
+.auth-content h1 {
+  font-family: Switzer, Arial, sans-serif;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  margin: 20px 0;
+}
+.account-card h2,
+.customer-page-heading h1,
+.security-dialog h2 {
+  font-family: Switzer, Arial, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+.security-dialog::backdrop {
+  backdrop-filter: none;
+}
+@media (max-width: 760px) {
+  .account-auth-layout {
+    display: flex;
+    flex-direction: column;
+  }
+  .auth-content {
+    order: 0;
+  }
+  .account-editorial {
+    order: 1;
+    min-height: 240px;
+    padding: 28px 24px;
+  }
+  .account-editorial h2 {
+    font-size: 36px;
+    margin: 0;
+  }
+  .account-editorial p {
+    font-size: 14px;
+    margin: 16px 0 0;
+  }
+  .auth-content h1 {
+    font-size: 30px;
+    margin-top: 0;
+  }
+}
+.auth-tabs button:not(.selected) {
+  color: #62665c;
+}
+.account-page .sale-link {
+  color: #4d5943;
+}
+.account-page .announcement {
+  color: var(--paper);
+}
+.account-page .skip-link {
+  background: var(--paper);
+}
+@media (max-width: 760px) {
+  .auth-content h1 {
+    font-size: 26px;
+  }
+}

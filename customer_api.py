@@ -10,6 +10,7 @@ from urllib.parse import quote
 
 from flask import g, jsonify, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
+from google_login import GoogleLogin
 
 
 def cart_key(product_id, size='', color=''):
@@ -19,6 +20,7 @@ def cart_key(product_id, size='', color=''):
 class CustomerAPI:
     def __init__(self, app, db, fail, body):
         self.app, self.db, self.fail, self.body = app, db, fail, body
+        self.dummy_password_hash = generate_password_hash(secrets.token_urlsafe(32))
         if not app.config['DATABASE_URL']:
             with app.app_context():
                 db().executescript('''
@@ -27,6 +29,9 @@ class CustomerAPI:
                     CREATE TABLE IF NOT EXISTS customer_addresses (id INTEGER PRIMARY KEY AUTOINCREMENT, customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE, document TEXT NOT NULL, is_default INTEGER NOT NULL DEFAULT 0);
                     CREATE UNIQUE INDEX IF NOT EXISTS customer_default_address ON customer_addresses(customer_id) WHERE is_default=1;
                     CREATE TABLE IF NOT EXISTS customer_state (customer_id INTEGER PRIMARY KEY REFERENCES customers(id) ON DELETE CASCADE, document TEXT NOT NULL, revision INTEGER NOT NULL DEFAULT 0);
+                    CREATE TABLE IF NOT EXISTS customer_google_identities (subject TEXT PRIMARY KEY, customer_id INTEGER UNIQUE NOT NULL REFERENCES customers(id) ON DELETE CASCADE, created_at INTEGER NOT NULL);
+                    CREATE TABLE IF NOT EXISTS customer_oauth_flows (state_hash TEXT PRIMARY KEY, browser_hash TEXT NOT NULL, document TEXT NOT NULL, expires_at INTEGER NOT NULL);
+                    CREATE INDEX IF NOT EXISTS customer_oauth_expiry ON customer_oauth_flows(expires_at);
                 ''')
                 columns = {row['name'] for row in db().execute('PRAGMA table_info(orders)')}
                 if 'customer_id' not in columns:
@@ -34,6 +39,7 @@ class CustomerAPI:
                 db().execute('CREATE INDEX IF NOT EXISTS customer_order_history ON orders(customer_id,created_at)')
                 db().commit()
         self.register_routes()
+        self.google = GoogleLogin(self)
 
     def csrf(self):
         if 'customer_csrf' not in session:
@@ -59,9 +65,16 @@ class CustomerAPI:
             return function(*args,**kwargs)
         return wrapped
 
-    @staticmethod
-    def profile(customer):
-        return {key:customer[key] for key in ['id','email','nama','nohp']}
+    def profile(self, customer):
+        linked = bool(self.google.enabled and self.db().execute('SELECT 1 FROM customer_google_identities WHERE customer_id=?', (customer['id'],)).fetchone())
+        return dict({key:customer[key] for key in ['id','email','nama','nohp']}, has_password=bool(customer['password_hash']), google_linked=linked)
+
+    def confirm_password(self, customer, password):
+        if not isinstance(password, str) or not 1 <= len(password) <= 128:
+            return False
+        hashed = customer['password_hash'] if customer and customer['password_hash'] else self.dummy_password_hash
+        verified = check_password_hash(hashed, password)
+        return bool(customer and customer['password_hash'] and verified)
 
     def start_session(self,customer_id):
         old = session.get('customer_sid','')
@@ -153,7 +166,7 @@ class CustomerAPI:
         @app.get('/api/customer/session')
         def customer_session():
             customer=self.current()
-            return jsonify(authenticated=bool(customer),customer=self.profile(customer) if customer else None,csrf=self.csrf())
+            return jsonify(authenticated=bool(customer),customer=self.profile(customer) if customer else None,csrf=self.csrf(),providers={'google':self.google.enabled})
 
         @app.post('/api/customer/register')
         def customer_register():
@@ -187,7 +200,7 @@ class CustomerAPI:
             email=str(data.get('email','')).strip().lower()
             password=data.get('password','')
             customer=db().execute('SELECT * FROM customers WHERE email=?',(email,)).fetchone()
-            if not isinstance(password,str) or len(password)>128 or not customer or not check_password_hash(customer['password_hash'],password):return fail('Email atau kata sandi salah.',401)
+            if not self.confirm_password(customer,password):return fail('Email atau kata sandi salah.',401)
             db().execute('DELETE FROM login_attempts WHERE address=?',(limit,))
             self.start_session(customer['id']);db().commit()
             return jsonify(authenticated=True,customer=self.profile(customer),csrf=self.csrf())
@@ -197,6 +210,20 @@ class CustomerAPI:
         def customer_logout():
             db().execute('DELETE FROM customer_sessions WHERE token=?',(hashlib.sha256(session.get('customer_sid','').encode()).hexdigest(),));db().commit()
             session.pop('customer_sid',None);session.pop('customer_csrf',None)
+            return jsonify(ok=True)
+
+        @app.post('/api/customer/logout-all')
+        @self.required
+        def customer_logout_all():
+            db().execute('BEGIN IMMEDIATE')
+            current = self.current()
+            if not current:
+                db().rollback();return fail('Silakan masuk kembali.',401)
+            db().execute('DELETE FROM customer_sessions WHERE customer_id=?', (current['id'],))
+            db().commit()
+            session.pop('customer_sid', None)
+            session.pop('customer_csrf', None)
+            session.pop('google_flow_browser', None)
             return jsonify(ok=True)
 
         @app.get('/api/customer/profile')
@@ -217,12 +244,18 @@ class CustomerAPI:
         @app.post('/api/customer/password')
         @self.required
         def change_password():
+            if not self.throttle('password'):return fail('Terlalu banyak percobaan. Coba lagi dalam 15 menit.',429)
             data=body();password=data.get('password','');current=data.get('current_password','')
-            if not isinstance(current,str) or len(current)>128 or not check_password_hash(g.customer['password_hash'],current):return fail('Kata sandi saat ini salah.',400)
             if not isinstance(password,str) or not 12<=len(password)<=128:return fail('Kata sandi baru harus 12–128 karakter.')
-            db().execute('UPDATE customers SET password_hash=? WHERE id=?',(generate_password_hash(password),g.customer['id']))
-            db().execute('DELETE FROM customer_sessions WHERE customer_id=?',(g.customer['id'],))
-            self.start_session(g.customer['id']);db().commit()
+            db().execute('BEGIN IMMEDIATE')
+            customer=self.current()
+            if not customer:
+                db().rollback();return fail('Silakan masuk kembali.',401)
+            if not self.confirm_password(customer,current):
+                db().rollback();return fail('Kata sandi saat ini salah.',400)
+            db().execute('UPDATE customers SET password_hash=? WHERE id=?',(generate_password_hash(password),customer['id']))
+            db().execute('DELETE FROM customer_sessions WHERE customer_id=?',(customer['id'],))
+            self.start_session(customer['id']);db().commit()
             return jsonify(ok=True,csrf=self.csrf())
 
         @app.get('/api/customer/addresses')

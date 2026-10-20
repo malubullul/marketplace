@@ -56,9 +56,7 @@ function showAuth(mode = "login") {
     String(mode === "register"),
   );
   accountElement("auth-title").textContent =
-    mode === "login"
-      ? "Senang melihatmu kembali."
-      : "Tempat untuk semua favoritmu.";
+    mode === "login" ? "Masuk ke Anredseller." : "Buat akunmu.";
 }
 accountElement("show-login").addEventListener("click", () => showAuth("login"));
 accountElement("show-register").addEventListener("click", () =>
@@ -112,6 +110,7 @@ function renderProfile() {
   accountElement("profile-name").value = customer.nama;
   accountElement("profile-email").value = customer.email;
   accountElement("profile-phone").value = customer.nohp;
+  renderAccountSecurity();
 }
 function renderAddresses() {
   accountElement("customer-address-list").innerHTML = accountAddresses.length
@@ -217,7 +216,7 @@ accountElement("customer-profile-form").addEventListener(
   "submit",
   async (event) => {
     event.preventDefault();
-    const button = event.currentTarget.querySelector("button");
+    const button = event.currentTarget.querySelector('button[type="submit"]');
     button.disabled = true;
     try {
       const data = await customerRequest("/profile", {
@@ -248,7 +247,7 @@ accountElement("customer-password-form").addEventListener(
       accountMessage("Kedua kata sandi baru harus sama.", true);
       return;
     }
-    const button = event.currentTarget.querySelector("button");
+    const button = event.currentTarget.querySelector('button[type="submit"]');
     button.disabled = true;
     try {
       const data = await customerRequest("/password", {
@@ -451,9 +450,198 @@ window.addEventListener("customer:state", () => {
     );
     return;
   }
-  if (!buyerSession.authenticated) showAuth();
-  else {
+  updateGoogleAccess();
+  const authCode = new URLSearchParams(location.search).get("auth");
+  const authError = googleAuthErrors[authCode];
+  if (authCode) {
+    const clean = new URL(location.href);
+    clean.searchParams.delete("auth");
+    history.replaceState({}, "", clean.pathname + clean.search + clean.hash);
+  }
+  if (authCode === "google-success" && buyerSession.authenticated) {
+    clearBuyerBrowserData();
+    signalCustomerAuthChange();
+    const next = safeAccountNext();
+    if (next !== "/akun.html" && next !== "akun.html") {
+      location.replace(next);
+      return;
+    }
+    history.replaceState({}, "", "akun.html");
+  }
+  if (!buyerSession.authenticated) {
+    showAuth();
+    if (authError) {
+      accountElement("google-auth-error").hidden = false;
+      formError("google-auth-error", authError);
+    }
+  } else {
     await loadAccount();
     showAccountPanel(location.hash.slice(1) || "profile");
+    if (authError) accountMessage(authError, true);
   }
 })();
+
+const googleAuthErrors = {
+  "google-unavailable": "Google belum tersedia. Silakan masuk dengan email.",
+  "google-invalid":
+    "Sesi masuk Google sudah berakhir atau tidak valid. Silakan coba lagi.",
+  "google-cancelled":
+    "Masuk dengan Google dibatalkan. Kamu bisa mencoba lagi atau menggunakan email.",
+  "google-failed": "Masuk dengan Google belum berhasil. Silakan coba lagi.",
+  "google-email-exists":
+    "Email ini sudah memiliki akun. Masuk dengan kata sandi, lalu hubungkan Google dari Keamanan akun.",
+  "google-link-mismatch":
+    "Pilih akun Google dengan email yang sama dengan akun Anredseller-mu.",
+};
+function updateGoogleAccess() {
+  const enabled = buyerSession.providers?.google === true;
+  accountElement("google-login").disabled = !enabled;
+  accountElement("google-availability").textContent = enabled
+    ? "Pertama kali di sini? Akunmu dibuat saat kamu melanjutkan."
+    : "Google belum tersedia. Gunakan email untuk saat ini.";
+}
+function renderAccountSecurity() {
+  const customer = buyerSession.customer;
+  if (!customer) return;
+  const hasPassword = customer.has_password !== false;
+  accountElement("password-settings").hidden = !hasPassword;
+  accountElement("email-method-status").textContent = hasPassword
+    ? "Aktif"
+    : "Tidak digunakan";
+  accountElement("google-method-status").textContent = customer.google_linked
+    ? "Terhubung"
+    : "Belum terhubung";
+  accountElement("google-connect").hidden =
+    !hasPassword || buyerSession.providers?.google !== true;
+  accountElement("google-connect").textContent = customer.google_linked
+    ? "Putuskan koneksi Google"
+    : "Hubungkan Google";
+  const note = accountElement("google-account-note");
+  note.hidden = hasPassword;
+  note.textContent = hasPassword
+    ? ""
+    : "Kamu masuk dengan Google. Atur kata sandi dan verifikasi dua langkah melalui akun Google-mu.";
+  accountElement("google-profile-note").hidden = !!customer.nohp;
+}
+async function startGoogle(intent = "login", password = "") {
+  const data = await customerRequest("/google/start", {
+    method: "POST",
+    body: {
+      intent,
+      current_password: password,
+      next: intent === "link" ? "/akun.html" : safeAccountNext(),
+    },
+  });
+  const url = new URL(data.url);
+  if (
+    url.origin !== "https://accounts.google.com" ||
+    url.pathname !== "/o/oauth2/v2/auth"
+  )
+    throw new Error("Tujuan masuk Google tidak valid.");
+  location.assign(url.href);
+}
+accountElement("google-login").addEventListener("click", async (event) => {
+  const button = event.currentTarget;
+  button.disabled = true;
+  formError("google-auth-error", "");
+  try {
+    await startGoogle();
+  } catch (error) {
+    accountElement("google-auth-error").hidden = false;
+    formError("google-auth-error", error.message);
+    button.disabled = false;
+  }
+});
+accountElement("google-connect").addEventListener("click", () => {
+  const unlink = buyerSession.customer.google_linked;
+  accountElement("google-security-form").reset();
+  formError("google-security-error", "");
+  accountElement("google-security-title").textContent = unlink
+    ? "Putuskan koneksi Google"
+    : "Hubungkan Google";
+  accountElement("google-security-description").textContent = unlink
+    ? "Setelah diputuskan, gunakan email dan kata sandi untuk masuk. Perangkat lain akan keluar."
+    : "Konfirmasi kata sandi, lalu pilih akun Google dengan email yang sama.";
+  accountElement("submit-google-security").textContent = unlink
+    ? "Putuskan koneksi"
+    : "Lanjut ke Google";
+  accountElement("google-security-dialog").showModal();
+});
+accountElement("cancel-google-security").addEventListener("click", () =>
+  accountElement("google-security-dialog").close(),
+);
+accountElement("google-security-form").addEventListener(
+  "submit",
+  async (event) => {
+    event.preventDefault();
+    const button = accountElement("submit-google-security");
+    button.disabled = true;
+    formError("google-security-error", "");
+    const password = accountElement("google-current-password").value;
+    try {
+      if (buyerSession.customer.google_linked) {
+        const data = await customerRequest("/google/unlink", {
+          method: "POST",
+          body: { current_password: password },
+        });
+        buyerSession.csrf = data.csrf;
+        buyerSession.customer = data.customer;
+        signalCustomerAuthChange();
+        renderAccountSecurity();
+        accountElement("google-security-dialog").close();
+        accountMessage(
+          "Koneksi Google diputuskan. Kamu tetap bisa masuk dengan email dan kata sandi.",
+        );
+      } else await startGoogle("link", password);
+    } catch (error) {
+      formError("google-security-error", error.message);
+    } finally {
+      accountElement("google-security-form").reset();
+      button.disabled = false;
+    }
+  },
+);
+// Labels remain attached to their inputs; visibility is an explicit, reversible choice.
+document
+  .querySelectorAll('.account-page input[type="password"]')
+  .forEach((input) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "password-field";
+    input.before(wrapper);
+    wrapper.appendChild(input);
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "password-toggle";
+    toggle.setAttribute("aria-controls", input.id);
+    toggle.setAttribute("aria-pressed", "false");
+    toggle.setAttribute("aria-label", "Tampilkan kata sandi");
+    toggle.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
+    toggle.addEventListener("click", () => {
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      toggle.setAttribute("aria-pressed", String(show));
+      toggle.setAttribute(
+        "aria-label",
+        show ? "Sembunyikan kata sandi" : "Tampilkan kata sandi",
+      );
+    });
+    wrapper.appendChild(toggle);
+  });
+
+accountElement("logout-all-devices").addEventListener(
+  "click",
+  async (event) => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      await customerRequest("/logout-all", { method: "POST" });
+      clearBuyerBrowserData();
+      signalCustomerAuthChange();
+      location.replace("akun.html");
+    } catch (error) {
+      accountMessage(error.message, true);
+      button.disabled = false;
+    }
+  },
+);

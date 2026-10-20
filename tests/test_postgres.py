@@ -31,7 +31,8 @@ def postgres_case(module_name, class_name):
             def factory(config=None):
                 config = dict(config or {})
                 schema = 'test_' + hashlib.sha256(str(config.get('DATA_DIR')).encode()).hexdigest()[:24]
-                config.update(DATABASE_URL=TEST_URL, DATABASE_SCHEMA=schema, SESSION_SECRET=secret)
+                config.update(DATABASE_URL=TEST_URL, DATABASE_SCHEMA=schema)
+                config.setdefault('SESSION_SECRET', secret)
                 app = create_app(config)
                 with app.app_context():
                     db = app.get_db()
@@ -64,6 +65,7 @@ if TEST_URL:
     PostgresStoreTests = postgres_case('test_server', 'StoreTests')
     PostgresCustomerTests = postgres_case('test_customers', 'CustomerTests')
     PostgresAdminPortalTests = postgres_case('test_admin_portal', 'AdminPortalTests')
+    PostgresGoogleLoginTests = postgres_case('test_google_login', 'GoogleLoginTests')
 else:
     @unittest.skip('Set ANREDSELLER_TEST_DATABASE_URL to run real PostgreSQL contracts.')
     class PostgresNotConfigured(unittest.TestCase):

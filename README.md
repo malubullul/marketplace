@@ -76,3 +76,5 @@ The separate-portal mode starts both services on different origins and verifies 
 Set `ANREDSELLER_TEST_DATABASE_URL` to a disposable local PostgreSQL database to run the same backend contracts against PostgreSQL and exercise the full browser workflow with PostgreSQL/Storage HTTP fixtures. Tests also cover concurrent checkout without overselling or duplicate reservation, both Supabase key formats, Storage errors/redirects and serverless filesystem independence. Without a test database, the PostgreSQL contracts are explicitly skipped. Never point test configuration at production.
 
 See [docs/UI_GUIDE.md](docs/UI_GUIDE.md) for the approved visual direction and UI/UX Pro Max guidance.
+
+Google customer sign-in and account security: [activation guide](docs/GOOGLE_LOGIN.md), [security review and validation](docs/AUTH_SECURITY_REVIEW.md). The Google method remains unavailable until the store owner configures the production OAuth client and database migration.

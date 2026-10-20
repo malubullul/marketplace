@@ -45,10 +45,13 @@ def create_app(config=None):
         MAX_CONTENT_LENGTH=4 * 1024 * 1024 + 64 * 1024,
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
-        SESSION_COOKIE_SECURE=os.environ.get("ANREDSELLER_SECURE_COOKIES") == "1",
+        SESSION_COOKIE_SECURE=os.environ.get("ANREDSELLER_SECURE_COOKIES", '1' if os.environ.get('VERCEL') else '0') == "1",
         PERMANENT_SESSION_LIFETIME=30 * 86400,
         ADMIN_GATEWAY_KEY=os.environ.get('ANREDSELLER_ADMIN_GATEWAY_KEY', ''),
         ADMIN_PORTAL_URL=os.environ.get('ANREDSELLER_ADMIN_PORTAL_URL', '').rstrip('/'),
+        GOOGLE_CLIENT_ID=os.environ.get('GOOGLE_CLIENT_ID', ''),
+        GOOGLE_CLIENT_SECRET=os.environ.get('GOOGLE_CLIENT_SECRET', ''),
+        PUBLIC_ORIGIN=os.environ.get('ANREDSELLER_PUBLIC_ORIGIN', ''),
     )
     app.config.update(config or {})
     if app.config['ADMIN_GATEWAY_KEY'] and len(app.config['ADMIN_GATEWAY_KEY']) < 32:
@@ -166,7 +169,7 @@ def create_app(config=None):
     def headers(response):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
-        response.headers["Referrer-Policy"] = "same-origin"
+        response.headers.setdefault("Referrer-Policy", "same-origin")
         response.headers["Content-Security-Policy"] = "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
         if request.path.startswith("/api/") or request.path.startswith("/admin") or request.path in {"/akun","/akun.html","/checkout.html","/konfirmasi.html"}:
             response.headers["Cache-Control"] = "no-store"

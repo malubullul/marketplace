@@ -16,7 +16,7 @@
       <section id="customer-auth" hidden class="account-auth-layout">
         <div class="account-editorial">
           <div>
-            <h1>Good finds.<br />Kept for you.</h1>
+            <h2>Good finds.<br />Kept for you.</h2>
             <p>
               Satu akun untuk koleksi favorit,<br />alamat tersimpan, dan setiap
               pesananmu.
@@ -24,7 +24,7 @@
           </div>
         </div>
         <div class="auth-content">
-          <h2 id="auth-title">Senang melihatmu kembali.</h2>
+          <h1 id="auth-title">Masuk ke Anredseller.</h1>
           <div class="auth-tabs" aria-label="Pilih masuk atau daftar">
             <button id="show-login" class="selected" aria-pressed="true">
               Masuk</button
@@ -32,6 +32,46 @@
               Daftar akun
             </button>
           </div>
+          <div class="auth-social">
+            <button
+              id="google-login"
+              class="google-button"
+              type="button"
+              disabled
+              aria-describedby="google-availability"
+            >
+              <svg class="google-mark" viewBox="0 0 18 18" aria-hidden="true">
+                <path
+                  fill="#4285f4"
+                  d="M17.64 9.205c0-.638-.057-1.252-.164-1.841H9v3.482h4.844a4.14 4.14 0 0 1-1.797 2.716v2.258h2.909c1.702-1.567 2.684-3.875 2.684-6.615Z"
+                />
+                <path
+                  fill="#34a853"
+                  d="M9 18c2.43 0 4.468-.806 5.956-2.18l-2.909-2.258c-.806.54-1.836.859-3.047.859-2.344 0-4.328-1.585-5.036-3.714H.957v2.332A9 9 0 0 0 9 18Z"
+                />
+                <path
+                  fill="#fbbc05"
+                  d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.592.102-1.169.282-1.707V4.961H.957A9 9 0 0 0 0 9c0 1.452.347 2.827.957 4.039l3.007-2.332Z"
+                />
+                <path
+                  fill="#ea4335"
+                  d="M9 3.579c1.321 0 2.507.454 3.439 1.346l2.58-2.58C13.464.892 11.426 0 9 0A9 9 0 0 0 .957 4.961l3.007 2.332C4.672 5.164 6.656 3.579 9 3.579Z"
+                />
+              </svg>
+              <span>Lanjut dengan Google</span>
+            </button>
+            <p id="google-availability" class="auth-provider-note">
+              Memeriksa pilihan masuk…
+            </p>
+            <p
+              id="google-auth-error"
+              class="account-error"
+              role="alert"
+              tabindex="-1"
+              hidden
+            ></p>
+          </div>
+          <p class="auth-email-label">Atau gunakan email</p>
           <form id="buyer-login-form">
             <label for="buyer-login-email">Email</label
             ><input
@@ -88,8 +128,8 @@
               maxlength="128"
               required
             /><small
-              >Gunakan 12–128 karakter. Kamu dapat memakai password
-              manager.</small
+              >Gunakan 12–128 karakter. Frasa panjang lebih mudah
+              diingat.</small
             ><label for="buyer-register-confirm">Ulangi kata sandi</label
             ><input
               id="buyer-register-confirm"
@@ -186,7 +226,40 @@
                 Simpan profil
               </button>
             </form>
-            <details class="account-card password-card">
+            <article class="account-card account-security">
+              <h2>Keamanan akun</h2>
+              <p>Atur cara kamu masuk ke Anredseller.</p>
+              <dl class="auth-methods">
+                <div>
+                  <dt>Email & kata sandi</dt>
+                  <dd id="email-method-status">Aktif</dd>
+                </div>
+                <div>
+                  <dt>Google</dt>
+                  <dd id="google-method-status">Belum terhubung</dd>
+                </div>
+              </dl>
+              <button
+                id="google-connect"
+                type="button"
+                class="account-button secondary"
+                hidden
+              >
+                Hubungkan Google
+              </button>
+              <p id="google-account-note" class="auth-provider-note" hidden></p>
+              <p id="google-profile-note" class="auth-provider-note" hidden>
+                Lengkapi nomor HP untuk memudahkan pengiriman pesananmu.
+              </p>
+              <button
+                id="logout-all-devices"
+                type="button"
+                class="account-button secondary"
+              >
+                Keluar dari semua perangkat
+              </button>
+            </article>
+            <details class="account-card password-card" id="password-settings">
               <summary>Ganti kata sandi</summary>
               <p>Perangkat lain akan keluar setelah kata sandi diganti.</p>
               <form id="customer-password-form">
@@ -364,6 +437,47 @@
         ×
       </button>
       <div id="customer-order-details"></div>
+    </dialog>
+    <dialog
+      class="account-dialog security-dialog"
+      id="google-security-dialog"
+      aria-labelledby="google-security-title"
+    >
+      <form id="google-security-form">
+        <h2 id="google-security-title">Hubungkan Google</h2>
+        <p id="google-security-description">
+          Konfirmasi kata sandi, lalu pilih akun Google dengan email yang sama.
+        </p>
+        <label for="google-current-password">Kata sandi saat ini</label>
+        <input
+          id="google-current-password"
+          type="password"
+          autocomplete="current-password"
+          maxlength="128"
+          required
+        />
+        <p
+          id="google-security-error"
+          class="account-error"
+          role="alert"
+          tabindex="-1"
+        ></p>
+        <div class="security-dialog-actions">
+          <button
+            type="button"
+            id="cancel-google-security"
+            class="account-button secondary"
+          >
+            Batal</button
+          ><button
+            type="submit"
+            id="submit-google-security"
+            class="account-button primary"
+          >
+            Lanjut ke Google
+          </button>
+        </div>
+      </form>
     </dialog>
     <script src="js/data.js"></script>
     <script src="js/cart.js"></script>

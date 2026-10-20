@@ -111,3 +111,7 @@ ANREDSELLER_TEST_DATABASE_URL=<URL_DATABASE_UJI_LOKAL> ANREDSELLER_TEST_ADMIN_PO
 ```
 
 Test PostgreSQL memakai schema sementara yang dihapus sesudahnya; jangan menunjuk database produksi. Pengujian Storage menggunakan server HTTP tiruan yang menguji kontrak Supabase, bukan bucket cloud milikmu. Keberhasilan pengujian lokal tidak berarti project Supabase/Vercel sudah dihubungkan atau dipublikasikan.
+
+## Login Google
+
+Untuk login/pendaftaran Google, ikuti [GOOGLE_LOGIN.md](GOOGLE_LOGIN.md). Jalankan migrasi `003_google_login.sql` terlebih dahulu, lalu isi kredensial Google dan origin toko pada project Vercel toko. Login email tetap tersedia ketika Google belum diaktifkan. Tidak perlu membuat provider Supabase Auth untuk implementasi ini.

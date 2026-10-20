@@ -49,3 +49,7 @@ The current visual layer is `css/editorial.css`, loaded after legacy styles on e
 The canonical admin stylesheet uses the same fonts, with a light frame, white work area and compact product rows. Font routes are limited to the three bundled WOFF2 files. Tooling under `.agents/` and generated inspection artifacts are excluded from the Vercel deployment.
 
 See [design direction, screenshot critique and verification](DESIGN_POLISH.md), [installed skill](../.agents/skills/design-taste-frontend/SKILL.md), and [asset provenance](../assets/SOURCES.md).
+
+## Customer sign-in polish
+
+The Google/email entry and registration components continue the same visual system. On phones the form comes first and the campaign image follows, so the main sign-in choices are available earlier. The form's title is the visible h1; provider availability and errors are explicit. Password visibility toggles retain labels, use 44px targets and never submit the form. Security settings describe actual available methods and preserve at least one usable sign-in method. See [Google activation](GOOGLE_LOGIN.md) and [security review](AUTH_SECURITY_REVIEW.md).

@@ -115,6 +115,19 @@ class CustomerTests(unittest.TestCase):
         self.assertEqual(self.a.get('/api/customer/profile').status_code,200)
         self.assertEqual(self.a.get('/api/admin/products').status_code,401)
 
+    def test_logout_all_revokes_only_this_customer_and_preserves_owner(self):
+        second, _ = self.login('alice@example.test')
+        owner_password = secrets.token_urlsafe(24)
+        create_owner(self.app, 'owner@example.test', owner_password)
+        csrf = self.a.get('/api/session').json['csrf']
+        self.assertEqual(self.a.post('/api/login', json={'email':'owner@example.test','password':owner_password}, headers={'X-CSRF-Token':csrf}).status_code, 200)
+        self.assertEqual(self.a.post('/api/customer/logout-all').status_code, 403)
+        self.assertEqual(self.a.post('/api/customer/logout-all', headers=self.ah).status_code, 200)
+        self.assertEqual(self.a.get('/api/customer/profile').status_code, 401)
+        self.assertEqual(second.get('/api/customer/profile').status_code, 401)
+        self.assertEqual(self.b.get('/api/customer/profile').status_code, 200)
+        self.assertEqual(self.a.get('/api/admin/products').status_code, 200)
+
     def test_legacy_guest_orders_not_claimed_by_matching_email(self):
         with self.app.app_context():
             self.app.get_db().execute('INSERT INTO orders(id,document,status,idempotency_key,created_at) VALUES(?,?,?,?,?)',('LEGACY',json.dumps({'email':'alice@example.test'}),'baru',secrets.token_hex(16),1));self.app.get_db().commit()
