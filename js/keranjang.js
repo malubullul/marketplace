@@ -65,13 +65,13 @@ function renderKeranjang() {
       (item) => `
     <div class="keranjang-item" id="item-${item.id}">
       <!-- Gambar -->
-      <a href="detail.html?id=${item.id}">
+      <a class="cart-product-image" href="detail.html?id=${item.id}">
         <div class="keranjang-gambar">
           <img src="${productImage(item.gambar)}" alt="${h(item.nama)}" loading="lazy">
         </div>
       </a>
       <!-- Nama -->
-      <div>
+      <div class="cart-product-info">
         <a href="detail.html?id=${item.id}" class="keranjang-nama">${h(item.nama)}</a>
         <div class="cart-variant">${h([item.ukuran, item.warna].filter(Boolean).join(" / "))}</div><div style="font-size:11px;color:var(--abu-teks);margin-top:4px">Stok: ${item.stok}</div>
       </div>
@@ -79,9 +79,9 @@ function renderKeranjang() {
       <div class="keranjang-harga">${formatHarga(item.harga)}</div>
       <!-- Jumlah -->
       <div class="keranjang-qty">
-        <button onclick="kurangiItem('${item.key}')">−</button>
+        <button aria-label="Kurangi jumlah ${h(item.nama)}" onclick="kurangiItem('${item.key}')">−</button>
         <span class="keranjang-qty-angka" id="qty-${item.key}">${item.jumlah}</span>
-        <button onclick="tambahItem('${item.key}')">+</button>
+        <button aria-label="Tambah jumlah ${h(item.nama)}" onclick="tambahItem('${item.key}')">+</button>
       </div>
       <!-- Subtotal -->
       <div class="keranjang-subtotal" id="subtotal-${item.key}">${formatHarga(item.harga * item.jumlah)}</div>
@@ -95,7 +95,7 @@ function renderKeranjang() {
   kiri.innerHTML = `
     ${headerHtml}
     ${itemsHtml}
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px;background:var(--abu-muda);border-radius:var(--radius-lg);margin-top:8px">
+    <div class="cart-list-actions" style="display:flex;justify-content:space-between;align-items:center;padding:16px;background:var(--abu-muda);border-radius:var(--radius-lg);margin-top:8px">
       <button onclick="konfirmasiKosongkan()" style="font-size:13px;color:var(--merah);font-weight:600;text-decoration:underline;background:none;border:none;cursor:pointer">
         🗑️ Kosongkan Keranjang
       </button>

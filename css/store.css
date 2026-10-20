@@ -2153,3 +2153,293 @@ svg {
     display: block;
   }
 }
+
+/* Responsive storefront: let content shrink and wrap within its own column. */
+.keranjang-layout > *,
+.checkout-layout > *,
+.detail-layout > *,
+.form-group {
+  min-width: 0;
+}
+.newsletter-input {
+  min-width: 0;
+}
+.kartu-produk-nama,
+.product-meta > span,
+.cart-product-info,
+.detail-nama,
+.tab-deskripsi,
+.breadcrumb,
+.konfirmasi-detail-baris > span {
+  overflow-wrap: anywhere;
+}
+.product-meta > span,
+.wishlist-list a,
+.wishlist-list a > span {
+  min-width: 0;
+}
+.wishlist-list a > span {
+  overflow-wrap: anywhere;
+}
+.wishlist-list img {
+  flex-shrink: 0;
+}
+.ringkasan-baris {
+  gap: 12px;
+}
+.ringkasan-baris > span:last-child {
+  flex-shrink: 0;
+}
+.keranjang-harga,
+.keranjang-subtotal {
+  white-space: nowrap;
+}
+.cart-list-actions {
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.desktop-nav.mobile-open {
+  max-height: calc(100svh - 120px);
+  max-height: calc(100dvh - 120px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.checkout-save-address input {
+  flex-shrink: 0;
+}
+.konfirmasi-detail-baris {
+  gap: 12px;
+}
+.konfirmasi-detail-baris > span {
+  min-width: 0;
+}
+.konfirmasi-detail-baris > span:last-child {
+  text-align: right;
+}
+@media (max-width: 1100px) {
+  .archive-home .campaign-photo > img {
+    object-position: 90% top;
+  }
+  .keranjang-layout,
+  .checkout-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ringkasan-order {
+    position: static;
+  }
+}
+@media (min-width: 761px) and (max-width: 1100px) and (max-height: 600px) {
+  .archive-home .campaign {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 1672 / 941;
+  }
+  .archive-home .campaign-copy {
+    bottom: 6%;
+    max-width: 55%;
+  }
+  .archive-home .campaign h1 {
+    font-size: clamp(20px, 2.7vw, 26px);
+  }
+  .archive-home .campaign .eyebrow {
+    margin-bottom: 14px;
+  }
+  .archive-home .campaign .solid-link {
+    margin-top: 16px;
+  }
+}
+@media (max-width: 760px) {
+  /* Portrait framing keeps both models visible; the copy gets its own space. */
+  .archive-home .campaign {
+    height: auto;
+    min-height: 0;
+    padding-top: 74px;
+  }
+  .archive-home .campaign-photo {
+    position: relative;
+    aspect-ratio: 4 / 5;
+  }
+  .archive-home .campaign-photo > img {
+    position: absolute;
+    inset: 0;
+    object-position: 90% top;
+  }
+  .archive-home .campaign-photo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, #21140d, transparent 25%);
+    pointer-events: none;
+  }
+  .archive-home .campaign::after {
+    background: none;
+  }
+  .archive-home .campaign-copy {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    max-width: none;
+    padding: 0 5% 32px;
+    margin-top: -32px;
+  }
+  .archive-home .campaign h1 {
+    font-size: clamp(22px, 5.5vw, 31px);
+  }
+  .archive-home .campaign .eyebrow {
+    margin-bottom: 12px;
+  }
+  .archive-home .campaign .solid-link {
+    margin-top: 20px;
+  }
+  .desktop-nav.mobile-open,
+  .archive-home .desktop-nav.mobile-open {
+    max-height: calc(100svh - 110px);
+    max-height: calc(100dvh - 110px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .page-banner-dalam {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .breadcrumb {
+    flex-wrap: wrap;
+  }
+  .service-strip {
+    font-size: 11px;
+    gap: 16px 10px;
+  }
+  .service-strip > span {
+    min-width: 0;
+    gap: 8px;
+  }
+  .service-strip svg {
+    flex-shrink: 0;
+  }
+  .keranjang-item {
+    grid-template-columns: 72px minmax(0, 1fr) 44px;
+    grid-template-areas:
+      "image name name"
+      "image price price"
+      "quantity quantity remove"
+      "subtotal subtotal subtotal";
+    padding: 16px;
+    gap: 12px;
+  }
+  .cart-product-image {
+    grid-area: image;
+    align-self: start;
+  }
+  .cart-product-info {
+    grid-area: name;
+  }
+  .keranjang-harga {
+    grid-area: price;
+  }
+  .keranjang-qty {
+    grid-area: quantity;
+  }
+  .btn-hapus-item {
+    grid-area: remove;
+  }
+  .keranjang-subtotal {
+    grid-area: subtotal;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px solid var(--abu-border);
+    padding-top: 12px;
+  }
+  .keranjang-subtotal::before {
+    content: "Subtotal";
+    font-size: 13px;
+    font-weight: 400;
+  }
+  .keranjang-qty button,
+  .btn-hapus-item {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+  }
+  .ringkasan-order,
+  .form-section,
+  .konfirmasi-detail {
+    padding: 20px;
+  }
+  .kupon-input,
+  .newsletter-input,
+  .sort-select {
+    font-size: 16px;
+  }
+  .detail-galeri .galeri-utama img {
+    padding: clamp(16px, 5vw, 32px);
+  }
+  .galeri-thumb {
+    overflow-x: auto;
+  }
+  .galeri-thumb-item {
+    flex: 0 0 64px;
+  }
+  .tabs-header {
+    flex-wrap: wrap;
+  }
+  #toast-container {
+    left: 16px;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    align-items: flex-end;
+  }
+  .toast {
+    width: max-content;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+}
+@media (max-width: 600px) {
+  .section-topline,
+  .section-header,
+  .toolbar-produk {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .section-topline > div {
+    flex-basis: 100%;
+  }
+  .editorial-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .editorial-card {
+    min-height: 320px;
+  }
+  .editorial-card > img {
+    width: 75%;
+    height: 80%;
+    right: -2%;
+    top: 0;
+  }
+  .editorial-card h3 {
+    font-size: 32px;
+  }
+  .form-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .form-row .form-group:last-child {
+    margin-bottom: 14px;
+  }
+  .newsletter-form {
+    flex-direction: column;
+  }
+  .newsletter-form > * {
+    width: 100%;
+  }
+  .konfirmasi-detail-baris {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .konfirmasi-detail-baris > span:last-child {
+    text-align: left;
+  }
+}

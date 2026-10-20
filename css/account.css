@@ -178,6 +178,14 @@
   padding: 0 8px 24px;
   border-bottom: 1px solid #d5daca;
 }
+.customer-greeting > div,
+.customer-order-items > div {
+  min-width: 0;
+}
+.customer-page-heading,
+.customer-order-items {
+  overflow-wrap: anywhere;
+}
 .customer-avatar {
   display: grid;
   place-items: center;

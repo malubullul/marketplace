@@ -1,6 +1,6 @@
 # Anredseller UI guide
 
-The user's visual reference is a dark editorial fashion campaign: full-screen photography, transparent navigation, a centered serif wordmark, a monochrome announcement strip, and a collection CTA at the lower left. Keep this composition when refining the interface.
+The user's visual reference is a dark editorial fashion campaign: full-screen photography, transparent navigation, a centered serif wordmark, a monochrome announcement strip, and a collection CTA at the lower left. Keep this desktop composition when refining the interface. On phones, use a portrait photo frame below the masthead with the copy following the photo so both models remain visible and text stays readable.
 
 ## Design tools
 
@@ -22,6 +22,10 @@ python3 /workspace/library-files/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-ma
 - Prefer 44px web controls for comfortable touch use. WCAG's web minimum is 24 CSS px with applicable exceptions; do not confuse native pt/dp units with CSS pixels.
 - Keep small outline icons inside larger hit areas. On narrow screens, expose wishlist through the menu so the wordmark and header actions do not overlap.
 - Product names and prices remain readable in the two-column mobile grid. Do not shrink them to fit a single line.
+- At widths up to 760px, the campaign uses a 4:5 frame with the image focused at 90% horizontally. Keep both models in the crop. Let the hero grow with its content instead of forcing a desktop viewport height.
+- Stack the cart and checkout columns through 1100px. Below 600px, show checkout fields and editorial category cards in a single column. Mobile cart cards keep photo, product information, quantity controls, remove action and subtotal in explicit grid areas.
+- Allow long names, brand names, email and addresses to wrap within their columns. Do not hide page overflow to conceal a layout problem. Category navigation and photo thumbnails may scroll within their own containers.
+- Limit open navigation and dialogs to the available viewport height, including landscape orientation, and allow their contents to scroll.
 - Category tabs support Left/Right, Home and End. Keep `aria-selected`, the active tab stop, and panel labelling synchronized with the visible products.
 - Wishlist buttons expose `aria-pressed` and the current action. Dialogs have a title, native focus handling, and an Escape route.
 - The announcement strip remains static. Avoid adding continuous movement without a pause control.
@@ -30,7 +34,7 @@ python3 /workspace/library-files/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-ma
 
 ## Verification
 
-Check 320/375/390px phones, 768px tablet, and 1440px desktop. Confirm no horizontal overflow, no header overlap, keyboard-only category navigation, wishlist state, dialog focus and mobile menu access. Run the existing browser smoke workflow after shared navigation changes. Do not describe these checks as a full WCAG audit.
+Run `python3 tests/responsive_smoke.py` with Playwright and Chromium installed. It starts an isolated store and checks every page at widths from 320px through 1440px, including tablet breakpoints and phone landscape orientations. It exercises populated accounts, cart, checkout, receipts, expanded menus, search and address/product dialogs with long text. Confirm no horizontal overflow, no header overlap and no clipped controls or dialogs. It also checks that both campaign models fit the phone crop. Run the existing `tests/browser_smoke.py` workflow to verify shopping interactions. Do not describe these checks as a full WCAG audit or testing on physical devices.
 
 ## Customer accounts
 

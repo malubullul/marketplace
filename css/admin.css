@@ -765,9 +765,15 @@ td {
   height: 60px;
   object-fit: contain;
   background: white;
+  flex-shrink: 0;
 }
 .order-item > div {
   flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.order-item > span {
+  white-space: nowrap;
 }
 .order-item strong {
   font-size: 13px;
@@ -1104,6 +1110,17 @@ td {
   }
   .order-total {
     font-size: 18px;
+  }
+  .order-dialog h2 {
+    overflow-wrap: anywhere;
+  }
+  .order-item {
+    display: grid;
+    grid-template-columns: 55px minmax(0, 1fr);
+  }
+  .order-item > span {
+    grid-column: 2;
+    font-size: 12px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

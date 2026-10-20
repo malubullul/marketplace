@@ -61,8 +61,11 @@ With Python Playwright and Chromium installed, run:
 
 ```sh
 python3 tests/browser_smoke.py
+python3 tests/responsive_smoke.py
 ```
 
 This starts a temporary store with disposable test credentials and data, uses separate owner/visitor browser contexts, and exercises photo upload → draft → publish → public product → customer registration → saved address → cross-device cart/wishlist → authenticated checkout → private customer history → owner order → unpublish → logout. It does not create an account in the development or production database.
+
+The responsive suite separately checks all pages at 14 portrait/landscape viewport sizes from 320px to 1440px, with long product/profile names, brand names, email and shipping data. It checks page overflow, header overlap, form controls, expanded menus, dialogs and the mobile campaign crop. Set `ANREDSELLER_SCREENSHOT_DIR` to retain screenshots in a chosen directory.
 
 See [docs/UI_GUIDE.md](docs/UI_GUIDE.md) for the approved visual direction and UI/UX Pro Max guidance.
