@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Anredseller — The Archive Collection</title>
+    <title>Anredseller — Toko Fashion & Sneakers Pilihan</title>
     <meta
       name="description"
-      content="Fashion, sneakers, dan everyday essentials. Temukan pilihan berikutnya untuk gaya kamu di Anredseller"
+      content="Belanja sneakers, pakaian, dan aksesori pilihan di Anredseller. Pilih produk, cek detail, lalu buat pesanan dengan mudah."
     />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/store.css" />
@@ -60,8 +60,8 @@
       <section class="edit-section" id="new-arrivals">
         <div class="section-topline">
           <div>
-            <h2>The everyday edit.</h2>
-            <p>Good pieces, on repeat. Mulai dari favorit barumu.</p>
+            <h2>Pilihan untuk harimu.</h2>
+            <p>Jelajahi sneakers, pakaian, dan aksesori pilihan Anredseller.</p>
           </div>
           <a class="text-link" href="produk.html?sort=terbaru"
             >Lihat semua produk
@@ -120,15 +120,15 @@
       <section class="edit-section category-editorial">
         <div class="section-topline">
           <div>
-            <h2>Find your everyday.</h2>
+            <h2>Temukan gayamu.</h2>
           </div>
-          <span class="category-note">Pilih yang paling kamu banget.</span>
+          <span class="category-note">Jelajahi kategori sesuai kebutuhanmu.</span>
         </div>
         <div class="editorial-grid">
           <a
             class="editorial-card sneakers-edit"
             href="produk.html?kategori=sneakers"
-            ><span class="editorial-label">The sneaker edit</span
+            ><span class="editorial-label">Pilihan sneakers</span
             ><img
               {% if content.images.category_sneakers.src %}src="{{ content.images.category_sneakers.src }}"{% else %}hidden{% endif %}
               style="object-position: {{ content.images.category_sneakers.position }}% center"
@@ -137,8 +137,8 @@
               height="512"
               loading="lazy" />
             <div>
-              <h3>Sneakers.</h3>
-              <p>Langkah baru, karakter yang sama.</p>
+              <h3>Sneakers favorit.</h3>
+              <p>Pilih sneakers untuk melengkapi gaya harianmu.</p>
               <span class="round-arrow"
                 ><svg
                   class="arrow-icon"
@@ -153,7 +153,7 @@
           ><a
             class="editorial-card apparel-edit"
             href="produk.html?kategori=apparel"
-            ><span class="editorial-label">Everyday apparel</span
+            ><span class="editorial-label">Pilihan pakaian</span
             ><img
               {% if content.images.category_apparel.src %}src="{{ content.images.category_apparel.src }}"{% else %}hidden{% endif %}
               style="object-position: {{ content.images.category_apparel.position }}% center"
@@ -162,8 +162,8 @@
               height="512"
               loading="lazy" />
             <div>
-              <h3>Wear it daily.</h3>
-              <p>Layer sederhana untuk hari-harimu.</p>
+              <h3>Gaya sehari-hari.</h3>
+              <p>Temukan pakaian yang mudah dipadukan dengan gayamu.</p>
               <span class="round-arrow"
                 ><svg
                   class="arrow-icon"
@@ -180,14 +180,14 @@
       </section>
       <section class="reseller-banner{% if not content.images.reseller_banner.src %} without-store-photo{% endif %}" id="reseller">
         <div class="reseller-content">
-          <h2>Good taste.<br />Shared.</h2>
+          <h2>Belanja pilihanmu.<br />Di Anredseller.</h2>
           <div>
             <p>
-              Punya rencana membangun koleksi untuk pelangganmu? Kenali konsep
-              program reseller Anredseller.
+              Pilih produk dari katalog, simpan di keranjang, lalu buat pesanan.
+              Pembayaran dilanjutkan melalui WhatsApp admin.
             </p>
-            <button class="solid-link light" data-dialog="reseller">
-              Kenali program reseller
+            <button class="solid-link light" data-dialog="shopping">
+              Lihat cara belanja
               <span
                 ><svg
                   class="arrow-icon"
@@ -214,11 +214,11 @@
       </section>
       <section class="newsletter-edit">
         <div>
-          <h2>Keep in the loop.</h2>
-          <p>Simpan minatmu untuk kabar koleksi berikutnya.</p>
+          <h2>Simpan minatmu.</h2>
+          <p>Catat alamat email di perangkat ini. Kami belum menyediakan langganan email.</p>
         </div>
         <form id="newsletter-form">
-          <label for="newsletter-email">Email kamu</label>
+          <label for="newsletter-email">Email untuk catatan pribadi</label>
           <div>
             <input
               id="newsletter-email"
@@ -226,7 +226,7 @@
               placeholder="you@email.com"
               required
               autocomplete="email"
-            /><button type="submit" aria-label="Simpan langganan email">
+            /><button type="submit" aria-label="Simpan catatan email di perangkat ini">
               <svg
                 class="arrow-icon"
                 viewBox="0 0 24 24"
@@ -240,7 +240,7 @@
             </button>
           </div>
           <small
-            >Minat disimpan di perangkat ini. Layanan email belum aktif.</small
+            >Hanya tersimpan di browser ini; tidak dikirim ke Anredseller.</small
           >
           <p id="newsletter-status" role="status"></p>
         </form>

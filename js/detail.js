@@ -130,9 +130,9 @@ function renderDetail(p) {
 
       <!-- JAMINAN -->
       <div class="detail-jaminan">
-        <div class="jaminan-item"><span class="ji"></span> Pembayaran Aman</div>
-        <div class="jaminan-item"><span class="ji">↩️</span> Garansi 30 Hari</div>
-        <div class="jaminan-item"><span class="ji"></span> Gratis Ongkir</div>
+        <div class="jaminan-item"><span class="ji"></span> Pesan langsung di website</div>
+        <div class="jaminan-item"><span class="ji">↩️</span> Tanya CS sebelum memesan</div>
+        <div class="jaminan-item"><span class="ji"></span> Pembayaran lewat WhatsApp</div>
       </div>
 
       <div class="detail-divider"></div>

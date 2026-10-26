@@ -32,7 +32,7 @@ function initURLParams() {
     if (katObj) {
       document.getElementById("page-judul").textContent = katObj.nama;
       document.getElementById("page-sub").textContent =
-        `Temukan produk ${katObj.nama} terbaik`;
+        `Jelajahi pilihan ${katObj.nama} di Anredseller`;
       document.getElementById("breadcrumb-aktif").textContent = katObj.nama;
     }
     // aktifkan nav link

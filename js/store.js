@@ -50,19 +50,19 @@ function paymentWhatsAppUrl(contacts, order) {
 }
 const header = document.getElementById("store-header");
 if (header)
-  header.innerHTML = `<div class="announcement"><span>A little upgrade for your everyday.</span><a href="produk.html?sort=terbaru">Discover the new collection <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></div><header class="store-header"><div class="store-header-inner"><button class="mobile-menu icon-button" aria-label="Buka menu" aria-expanded="false">${icon("menu")}</button><nav class="desktop-nav" aria-label="Navigasi utama"><a href="produk.html">Shop all</a><a href="produk.html?sort=terbaru">New arrivals <span class="nav-dot"></span></a><button data-dialog="about">Our story</button></nav><a class="wordmark" href="index.html" aria-label="Anredseller Beranda">Anredseller<span>•</span></a><div class="store-actions"><button class="icon-button" data-dialog="search" aria-label="Cari produk">${icon("search")}</button><a class="icon-button customer-account-link" href="akun.html" aria-label="Akun pembeli">${icon("user")}</a><a class="icon-button cart-link" href="keranjang.html" aria-label="Buka keranjang">${icon("bag")}<span class="badge-keranjang">0</span></a></div></div><nav class="store-subnav" aria-label="Kategori"><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><span></span><a href="produk.html?sort=terlaris">Best sellers</a><a href="produk.html?sort=diskon" class="sale-link">The good deals <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></nav></header>`;
+  header.innerHTML = `<div class="announcement"><span>Pilihan fashion untuk harimu.</span><a href="produk.html?sort=terbaru">Lihat produk terbaru <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></div><header class="store-header"><div class="store-header-inner"><button class="mobile-menu icon-button" aria-label="Buka menu" aria-expanded="false">${icon("menu")}</button><nav class="desktop-nav" aria-label="Navigasi utama"><a href="produk.html">Semua produk</a><a href="produk.html?sort=terbaru">Produk terbaru <span class="nav-dot"></span></a><button data-dialog="about">Tentang kami</button></nav><a class="wordmark" href="index.html" aria-label="Anredseller Beranda">Anredseller<span>•</span></a><div class="store-actions"><button class="icon-button" data-dialog="search" aria-label="Cari produk">${icon("search")}</button><a class="icon-button customer-account-link" href="akun.html" aria-label="Akun pembeli">${icon("user")}</a><a class="icon-button cart-link" href="keranjang.html" aria-label="Buka keranjang">${icon("bag")}<span class="badge-keranjang">0</span></a></div></div><nav class="store-subnav" aria-label="Kategori"><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><span></span><a href="produk.html?sort=terlaris">Terlaris</a><a href="produk.html?sort=diskon" class="sale-link">Pilihan diskon <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></nav></header>`;
 if (header && document.body.classList.contains("archive-home")) {
   header.innerHTML = `
     <header class="store-header archive-header">
       <div class="store-header-inner">
         <button class="mobile-menu icon-button" aria-label="Buka menu" aria-expanded="false" aria-controls="store-navigation">${icon("menu")}</button>
         <nav class="desktop-nav" id="store-navigation" aria-label="Navigasi utama">
-          <a href="produk.html">Shop all</a>
-          <a href="produk.html?sort=terbaru">New arrivals</a>
+          <a href="produk.html">Semua produk</a>
+          <a href="produk.html?sort=terbaru">Produk terbaru</a>
           <a href="produk.html?kategori=apparel">Apparel</a>
           <a href="produk.html?kategori=sneakers">Sneakers</a>
           <a href="produk.html?kategori=essentials">Essentials</a>
-          <button data-dialog="about">Our story</button>
+          <button data-dialog="about">Tentang kami</button>
         </nav>
         <a class="wordmark" href="index.html" aria-label="Anredseller Beranda">Anredseller</a>
         <div class="store-actions">
@@ -98,7 +98,7 @@ if (navigation) {
 }
 const footer = document.getElementById("store-footer");
 if (footer)
-  footer.innerHTML = `<footer class="store-footer"><div class="footer-top"><div class="footer-invitation"><h2>Your next good find.</h2><p>Fashion yang kamu pilih.<br>Karakter yang kamu bawa.</p><a class="text-link" href="produk.html">Jelajahi katalog ${icon("bag")}</a></div><nav aria-label="Koleksi footer"><h3>Koleksi</h3><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><a href="produk.html?sort=diskon">Pilihan diskon</a></nav><nav aria-label="Bantuan footer"><h3>Di sini untukmu</h3><button type="button" data-support-open>Hubungi CS via WhatsApp</button><button data-dialog="help">Bantuan & FAQ</button><button data-dialog="shipping">Pengiriman</button><button data-dialog="reseller">Program reseller</button><button data-dialog="privacy">Privasi</button></nav><nav aria-label="Akun footer"><h3>Anredseller</h3><a href="akun.html">Akun & pesanan</a><button data-dialog="wishlist">Wishlist</button><button data-dialog="about">Tentang kami</button><a href="admin.html">Area pemilik</a></nav></div><nav class="footer-socials" id="footer-socials" aria-label="Media sosial Anredseller" hidden><span>Ikuti Anredseller</span><div id="footer-social-links"></div></nav><a class="footer-wordmark" href="index.html" aria-label="Anredseller beranda">Anredseller</a><div class="footer-bottom"><span>© ${new Date().getFullYear()} Anredseller</span><span>Pembayaran dibantu via WhatsApp</span><a href="#main-content">Kembali ke atas ↑</a></div></footer>`;
+  footer.innerHTML = `<footer class="store-footer"><div class="footer-top"><div class="footer-invitation"><h2>Temukan gaya favoritmu.</h2><p>Sneakers, pakaian, dan aksesori pilihan.<br>Belanja dengan mudah di Anredseller.</p><a class="text-link" href="produk.html">Jelajahi katalog ${icon("bag")}</a></div><nav aria-label="Koleksi footer"><h3>Koleksi</h3><a href="produk.html?kategori=sneakers">Sneakers</a><a href="produk.html?kategori=apparel">Apparel</a><a href="produk.html?kategori=essentials">Essentials</a><a href="produk.html?sort=diskon">Pilihan diskon</a></nav><nav aria-label="Bantuan footer"><h3>Di sini untukmu</h3><button type="button" data-support-open>Hubungi CS via WhatsApp</button><button data-dialog="help">Bantuan & FAQ</button><button data-dialog="shipping">Pengiriman</button><button data-dialog="shopping">Cara belanja</button><button data-dialog="privacy">Privasi</button></nav><nav aria-label="Akun footer"><h3>Anredseller</h3><a href="akun.html">Akun & pesanan</a><button data-dialog="wishlist">Wishlist</button><button data-dialog="about">Tentang kami</button><a href="admin.html">Area pemilik</a></nav></div><nav class="footer-socials" id="footer-socials" aria-label="Media sosial Anredseller" hidden><span>Ikuti Anredseller</span><div id="footer-social-links"></div></nav><a class="footer-wordmark" href="index.html" aria-label="Anredseller beranda">Anredseller</a><div class="footer-bottom"><span>© ${new Date().getFullYear()} Anredseller</span><span>Pembayaran dibantu via WhatsApp</span><a href="#main-content">Kembali ke atas ↑</a></div></footer>`;
 
 storeContentReady.then(content => {
   const section = document.getElementById("footer-socials");
@@ -173,29 +173,29 @@ document.body.appendChild(dialog);
 const dialogContent = dialog.querySelector("#dialog-content");
 const info = {
   about: [
-    "A good find. A better everyday.",
-    "Anredseller adalah konsep toko reseller untuk sneakers, apparel, dan barang pilihan sehari-hari. Kami percaya gaya personal dimulai dari pilihan yang kamu suka.",
-    "Koleksi produk dikelola oleh pemilik toko. Produk contoh perlu diganti sebelum toko mulai beroperasi.",
+    "Tentang Anredseller",
+    "Anredseller adalah toko online yang menyediakan pilihan sneakers, pakaian, dan aksesori dari berbagai supplier untuk pembeli langsung.",
+    "Jelajahi produk yang tersedia, periksa harga, ukuran, dan stok sebelum membuat pesanan.",
   ],
   help: [
-    "How can we help?",
-    "Cari produk melalui ikon pencarian, pilih koleksi, lalu tambahkan favoritmu ke keranjang. Pesanan dapat dicoba sampai konfirmasi.",
-    "Setelah checkout, lanjutkan pembayaran melalui tombol WhatsApp pada rincian pesanan. Admin pembayaran memberikan instruksi transfer dan memeriksa bukti pembayaran. Untuk pertanyaan belanja, hubungi nomor CS yang terpisah.",
+    "Cara belanja di Anredseller",
+    "Pilih produk, tentukan ukuran atau warna yang tersedia, lalu masukkan ke keranjang. Masuk atau daftar akun untuk membuat pesanan.",
+    "Setelah pesanan dibuat, klik Lanjut pembayaran via WhatsApp untuk meminta instruksi transfer. Pesanan diproses setelah pembayaran diverifikasi admin. Pertanyaan produk atau pengiriman dapat ditanyakan ke CS.",
   ],
   shipping: [
-    "From us, to your everyday.",
-    "Opsi pengiriman tersedia pada halaman checkout. Rincian ongkir dapat dilihat pada ringkasan keranjang.",
-    "Pengiriman dan pembayaran dikonfirmasi langsung oleh toko. Ongkir yang tampil adalah estimasi berdasarkan tarif toko.",
+    "Informasi pengiriman",
+    "Periksa alamat dan pilihan pengiriman di halaman checkout. Biaya yang tercantum di ringkasan pesanan akan diperiksa saat pemesanan.",
+    "Status pengiriman dapat dilihat di menu Pesanan saya. Untuk detail pengiriman, hubungi CS Anredseller.",
   ],
   privacy: [
-    "Your details, thoughtfully kept.",
-    "Profil, alamat, wishlist, keranjang, dan pesanan tersimpan di akun pembeli. Kamu dapat mengaksesnya setelah masuk di perangkat lain.",
+    "Privasi dan akun belanjamu",
+    "Profil, alamat, produk favorit, keranjang, dan pesanan tersimpan di akun pembeli. Masuk untuk mengaksesnya kembali.",
     "Data pesanan hanya dapat dilihat oleh pembeli yang bersangkutan dan pemilik toko yang sudah login.",
   ],
-  reseller: [
-    "Good things. Better together.",
-    "Bangun koleksi pilihan untuk pelangganmu lewat konsep program reseller Anredseller",
-    "Program akan mencakup katalog pilihan, informasi stok, dan panduan pemesanan. Harga reseller, minimum order, dan kontak admin belum ditetapkan.",
+  shopping: [
+    "Belanja mudah di Anredseller",
+    "Jelajahi produk dari berbagai kategori, pilih ukuran atau warna, dan masukkan produk ke keranjang.",
+    "Buat pesanan melalui checkout, kemudian hubungi admin pembayaran lewat WhatsApp. Pembayaran diverifikasi sebelum pesanan diproses.",
   ],
 };
 async function openStoreDialog(type) {
@@ -219,7 +219,7 @@ async function openStoreDialog(type) {
         : '<p>Belum ada produk tersimpan. Ketuk ikon hati pada produk yang kamu suka.</p><a class="solid-link" href="produk.html">Temukan favoritmu <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a>');
   } else {
     const copy = info[type] || info.help;
-    dialogContent.innerHTML = `<h2>${copy[0]}</h2><p>${copy[1]}</p><p>${copy[2]}</p>${type === "reseller" ? '<a class="solid-link" href="produk.html">Jelajahi katalog contoh <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a>' : ""}`;
+    dialogContent.innerHTML = `<h2>${copy[0]}</h2><p>${copy[1]}</p><p>${copy[2]}</p>${type === "shopping" ? '<a class="solid-link" href="produk.html">Lihat semua produk <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a>' : ""}`;
   }
   const title = dialogContent.querySelector("h2");
   title.id = "store-dialog-title";
