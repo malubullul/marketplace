@@ -13,3 +13,11 @@ scripts
 .agents
 .taste-skill
 skills-lock.json
+node_modules
+components
+frontend
+lib
+package.json
+package-lock.json
+tsconfig.json
+components.json

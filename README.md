@@ -50,6 +50,7 @@ Opening HTML directly or running `python -m http.server` provides a static examp
 - Owner-managed campaign/category/banner/account photos and optional social links in the footer. See [content management](docs/STORE_CONTENT.md).
 - Owner-managed [promo codes](docs/PROMO_CODES.md) for partner collaborations: percentage/fixed discounts, minimum spend, caps, dates, total/account limits, order attribution and server-verified checkout totals. Uses existing database tables; no additional migration.
 - Existing keyboard accessibility, wishlist and responsive navigation.
+- A responsive [React 404 page](docs/REACT_404.md) with shadcn/Tailwind/TypeScript source, real HTTP 404 responses, working recovery links and pre-rendered fallback.
 
 ## Operational limits
 

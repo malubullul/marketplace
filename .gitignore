@@ -13,3 +13,4 @@ __pycache__/
 *.sqlite3-shm
 
 .taste-skill/
+node_modules/

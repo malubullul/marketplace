@@ -16,6 +16,8 @@ The installer recommends restarting the coding assistant so the new skills are d
 
 The public interface uses plain HTML, CSS and JavaScript; the owner dashboard and shared API use Flask, with PostgreSQL/private Supabase Storage for Vercel or SQLite/local photos for development. Do not add a framework or Tailwind solely because a skill supports it. Search recommendations supplement the user's reference; they do not replace it. The broad luxury-commerce search returned an Apple-specific Liquid Glass style that does not fit this site, so it was rejected. Targeted minimalism and web accessibility guidance was used instead.
 
+The explicitly requested [404 component](REACT_404.md) is an isolated React/TypeScript page with shadcn Button and Tailwind v4. Its styles and runtime load only on missing public pages; Flask serves pre-rendered HTML with a true 404 status. Preserve the standard storefront's existing stylesheet and routing behavior when extending that component.
+
 The canonical owner UI now lives in `admin-portal/templates/index.html` and `admin-portal/static/`. The store backend serves those same files in local single-domain mode, while the standalone portal serves them on the owner domain. Keep one UI implementation so mobile fixes apply to both. Store links use `/portal-config` to reach the configured public store.
 
 Useful searches from this review:

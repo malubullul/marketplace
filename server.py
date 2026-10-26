@@ -31,6 +31,18 @@ ROOT = Path(__file__).resolve().parent
 ADMIN_ROOT = ROOT / 'admin-portal'
 
 
+def not_found_page():
+    """Pre-rendered React markup also works without JS, Node or a database."""
+    response = Flask.response_class((ROOT / '404.html').read_text(), status=404, mimetype='text/html')
+    response.headers['Cache-Control'] = 'no-store'
+    response.headers['X-Robots-Tag'] = 'noindex'
+    return response
+
+
+def is_page_request():
+    return request.method in {'GET', 'HEAD'} and not request.path.startswith(('/api/', '/css/', '/js/', '/assets/', '/uploads/')) and request.path != '/api'
+
+
 def public_html(filename, content=None):
     content = content if content is not None else public_content(default_content())
     campaign = content['campaigns'][0] if content['campaigns'] else dict(CAMPAIGNS[0], image='', alt='', crop='50% center')
@@ -229,9 +241,11 @@ def create_app(config=None):
 
     @app.errorhandler(HTTPException)
     def http_error(error):
-        if request.path.startswith("/api/"):
+        if request.path.startswith("/api/") or request.path == '/api':
             messages = {413: "File terlalu besar. Batas unggahan 4 MB.", 404: "Data tidak ditemukan.", 405: "Metode tidak diizinkan."}
             return fail(messages.get(error.code, "Permintaan tidak dapat diproses."), error.code)
+        if error.code == 404 and is_page_request():
+            return not_found_page()
         return error
 
     @app.get("/api/health")
@@ -640,7 +654,7 @@ def create_app(config=None):
             return public_html(filename, public_content(content_settings.read()))
         if parts and parts[0] in {"css","js","assets"} and not any(part.startswith(".") for part in parts):
             return send_from_directory(ROOT, filename)
-        return fail("Halaman tidak ditemukan.", 404)
+        abort(404)
 
     return app
 
@@ -664,6 +678,10 @@ def configuration_app():
     fallback SQLite store and cannot accept registrations or orders.
     """
     pending = Flask(__name__, static_folder=None)
+
+    @pending.errorhandler(404)
+    def missing_page(error):
+        return not_found_page() if is_page_request() else error
 
     @pending.route('/api/<path:path>', methods=['GET','POST','PUT','PATCH','DELETE'])
     def unavailable_api(path):
