@@ -501,6 +501,7 @@ function showCustomerOrder(order) {
       [order.alamat, order.kota, order.provinsi, order.kodepos].join(", "),
     ],
     ["Pembayaran", "Dibantu melalui WhatsApp pembayaran"],
+    ...(order.promo ? [["Kode promo", order.promo.code]] : []),
     ["Catatan", order.catatan || "Tidak ada catatan"],
   ];
   accountElement("customer-order-details").innerHTML =

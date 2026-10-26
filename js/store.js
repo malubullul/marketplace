@@ -45,6 +45,7 @@ function paymentWhatsAppUrl(contacts, order) {
   if (order.items.length > 10) items.push(`- dan ${order.items.length - 10} produk lainnya`);
   return whatsAppUrl(contacts.payment_whatsapp,
     ["Halo Anredseller, saya ingin membayar pesanan:", order.nomor, "", ...items, "",
+     ...(order.promo ? ["Kode promo: " + order.promo.code, "Diskon: −" + formatHarga(order.diskon)] : []),
      "Total pesanan: " + formatHarga(order.total),
      "Mohon instruksi transfer dan konfirmasi pembayaran. Terima kasih."].join("\n"));
 }

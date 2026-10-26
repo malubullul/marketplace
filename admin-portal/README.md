@@ -4,6 +4,8 @@ Portal khusus pemilik toko pada domain sendiri, memakai **repository `marketplac
 
 Fitur: login/keluar pemilik, tambah/edit/hapus produk, unggah dan urutkan foto, stok, ukuran/warna, simpan draf/terbitkan produk, rincian pesanan dan pembaruan status. Tampilannya mengikuti dashboard Anredseller, termasuk ukuran HP.
 
+Menu **Kode promo** dapat membuat kode diskon persen/rupiah, mengisi nama partner/ambassador, minimum belanja, batas potongan, jadwal WIB, kuota total dan batas pemakaian per akun. Centang **Aktifkan kode promo** untuk mengaktifkan; edit dan nonaktifkan dari menu yang sama. Pembeli memakai kode di keranjang/checkout. Riwayat pesanan tetap menyimpan kode, partner dan potongan awal. Tidak perlu migrasi database tambahan. Lihat [panduan kode promo](../docs/PROMO_CODES.md).
+
 ## Cara kerjanya
 
 ```text

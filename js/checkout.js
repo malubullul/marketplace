@@ -19,10 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 function renderRingkasanCheckout() {
   const keranjang = getKeranjang();
   const subtotal = hitungTotalKeranjang();
-  const coupons = { HEMAT10: 10, ANRED15: 15, SALE20: 20 };
-  const diskon = Math.floor(
-    (subtotal * (coupons[sessionStorage.getItem("checkout_kupon")] || 0)) / 100,
-  );
+  const diskon = promoDiscount();
   const ongkir = subtotal >= 200000 ? 0 : 15000;
   const total = subtotal - diskon + ongkir;
 
@@ -57,8 +54,8 @@ function renderRingkasanCheckout() {
     ongkirEl.className = "";
   }
 
+  document.getElementById("co-diskon-row").style.display = diskon > 0 ? "flex" : "none";
   if (diskon > 0) {
-    document.getElementById("co-diskon-row").style.display = "flex";
     document.getElementById("co-diskon").textContent =
       `-${formatHarga(diskon)}`;
   }
@@ -120,6 +117,11 @@ async function prosesCheckout() {
   }
   const errorEl = document.getElementById("checkout-error");
   errorEl.textContent = "";
+  if (!promoReadyForCheckout()) {
+    errorEl.textContent = "Kode promo belum valid. Tunggu pemeriksaan selesai, terapkan ulang, atau hapus kode promo.";
+    errorEl.focus();
+    return;
+  }
   if (katalogMode !== "server") {
     errorEl.textContent =
       "Pemesanan memerlukan server Anredseller. Pratinjau statis tidak dapat mengirim pesanan.";
@@ -157,6 +159,7 @@ async function prosesCheckout() {
       warna: item.warna || "",
     })),
     coupon: sessionStorage.getItem("checkout_kupon") || "",
+    expected_discount: promoDiscount(),
     catatan: val("catatan"),
     address_id: document.getElementById("checkout-address-select").value
       ? Number(document.getElementById("checkout-address-select").value)
@@ -263,3 +266,5 @@ window.addEventListener("customer:state", () => {
   )
     renderRingkasanCheckout();
 });
+
+window.addEventListener("promo:change", renderRingkasanCheckout);

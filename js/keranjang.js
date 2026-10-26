@@ -2,21 +2,11 @@
 // KERANJANG.JS — Logic Halaman Keranjang
 // ============================================================
 
-const KUPON_VALID = {
-  HEMAT10: 0.1, // 10% off
-  ANRED15: 0.15, // 15% off
-  SALE20: 0.2, // 20% off
-};
-
-let diskonKupon = 0;
-
 document.addEventListener("DOMContentLoaded", async () => {
   await buyerReady;
   syncCartCatalog();
-  diskonKupon = KUPON_VALID[sessionStorage.getItem("checkout_kupon")] || 0;
   renderKeranjang();
   renderProdukSuka();
-  initKupon();
   initSearch();
 });
 
@@ -86,7 +76,7 @@ function renderKeranjang() {
       <!-- Subtotal -->
       <div class="keranjang-subtotal" id="subtotal-${item.key}">${formatHarga(item.harga * item.jumlah)}</div>
       <!-- Hapus -->
-      <button class="btn-hapus-item" onclick="hapusItem('${item.key}')" title="Hapus">✕</button>
+      <button class="btn-hapus-item" onclick="hapusItem('${item.key}')" aria-label="Hapus ${h(item.nama)}" title="Hapus">×</button>
     </div>
   `,
     )
@@ -97,7 +87,7 @@ function renderKeranjang() {
     ${itemsHtml}
     <div class="cart-list-actions" style="display:flex;justify-content:space-between;align-items:center;padding:16px;background:var(--abu-muda);border-radius:var(--radius-lg);margin-top:8px">
       <button onclick="konfirmasiKosongkan()" style="font-size:13px;color:var(--merah);font-weight:600;text-decoration:underline;background:none;border:none;cursor:pointer">
-        🗑️ Kosongkan Keranjang
+        Kosongkan Keranjang
       </button>
       <a href="produk.html" style="font-size:13px;font-weight:600;color:var(--teks-hitam);display:flex;align-items:center;gap:4px">
         ← Lanjut Belanja
@@ -148,7 +138,7 @@ async function konfirmasiKosongkan() {
 function updateRingkasan() {
   const subtotal = hitungTotalKeranjang();
   const jumlah = hitungJumlahItem();
-  const diskon = Math.round(subtotal * diskonKupon);
+  const diskon = promoDiscount();
   const ongkir = subtotal >= 200000 ? 0 : 15000;
   const total = subtotal - diskon + ongkir;
 
@@ -182,41 +172,7 @@ function updateRingkasan() {
   sessionStorage.setItem("checkout_total", total);
 }
 
-// ── Kupon ──────────────────────────────────────────────────
-function initKupon() {
-  document.getElementById("btn-kupon")?.addEventListener("click", () => {
-    const kode = document
-      .getElementById("kupon-input")
-      .value.trim()
-      .toUpperCase();
-    const pesanEl = document.getElementById("kupon-pesan");
-
-    if (!kode) {
-      pesanEl.textContent = "⚠️ Masukkan kode kupon terlebih dahulu.";
-      pesanEl.style.color = "var(--bintang)";
-      return;
-    }
-
-    if (KUPON_VALID[kode]) {
-      diskonKupon = KUPON_VALID[kode];
-      sessionStorage.setItem("checkout_kupon", kode);
-      const persen = Math.round(diskonKupon * 100);
-      pesanEl.textContent = ` Kupon "${kode}" berhasil! Diskon ${persen}% diterapkan.`;
-      pesanEl.style.color = "var(--hijau)";
-      updateRingkasan();
-    } else {
-      diskonKupon = 0;
-      sessionStorage.removeItem("checkout_kupon");
-      pesanEl.textContent = `❌ Kode kupon "${kode}" tidak valid atau sudah kadaluwarsa.`;
-      pesanEl.style.color = "var(--merah)";
-      updateRingkasan();
-    }
-  });
-
-  document.getElementById("kupon-input")?.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") document.getElementById("btn-kupon")?.click();
-  });
-}
+window.addEventListener("promo:change", updateRingkasan);
 
 // ── Produk Suka ────────────────────────────────────────────
 function renderProdukSuka() {

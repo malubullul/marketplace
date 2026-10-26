@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="css/store.css" />
     <link rel="stylesheet" href="css/editorial.css" />
   </head>
-  <body>
+  <body class="cart-page">
     <!-- TOP BAR -->
     <div id="store-header"></div>
 
@@ -74,20 +74,12 @@
               <span id="total-ringkasan">Rp0</span>
             </div>
 
-            <!-- Kupon -->
-            <div class="kupon-box">
-              <input
-                type="text"
-                class="kupon-input"
-                id="kupon-input"
-                placeholder="Kode kupon..."
-              />
-              <button class="btn-kupon" id="btn-kupon">Pakai</button>
+            <div class="promo-entry" aria-labelledby="promo-label">
+              <label id="promo-label" for="promo-input">Punya kode promo?</label>
+              <div class="promo-entry-controls"><input id="promo-input" type="text" maxlength="32" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Masukkan kode promo" aria-describedby="promo-message" /><button id="promo-apply" type="button">Gunakan</button></div>
+              <p id="promo-message" role="status" aria-live="polite"></p>
+              <button id="promo-remove" type="button" class="promo-remove" hidden>Hapus kode promo</button>
             </div>
-            <div
-              id="kupon-pesan"
-              style="font-size: 12px; margin-top: -8px; margin-bottom: 8px"
-            ></div>
 
             <button
               class="btn-checkout"
@@ -146,6 +138,7 @@
     <script src="js/data.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/promo.js"></script>
     <script src="js/keranjang.js"></script>
     <script src="js/store.js"></script>
   </body>

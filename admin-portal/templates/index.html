@@ -63,6 +63,7 @@
             Pesanan masuk <span id="orders-count">0</span>
           </button>
           <button class="nav-button" data-page="appearance">Tampilan toko</button>
+          <button class="nav-button" data-page="promos">Kode promo</button>
           <button class="nav-button" data-page="socials">Media sosial</button>
           <button class="nav-button" data-page="settings">Kontak WhatsApp</button>
         </nav>
@@ -184,6 +185,13 @@
               <p>Pesanan yang dibuat dari toko publik akan muncul di sini.</p>
             </div>
           </div>
+        </section>
+        <section id="promos-page" hidden>
+          <div class="page-heading"><div><h1>Kode promo<span>.</span></h1><p>Diskon untuk koleksi pilihan dan kolaborasi partner.</p></div><button id="add-promo" class="button primary">+ Buat kode promo</button></div>
+          <div class="list-toolbar"><label class="search-field" for="promo-search"><span>Cari kode atau partner</span><input id="promo-search" type="search" placeholder="Nama partner atau kode…" /></label><button id="refresh-promos" class="button secondary">Muat ulang</button></div>
+          <p id="promo-list-status" role="status"></p>
+          <div class="table-wrap"><table class="promo-table"><thead><tr><th>Kode / Partner</th><th>Diskon</th><th>Kuota terpakai</th><th>Pesanan selesai</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="promo-rows"></tbody></table><div id="promos-empty" class="empty" hidden><h2>Belum ada kode promo.</h2><p>Buat kode untuk partner atau promo tokomu. Belum ada diskon yang aktif otomatis.</p></div></div>
+          <p class="table-note">Kuota terpakai termasuk pesanan menunggu pembayaran. Pesanan dibatalkan mengembalikan kuota. Nilai pesanan selesai mengikuti status yang dikonfirmasi toko; ini bukan perhitungan komisi partner.</p>
         </section>
         <section id="settings-page" hidden>
           <div class="page-heading">
@@ -443,6 +451,29 @@
         ×
       </button>
       <div id="order-details"></div>
+    </dialog>
+    <dialog id="promo-dialog" class="order-dialog promo-dialog" aria-labelledby="promo-title">
+      <button type="button" class="close-button" id="close-promo" aria-label="Tutup pengaturan promo">×</button>
+      <form id="promo-form">
+        <h2 id="promo-title">Buat kode promo</h2><p class="promo-intro">Satu kode per pesanan. Diskon berlaku untuk subtotal produk, sebelum ongkir.</p>
+        <div class="promo-form-grid">
+          <label>Kode promo<input id="promo-code" required minlength="3" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9_-]{2,31}" placeholder="Contoh: PARTNER10" autocomplete="off" /><small>Kode tidak dapat diganti setelah dibuat.</small></label>
+          <label>Nama partner / ambassador (opsional)<input id="promo-partner" maxlength="100" placeholder="Nama partner" /></label>
+          <label>Jenis diskon<select id="promo-kind"><option value="percent">Persen (%)</option><option value="fixed">Potongan rupiah (Rp)</option></select></label>
+          <label><span id="promo-value-label">Besar diskon (%)</span><input id="promo-value" type="number" min="1" max="100" step="1" value="10" required /></label>
+          <label>Minimal belanja (Rp)<input id="promo-min" type="number" min="0" max="100000000" step="1" value="0" required /></label>
+          <label id="promo-cap-label">Maksimal potongan (Rp, opsional)<input id="promo-cap" type="number" min="1" max="10000000" step="1" placeholder="Tanpa batas potongan" /></label>
+          <label>Mulai tanggal (WIB, opsional)<input id="promo-start" type="date" max="2099-12-31" /><small>Kosongkan untuk langsung berlaku.</small></label>
+          <label>Terakhir berlaku (WIB, opsional)<input id="promo-end" type="date" max="2099-12-31" /><small>Berlaku sampai akhir tanggal ini.</small></label>
+          <label>Kuota total (opsional)<input id="promo-limit" type="number" min="1" max="1000000" step="1" placeholder="Tanpa batas kuota total" /></label>
+          <label>Batas pemakaian per akun<input id="promo-person" type="number" min="1" max="1000" step="1" value="1" required /></label>
+        </div>
+        <label class="promo-active"><input id="promo-active" type="checkbox" />Aktifkan kode promo</label>
+        <p id="promo-preview" class="promo-preview" aria-live="polite"></p>
+        <p id="promo-error" class="error" role="alert" tabindex="-1"></p>
+        <div class="promo-form-actions"><button type="button" class="button secondary" id="cancel-promo">Batal</button><button type="submit" class="button primary" id="save-promo">Simpan kode promo</button></div>
+        <p class="table-note">Perubahan hanya berlaku untuk pesanan berikutnya. Nonaktifkan kode jika kerja sama berakhir; riwayat pesanan tetap tersimpan.</p>
+      </form>
     </dialog>
     <script src="/js/admin.js"></script>
   </body>

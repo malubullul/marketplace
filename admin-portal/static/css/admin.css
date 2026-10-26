@@ -1591,3 +1591,37 @@ th:nth-child(3) {
 }
 .settings-inline-note { font-size: 14px; margin: 0 0 16px; color: #526047; }
 #site-image-settings { font-variant-numeric: tabular-nums; }
+
+/* Promotions retain the existing Switzer/olive owner workspace. */
+.promo-table td { vertical-align: top; }
+.promo-table small { display: block; color: var(--muted); font-size: 12px; line-height: 1.6; margin-top: 4px; }
+.promo-table .promo-number, .promo-table th:nth-child(2), .promo-table th:nth-child(3), .promo-table th:nth-child(4) { text-align: right; font-variant-numeric: tabular-nums; }
+.promo-table td:first-child { overflow-wrap: anywhere; }
+.promo-dialog { width: min(760px, calc(100% - 32px)); padding: 28px; }
+.promo-dialog h2 { margin: 0 40px 8px 0; font: 500 24px/1.3 Switzer, Arial, sans-serif; }
+.promo-intro { color: var(--muted); margin: 0 0 24px; }
+.promo-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 20px; }
+.promo-form-grid label { display: grid; align-content: start; gap: 8px; font-weight: 500; min-width: 0; margin: 0; }
+.promo-form-grid label > span { color: inherit; }
+.promo-form-grid small { color: var(--muted); font-size: 12px; font-weight: 400; }
+.promo-active { display: flex; gap: 10px; align-items: center; margin: 24px 0 16px; }
+.promo-active input { width: 20px; min-height: 20px; height: 20px; accent-color: var(--green); }
+.promo-preview { background: var(--paper); padding: 16px; margin: 0 0 16px; }
+.promo-form-actions { display: flex; justify-content: flex-end; gap: 12px; }
+@media (max-width: 760px) {
+  .promo-table .promo-number { text-align: left; }
+  .promo-table td[data-label]::before { font-size: 12px; }
+  .promo-dialog { padding: 20px; }
+  .promo-form-grid { grid-template-columns: minmax(0,1fr); gap: 16px; }
+  .promo-form-actions { flex-wrap: wrap; }
+  .promo-form-actions .button { flex: 1 1 auto; }
+}
+@media (max-width: 1100px) {
+  /* Six columns need more room than the tablet canvas beside the sidebar. */
+  #promos-page .table-wrap thead { display: none; }
+  #promos-page .table-wrap table, #promos-page .table-wrap tbody { display: block; }
+  #promos-page .table-wrap tr { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); padding: 16px; border-bottom: 1px solid var(--line); gap: 16px; }
+  #promos-page .table-wrap td { display: block; min-width: 0; padding: 0; border: 0; text-align: left; }
+  #promos-page .table-wrap td:first-child, #promos-page .table-wrap td:last-child { grid-column: 1/-1; }
+  #promos-page .table-wrap td[data-label]::before { content: attr(data-label); display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+}

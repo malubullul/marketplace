@@ -23,6 +23,8 @@ API_ROUTES = [
     ('PATCH', r'/api/admin/orders/[A-Za-z0-9-]{1,80}'),
     ('GET', r'/api/admin/contacts'), ('PUT', r'/api/admin/contacts'),
     ('GET', r'/api/admin/content'), ('PUT', r'/api/admin/content'),
+    ('GET', r'/api/admin/promos'), ('POST', r'/api/admin/promos'),
+    ('PUT', r'/api/admin/promos/[A-Z0-9][A-Z0-9_-]{2,31}'),
 ]
 
 

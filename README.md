@@ -48,6 +48,7 @@ Opening HTML directly or running `python -m http.server` provides a static examp
 - Owner order view, status changes and one-time stock restoration on cancellation.
 - WhatsApp payment handoff with order reference and server-calculated total; separate customer-service chat and owner-editable contact numbers. See [WhatsApp guide](docs/WHATSAPP.md).
 - Owner-managed campaign/category/banner/account photos and optional social links in the footer. See [content management](docs/STORE_CONTENT.md).
+- Owner-managed [promo codes](docs/PROMO_CODES.md) for partner collaborations: percentage/fixed discounts, minimum spend, caps, dates, total/account limits, order attribution and server-verified checkout totals. Uses existing database tables; no additional migration.
 - Existing keyboard accessibility, wishlist and responsive navigation.
 
 ## Operational limits
@@ -70,6 +71,7 @@ With Python Playwright and Chromium installed, run:
 python3 tests/browser_smoke.py
 python3 tests/responsive_smoke.py
 ANREDSELLER_TEST_ADMIN_PORTAL=1 python3 tests/browser_smoke.py
+python3 tests/browser_promos_smoke.py
 ```
 
 This starts a temporary store with disposable test credentials and data, uses separate owner/visitor browser contexts, and exercises photo upload → draft → publish → public product → customer registration → saved address → cross-device cart/wishlist → authenticated checkout → private customer history → owner order → unpublish → logout. It does not create an account in the development or production database.

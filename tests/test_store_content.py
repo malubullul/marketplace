@@ -85,7 +85,7 @@ class StoreContentTests(unittest.TestCase):
             self.assertEqual(len(data['campaigns']),4)
             html=client.get('/').data.decode();parsed=HTMLSnapshot(html)
             self.assertEqual(parsed.images['campaign-image']['src'],'assets/campaign-after-hours.webp')
-            self.assertIn('After hours.',html)
+            self.assertIn('Gaya santai.',html)
 
     def test_all_images_can_be_removed_without_broken_image_sources(self):
         state=self.admin()

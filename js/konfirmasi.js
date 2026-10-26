@@ -54,6 +54,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       "Tanggal pesanan",
       new Date(order.created_at * 1000).toLocaleString("id-ID"),
     ],
+    ["Subtotal produk", formatHarga(order.subtotal)],
+    ...(order.promo ? [["Kode promo", order.promo.code]] : []),
+    ["Diskon", "−" + formatHarga(order.diskon)],
+    ["Estimasi ongkir", formatHarga(order.ongkir)],
     ["Total pesanan", formatHarga(order.total)],
   ];
   document.getElementById("detail-pesanan").innerHTML = fields

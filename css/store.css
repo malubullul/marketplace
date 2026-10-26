@@ -2396,3 +2396,35 @@ svg {
     text-align: left;
   }
 }
+
+/* One promotion form shared by cart and checkout. */
+.cart-page, .checkout-page { --abu-teks: #62665c; --merah: #aa302c; }
+.cart-page .gratis, .checkout-page .gratis { color: var(--aksen); }
+.promo-entry { margin: 20px 0; color: var(--teks-hitam); }
+.promo-entry label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; }
+.promo-entry-controls { display: flex; gap: 8px; }
+.promo-entry input { flex: 1 1 0; width: 0; min-width: 0; min-height: 44px; padding: 10px 12px; border: 1px solid var(--abu-border); background: var(--putih); color: inherit; font: inherit; font-size: 14px; border-radius: 0; }
+.promo-entry-controls button { flex: none; padding: 10px 14px; min-height: 44px; background: var(--aksen); color: var(--putih); font-size: 13px; font-weight: 500; }
+.promo-entry-controls button:disabled { opacity: .65; cursor: progress; }
+.promo-entry p { margin: 8px 0 0; font-size: 12px; line-height: 1.6; color: var(--muted); overflow-wrap: anywhere; }
+.promo-entry p.promo-error { color: #aa302c; }
+.promo-entry [hidden] { display: none !important; }
+.promo-remove { padding: 8px 0; min-height: 44px; font-size: 12px; text-decoration: underline; }
+.promo-entry input:focus-visible, .promo-entry button:focus-visible { outline: 2px solid var(--aksen); outline-offset: 3px; }
+@media (min-width: 761px) and (max-width: 1100px) {
+  /* The Indonesian navigation labels need the menu before they meet the logo. */
+  .cart-page .desktop-nav, .checkout-page .desktop-nav { display: none; }
+  .cart-page .mobile-menu, .checkout-page .mobile-menu { display: flex; }
+  .cart-page .desktop-nav.mobile-open, .checkout-page .desktop-nav.mobile-open { display: flex; flex-direction: column; align-items: stretch; position: absolute; top: 100%; left: 0; right: 0; padding: 24px 5vw; gap: 12px; background: var(--putih); z-index: 40; }
+  .cart-page .desktop-nav.mobile-open a, .cart-page .desktop-nav.mobile-open button, .checkout-page .desktop-nav.mobile-open a, .checkout-page .desktop-nav.mobile-open button { font-size: 16px; min-height: 44px; text-align: left; }
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .cart-page .keranjang-item { display: grid; grid-template-columns: 80px minmax(0,1fr) auto 44px; grid-template-areas: "image name name remove" "image price quantity remove" "subtotal subtotal subtotal subtotal"; gap: 16px; }
+  .cart-page .cart-product-image { grid-area: image; align-self: start; }
+  .cart-page .cart-product-info { grid-area: name; }
+  .cart-page .keranjang-harga { grid-area: price; }
+  .cart-page .keranjang-qty { grid-area: quantity; }
+  .cart-page .btn-hapus-item { grid-area: remove; position: static; align-self: start; }
+  .cart-page .keranjang-subtotal { grid-area: subtotal; display: flex; justify-content: space-between; border-top: 1px solid var(--abu-border); padding-top: 12px; }
+  .cart-page .keranjang-subtotal::before { content: "Subtotal"; color: var(--abu-teks); font-weight: 400; }
+}

@@ -154,6 +154,8 @@ class StoreTests(unittest.TestCase):
 
     def test_discount_shipping_and_drafts_not_orderable(self):
         product = self.product(harga=10000,hargaAsli=10000)
+        promo = dict(code='HEMAT10',partner='',kind='percent',value=10,min_subtotal=0,max_discount=None,starts_at=None,expires_at=None,usage_limit=None,per_customer_limit=1,active=True,version='0')
+        self.assertEqual(self.client.post('/api/admin/promos',json=promo,headers=self.headers).status_code,201)
         result = self.order(product,coupon='HEMAT10')
         self.assertEqual(result.status_code,201)
         order = result.json['order']

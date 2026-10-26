@@ -186,6 +186,12 @@
           <div class="ringkasan-order">
             <h2 class="ringkasan-judul">Ringkasan pesanan</h2>
             <div id="ringkasan-items" style="margin-bottom: 18px"></div>
+            <div class="promo-entry" aria-labelledby="promo-label">
+              <label id="promo-label" for="promo-input">Punya kode promo?</label>
+              <div class="promo-entry-controls"><input id="promo-input" type="text" maxlength="32" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Masukkan kode promo" aria-describedby="promo-message" /><button id="promo-apply" type="button">Gunakan</button></div>
+              <p id="promo-message" role="status" aria-live="polite"></p>
+              <button id="promo-remove" type="button" class="promo-remove" hidden>Hapus kode promo</button>
+            </div>
             <div class="ringkasan-baris">
               <span>Subtotal</span><span id="co-subtotal">Rp 0</span>
             </div>
@@ -218,6 +224,7 @@
     <div id="store-footer"></div>
     <script src="js/data.js"></script>
     <script src="js/cart.js"></script>
+    <script src="js/promo.js"></script>
     <script src="js/checkout.js"></script>
     <script src="js/store.js"></script>
   </body>

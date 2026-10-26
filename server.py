@@ -25,6 +25,7 @@ from password_recovery import PasswordRecovery
 from database import PostgresDatabase, PostgresError
 from storage import LocalStorage, SupabaseStorage, StorageError
 from store_content import CAMPAIGNS, StoreContent, default_content, public_content
+from promo_codes import PromoCodes, normalize_code
 
 ROOT = Path(__file__).resolve().parent
 ADMIN_ROOT = ROOT / 'admin-portal'
@@ -42,7 +43,6 @@ def public_html(filename, content=None):
     return response
 CATEGORIES = {"apparel", "sneakers", "essentials"}
 ORDER_STATES = {"baru", "diproses", "dikirim", "selesai", "dibatalkan"}
-COUPONS = {"HEMAT10": 10, "ANRED15": 15, "SALE20": 20}
 DEFAULT_STORE_CONTACTS = {'payment_whatsapp': '6287729766809', 'support_whatsapp': '6282335963140'}
 Image.MAX_IMAGE_PIXELS = 25_000_000
 
@@ -175,6 +175,8 @@ def create_app(config=None):
                 return fail("Sesi formulir tidak valid. Muat ulang halaman.", 403)
             return func(*args, **kwargs)
         return wrapped
+
+    promos = PromoCodes(app, db, customers, owner_required, fail, body)
 
     @app.before_request
     def admin_gateway():
@@ -497,9 +499,10 @@ def create_app(config=None):
         lines = data.get("items", [])
         if not isinstance(lines, list) or not 1 <= len(lines) <= 50:
             return fail("Keranjang tidak valid.")
-        coupon = str(data.get("coupon", "")).strip().upper()
-        if coupon and coupon not in COUPONS:
-            return fail("Kupon tidak berlaku.")
+        try:
+            coupon = normalize_code(data.get("coupon", ""), optional=True)
+        except ValueError as error:
+            return fail(str(error))
         try:
             db().execute("BEGIN IMMEDIATE")
             # Check again inside the write transaction for simultaneous retries.
@@ -537,10 +540,15 @@ def create_app(config=None):
                 product["stok"] -= quantity
                 db().execute("UPDATE products SET document=?,updated_at=? WHERE id=?", (json.dumps(product), time.time_ns(), product_id))
             subtotal = sum(line["harga"] * line["jumlah"] for line in items)
-            discount = subtotal * COUPONS.get(coupon, 0) // 100
+            promo = promos.evaluate(coupon,customer_id,subtotal)
+            discount = promo['discount'] if promo else 0
+            if 'expected_discount' in data and (type(data['expected_discount']) is not int or data['expected_discount'] != discount):
+                raise ValueError('Diskon promo berubah. Terapkan ulang kode promo untuk memeriksa total terbaru sebelum membuat pesanan.')
             shipping = 0 if subtotal >= 200000 else 15000
             order_id = "ANR-" + secrets.token_hex(6).upper()
             order = dict(customer, nomor=order_id, tanggal=time.strftime("%Y-%m-%d"), created_at=int(time.time()), items=items, subtotal=subtotal, diskon=discount, ongkir=shipping, total=subtotal-discount+shipping, kurir="Dikonfirmasi oleh toko", metode="whatsapp", status="baru", catatan=str(data.get("catatan", ""))[:1000])
+            if promo:
+                order['promo'] = promo
             if data.get("save_address") is True and address_id is None:
                 customers.save_address(customer_id, dict(customer,label="Alamat checkout"))
             db().execute("INSERT INTO orders(id,document,status,idempotency_key,created_at,customer_id) VALUES(?,?,?,?,?,?)", (order_id, json.dumps(order), "baru", order_key, int(time.time()), customer_id))

@@ -82,7 +82,7 @@ async function openDashboard(email) {
   $("login-view").hidden = true;
   $("dashboard").hidden = false;
   await refresh();
-  showPage(["products", "orders", "settings", "appearance", "socials"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "products");
+  showPage(["products", "orders", "settings", "appearance", "socials", "promos"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "products");
 }
 async function refresh() {
   try {
@@ -167,9 +167,11 @@ function showPage(name) {
   $("settings-page").hidden = name !== "settings";
   $("appearance-page").hidden = name !== "appearance";
   $("socials-page").hidden = name !== "socials";
+  $("promos-page").hidden = name !== "promos";
+  if (name === "promos") loadPromos();
   if (["appearance", "socials"].includes(name) && !siteContentState) loadSiteSettings();
   $("page-breadcrumb").textContent =
-    {products: "KOLEKSI", orders: "PESANAN", settings: "KONTAK WHATSAPP", appearance: "TAMPILAN TOKO", socials: "MEDIA SOSIAL"}[name];
+    {products: "KOLEKSI", orders: "PESANAN", settings: "KONTAK WHATSAPP", appearance: "TAMPILAN TOKO", socials: "MEDIA SOSIAL", promos: "KODE PROMO"}[name];
   document
     .querySelectorAll("[data-page]")
     .forEach((button) =>
@@ -487,7 +489,7 @@ document.addEventListener("change", async (event) => {
 });
 function openOrder(order) {
   $("order-details").innerHTML =
-    `<span class="eyebrow">RINCIAN PESANAN</span><h2 id="order-title">${esc(order.nomor)}</h2><span class="badge new">${statusNames[order.status]}</span><div class="order-info"><div><span>Penerima</span><strong>${esc(order.nama_penerima || order.nama)}</strong></div><div><span>Email / Nomor HP</span><strong>${esc(order.email)} / ${esc(order.nohp)}</strong></div><div><span>Alamat pengiriman</span><strong>${esc(order.alamat)}, ${esc(order.kota)}, ${esc(order.provinsi)} ${esc(order.kodepos)}</strong></div><div><span>Catatan pelanggan</span><strong>${esc(order.catatan) || "Tidak ada catatan"}</strong></div><div><span>Pembayaran</span><strong>Transfer dibantu lewat WhatsApp pembayaran</strong></div></div><div class="order-items">${order.items.map((item) => `<div class="order-item"><img src="${esc(item.gambar)}" alt="${esc(item.nama)}"><div><strong>${esc(item.nama)}</strong><small>${esc([item.ukuran, item.warna].filter(Boolean).join(" / "))} · ${item.jumlah} pcs</small></div><span>${money(item.harga * item.jumlah)}</span></div>`).join("")}</div><div class="order-info"><div><span>Subtotal / Ongkir / Diskon</span><strong>${money(order.subtotal)} / ${money(order.ongkir)} / −${money(order.diskon)}</strong></div></div><div class="order-total">Total ${money(order.total)}</div>`;
+    `<span class="eyebrow">RINCIAN PESANAN</span><h2 id="order-title">${esc(order.nomor)}</h2><span class="badge new">${statusNames[order.status]}</span><div class="order-info"><div><span>Penerima</span><strong>${esc(order.nama_penerima || order.nama)}</strong></div><div><span>Email / Nomor HP</span><strong>${esc(order.email)} / ${esc(order.nohp)}</strong></div><div><span>Alamat pengiriman</span><strong>${esc(order.alamat)}, ${esc(order.kota)}, ${esc(order.provinsi)} ${esc(order.kodepos)}</strong></div><div><span>Catatan pelanggan</span><strong>${esc(order.catatan) || "Tidak ada catatan"}</strong></div><div><span>Pembayaran</span><strong>Transfer dibantu lewat WhatsApp pembayaran</strong></div>${order.promo ? `<div><span>Kode promo / Partner</span><strong>${esc(order.promo.code)}${order.promo.partner ? " / " + esc(order.promo.partner) : ""}</strong></div>` : ""}</div><div class="order-items">${order.items.map((item) => `<div class="order-item"><img src="${esc(item.gambar)}" alt="${esc(item.nama)}"><div><strong>${esc(item.nama)}</strong><small>${esc([item.ukuran, item.warna].filter(Boolean).join(" / "))} · ${item.jumlah} pcs</small></div><span>${money(item.harga * item.jumlah)}</span></div>`).join("")}</div><div class="order-info"><div><span>Subtotal / Ongkir / Diskon</span><strong>${money(order.subtotal)} / ${money(order.ongkir)} / −${money(order.diskon)}</strong></div></div><div class="order-total">Total ${money(order.total)}</div>`;
   $("order-dialog").showModal();
 }
 async function initializePortal() {
@@ -630,4 +632,114 @@ document.addEventListener("change", async event => {
 });
 window.addEventListener("beforeunload", event => {
   if (dirty || siteDirty.images || siteDirty.socials || siteUploading) {event.preventDefault();event.returnValue="";}
+});
+
+// Partner promotions share the store's database and owner session.
+let promoList = [], editingPromo = null, promoSaving = false, promoLoadSerial = 0;
+const promoDate = (seconds) => seconds === null ? "" : new Date(seconds * 1000 + 7 * 3600000).toISOString().slice(0,10);
+function promoState(promo) {
+  const now = Date.now() / 1000;
+  if (!promo.active) return "Nonaktif";
+  if (promo.expires_at !== null && now >= promo.expires_at) return "Kedaluwarsa";
+  if (promo.starts_at !== null && now < promo.starts_at) return "Terjadwal";
+  if (promo.usage_limit !== null && promo.used >= promo.usage_limit) return "Kuota habis";
+  return "Aktif";
+}
+async function loadPromos() {
+  const serial = ++promoLoadSerial;
+  $("promo-list-status").textContent = "Memuat kode promo…";
+  $("refresh-promos").disabled = true;
+  try {
+    const result = await api("/api/admin/promos");
+    if (serial !== promoLoadSerial) return;
+    promoList = result.promos;
+    renderPromos();
+  } catch (error) {
+    if (serial === promoLoadSerial) $("promo-list-status").textContent = error.message + " Tekan Muat ulang untuk mencoba lagi.";
+  } finally {
+    if (serial === promoLoadSerial) $("refresh-promos").disabled = false;
+  }
+}
+function renderPromos() {
+  const query = $("promo-search").value.trim().toLowerCase();
+  const list = promoList.filter(p => (p.code + " " + p.partner).toLowerCase().includes(query));
+  $("promo-list-status").textContent = `${list.length} kode promo${query ? " ditemukan" : " tersimpan"}`;
+  $("promos-empty").hidden = list.length > 0;
+  $("promos-empty").querySelector("h2").textContent = query ? "Kode promo tidak ditemukan." : "Belum ada kode promo.";
+  $("promo-rows").innerHTML = list.map(p => {
+    const state = promoState(p);
+    const dates = [p.starts_at === null ? "Mulai sekarang" : "Mulai " + promoDate(p.starts_at), p.expires_at === null ? "tanpa tanggal akhir" : "s.d. " + promoDate(p.expires_at)].join(" · ");
+    return `<tr><td><strong>${esc(p.code)}</strong><small>${esc(p.partner) || "Promo toko"}</small></td><td data-label="Diskon" class="promo-number"><strong>${p.kind === "percent" ? p.value + "%" : money(p.value)}</strong><small>Min. ${money(p.min_subtotal)}${p.max_discount === null ? "" : " · maks. " + money(p.max_discount)}</small></td><td data-label="Kuota terpakai" class="promo-number">${p.used}${p.usage_limit === null ? " / tanpa batas" : " / " + p.usage_limit}<small>${p.per_customer_limit} kali per akun</small></td><td data-label="Pesanan selesai" class="promo-number">${p.completed}<small>${money(p.completed_sales)}</small></td><td data-label="Status"><span class="badge ${state === "Aktif" ? "published" : ""}">${state}</span><small>${esc(dates)} WIB</small></td><td><div class="row-actions"><button data-edit-promo="${esc(p.code)}" aria-label="Edit promo ${esc(p.code)}">Edit</button></div></td></tr>`;
+  }).join("");
+}
+function updatePromoPreview() {
+  const percent = $("promo-kind").value === "percent";
+  $("promo-value-label").textContent = percent ? "Besar diskon (%)" : "Besar potongan (Rp)";
+  $("promo-value").max = percent ? "100" : "10000000";
+  $("promo-cap-label").hidden = !percent;
+  $("promo-cap").disabled = !percent;
+  const amount = Number($("promo-value").value);
+  const description = percent ? amount + "%" : money(amount);
+  const cap = percent && $("promo-cap").value ? ", maksimal " + money($("promo-cap").value) : "";
+  $("promo-preview").textContent = `Diskon ${description}${cap}, minimal belanja ${money($("promo-min").value)}. ${$("promo-active").checked ? "Berlaku sesuai jadwal dan kuota setelah disimpan." : "Kode belum dapat dipakai sampai diaktifkan."}`;
+}
+function openPromo(promo = null) {
+  editingPromo = promo;
+  $("promo-form").reset();
+  $("promo-title").textContent = promo ? "Edit kode promo" : "Buat kode promo";
+  $("promo-error").textContent = "";
+  const fields = {code:"code",partner:"partner",kind:"kind",value:"value",min:"min_subtotal",cap:"max_discount",limit:"usage_limit",person:"per_customer_limit"};
+  for (const [id,key] of Object.entries(fields)) if (promo) $("promo-"+id).value = promo[key] ?? "";
+  $("promo-code").readOnly = !!promo;
+  $("promo-start").value = promo ? promoDate(promo.starts_at) : "";
+  // Expires_at is exclusive midnight immediately after the chosen last valid date.
+  $("promo-end").value = promo && promo.expires_at !== null ? promoDate(promo.expires_at - 1) : "";
+  $("promo-active").checked = promo?.active || false;
+  updatePromoPreview();
+  $("promo-dialog").showModal();
+}
+function closePromo() { if (!promoSaving) $("promo-dialog").close(); }
+$("add-promo").addEventListener("click", () => openPromo());
+$("refresh-promos").addEventListener("click", loadPromos);
+$("promo-search").addEventListener("input", renderPromos);
+$("close-promo").addEventListener("click", closePromo);
+$("cancel-promo").addEventListener("click", closePromo);
+$("promo-dialog").addEventListener("cancel", event => { if (promoSaving) event.preventDefault(); });
+$("promo-form").addEventListener("input", updatePromoPreview);
+$("promo-rows").addEventListener("click", event => {
+  const button = event.target.closest("[data-edit-promo]");
+  if (button) openPromo(promoList.find(p => p.code === button.dataset.editPromo));
+});
+$("promo-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (promoSaving) return;
+  const integer = (id, optional = false) => $(id).value === "" && optional ? null : Number($(id).value);
+  const date = (id, end = false) => !$(id).value ? null : Math.floor(Date.parse($(id).value + "T00:00:00+07:00") / 1000) + (end ? 86400 : 0);
+  const payload = {
+    code: $("promo-code").value.trim().toUpperCase(), partner: $("promo-partner").value.trim(),
+    kind: $("promo-kind").value, value: integer("promo-value"), min_subtotal: integer("promo-min"),
+    max_discount: $("promo-kind").value === "percent" ? integer("promo-cap",true) : null,
+    starts_at: date("promo-start"), expires_at: date("promo-end",true),
+    usage_limit: integer("promo-limit",true), per_customer_limit: integer("promo-person"),
+    active: $("promo-active").checked, version: editingPromo?.version || "0"
+  };
+  promoSaving = true;
+  $("promo-error").textContent = "";
+  const controls = [...$("promo-form").querySelectorAll("input,select,button")];
+  const disabled = controls.map(control => control.disabled);
+  controls.forEach(control => control.disabled = true);
+  $("save-promo").textContent = "Menyimpan…";
+  try {
+    await api("/api/admin/promos" + (editingPromo ? "/" + encodeURIComponent(editingPromo.code) : ""), {method: editingPromo ? "PUT" : "POST", body: payload});
+    $("promo-dialog").close();
+    message("Kode promo " + payload.code + " tersimpan" + (payload.active ? "." : " sebagai nonaktif."));
+    await loadPromos();
+  } catch (error) {
+    $("promo-error").textContent = error.message;
+    $("promo-error").focus();
+  } finally {
+    promoSaving = false;
+    controls.forEach((control,index) => control.disabled = disabled[index]);
+    $("save-promo").textContent = "Simpan kode promo";
+  }
 });
