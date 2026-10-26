@@ -4,7 +4,15 @@ The user's visual reference is a dark editorial fashion campaign: full-screen ph
 
 ## Design tools
 
-Reviewed with [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) at commit `56ea9cf174ed86786187daa9de0e6247cb0747e4`. The skill and its searchable local dataset are checked out at `/workspace/library-files/ui-ux-pro-max-skill` in the cloud environment. This is a local tool checkout, not a runtime website dependency or a global plugin installation.
+The project installs [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) for Codex at [`.agents/skills/ui-ux-pro-max/SKILL.md`](../.agents/skills/ui-ux-pro-max/SKILL.md), including its local datasets and Python search scripts. Installed with the official `ui-ux-pro-max-cli` version **2.15.0**. Its installer also includes the companion skills `banner-design`, `brand`, `design`, `design-system`, `slides` and `ui-styling`. Existing taste-skill and sharp-edges installations are preserved. These are project tools, excluded from Vercel builds, with no website runtime dependency or global installation.
+
+Reproduce the installation from the repository root (Python 3 is already available in the cloud workspace):
+
+```sh
+npx --yes --package=ui-ux-pro-max-cli@2.15.0 uipro init --ai codex
+```
+
+The installer recommends restarting the coding assistant so the new skills are discovered. Installation was verified by running the local search against `mobile responsive` in the `ux` domain and receiving a result from `ux-guidelines.csv`. This installation does not redesign the storefront. The earlier design review used upstream commit `56ea9cf174ed86786187daa9de0e6247cb0747e4` from the separate library checkout.
 
 The public interface uses plain HTML, CSS and JavaScript; the owner dashboard and shared API use Flask, with PostgreSQL/private Supabase Storage for Vercel or SQLite/local photos for development. Do not add a framework or Tailwind solely because a skill supports it. Search recommendations supplement the user's reference; they do not replace it. The broad luxury-commerce search returned an Apple-specific Liquid Glass style that does not fit this site, so it was rejected. Targeted minimalism and web accessibility guidance was used instead.
 
@@ -13,9 +21,9 @@ The canonical owner UI now lives in `admin-portal/templates/index.html` and `adm
 Useful searches from this review:
 
 ```sh
-python3 /workspace/library-files/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max/scripts/search.py "minimalism editorial monochrome" --domain style
-python3 /workspace/library-files/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max/scripts/search.py "touch target size spacing" --domain ux
-python3 /workspace/library-files/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max/scripts/search.py "keyboard tab navigation" --domain ux
+python3 .agents/skills/ui-ux-pro-max/scripts/search.py "minimalism editorial monochrome" --domain style
+python3 .agents/skills/ui-ux-pro-max/scripts/search.py "touch target size spacing" --domain ux
+python3 .agents/skills/ui-ux-pro-max/scripts/search.py "keyboard tab navigation" --domain ux
 ```
 
 ## Implementation decisions
