@@ -1443,6 +1443,24 @@ p {
 .campaign-selectors button[aria-current="true"]::after, .campaign-selectors button:hover::after { opacity: 1; }
 .campaign-arrows[hidden], .campaign-pagination[hidden] { display: none; }
 .campaign-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* Layered scrolling enhances the existing photo; its frame and controls stay put. */
+@media (min-width: 761px) and (min-height: 600px) and (prefers-reduced-motion: no-preference) {
+  .campaign-parallax #campaign-image,
+  .campaign-parallax .campaign-image-outgoing {
+    transform: translate3d(0, var(--campaign-photo-shift, 0px), 0);
+  }
+  .campaign-parallax .campaign-copy {
+    transform: translate3d(0, var(--campaign-copy-shift, 0px), 0);
+  }
+  .campaign-parallax.campaign-parallax-visible #campaign-image,
+  .campaign-parallax.campaign-parallax-visible .campaign-image-outgoing,
+  .campaign-parallax.campaign-parallax-visible .campaign-copy {
+    will-change: transform;
+  }
+  .campaign-parallax .campaign-copy:focus-within {
+    transform: none;
+  }
+}
 @media (max-width: 760px) {
   .campaign-arrow { width: 44px; height: 60px; padding: 10px; background: #15140e38; }
   .campaign-arrow svg { width: 20px; height: 34px; }
