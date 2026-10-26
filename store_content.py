@@ -9,11 +9,11 @@ from urllib.parse import urlsplit
 from flask import jsonify
 
 CAMPAIGNS = [
-    dict(id='campaign_archive', name='The Archive', heading=['The Archive.', 'Worn your way.'], description='Fashion, sneakers, dan pilihan sehari-hari. Temukan yang terasa seperti kamu.', href='produk.html?kategori=apparel'),
-    dict(id='campaign_after_hours', name='After Hours', heading=['After hours.', 'Always in style.'], description='Warna hangat, siluet tenang. Pilihan untuk rencana yang tak perlu terburu-buru.', href='produk.html?kategori=apparel'),
-    dict(id='campaign_city', name='City Uniform', heading=['City uniform.', 'Your own rhythm.'], description='Lapisan ringan dan sneakers favorit. Bergerak nyaman, dari pagi sampai nanti.', href='produk.html?kategori=sneakers'),
-    dict(id='campaign_soft_form', name='Soft Form', heading=['Soft form.', 'Quiet confidence.'], description='Tekstur lembut dan potongan yang mengalir. Detail kecil yang terasa berbeda.', href='produk.html?kategori=apparel'),
-    dict(id='campaign_objects', name='Everyday Objects', heading=['Everyday objects.', 'Well chosen.'], description='Sneakers, tas, dan pelengkap sehari-hari. Sedikit pilihan, banyak kemungkinan.', href='produk.html?kategori=essentials'),
+    dict(id='campaign_archive', name='The Archive', heading=['Gaya pilihan.', 'Untuk harimu.'], description='Belanja sneakers, pakaian, dan aksesori pilihan. Temukan yang sesuai dengan gayamu.', href='produk.html?kategori=apparel'),
+    dict(id='campaign_after_hours', name='After Hours', heading=['Gaya santai.', 'Tetap rapi.'], description='Jelajahi pilihan pakaian untuk aktivitas santai dan gaya sehari-hari.', href='produk.html?kategori=apparel'),
+    dict(id='campaign_city', name='City Uniform', heading=['Pilihan sneakers.', 'Untuk gayamu.'], description='Lihat pilihan sneakers dan padukan dengan pakaian favoritmu.', href='produk.html?kategori=sneakers'),
+    dict(id='campaign_soft_form', name='Soft Form', heading=['Tampil simpel.', 'Tetap menarik.'], description='Temukan model pakaian yang cocok untuk beragam gaya dan kesempatan.', href='produk.html?kategori=apparel'),
+    dict(id='campaign_objects', name='Everyday Objects', heading=['Lengkapi gaya.', 'Sesukamu.'], description='Jelajahi tas, aksesori, dan pilihan pelengkap kebutuhan harian.', href='produk.html?kategori=essentials'),
 ]
 IMAGE_SLOTS = {
     'campaign_archive': ('Slider 1 · The Archive', 'assets/archive-campaign.webp', 'Dua model mengenakan jaket suede cokelat di lounge bernuansa kayu gelap.', 90),
@@ -23,7 +23,7 @@ IMAGE_SLOTS = {
     'campaign_objects': ('Slider 5 · Everyday Objects', 'assets/campaign-everyday-objects.webp', 'Sneakers suede putih, kemeja oatmeal terlipat, dan tas kulit cokelat pada plinth walnut.', 84),
     'category_sneakers': ('Kategori · Sneakers', 'assets/shoe-3.png', 'Sneaker biru dan hitam', 50),
     'category_apparel': ('Kategori · Apparel', 'assets/shirt.png', 'Kaos hitam essential', 50),
-    'reseller_banner': ('Banner · Good taste. Shared.', 'assets/archive-campaign.webp', 'Detail layer suede dari kampanye Archive', 80),
+    'reseller_banner': ('Banner · Cara belanja Anredseller', 'assets/archive-campaign.webp', 'Detail layer suede dari kampanye Archive', 80),
     'account_editorial': ('Halaman · Akun pembeli', 'assets/archive-campaign.webp', 'Kampanye fashion Anredseller', 69),
 }
 SOCIALS = {
