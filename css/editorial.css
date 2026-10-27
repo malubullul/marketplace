@@ -1582,3 +1582,162 @@ p {
 /* Dock CS in the footer's reserved space so it cannot cover its title or social links. */
 .store-footer { position: relative; }
 .support-launcher.support-docked { position: absolute; bottom: 24px; right: var(--page-gutter); }
+
+/* Anredseller / Noir. Photographs carry the colour; the interface stays neutral. */
+:root {
+  color-scheme: dark;
+  --paper: #101210;
+  --surface: #191c19;
+  --surface-raised: #252925;
+  --surface-hover: #30362f;
+  --ink: #efeee7;
+  --muted: #b8bcb2;
+  --stone: var(--surface);
+  --line: #373f36;
+  --control: #778370;
+  --olive: #e5e4d8;
+  --action-ink: #131610;
+  --action-hover: #faf9ef;
+  --on-photo: #f5f4ed;
+  --photo-mat: #e6e7e0;
+  --positive: #b2d7b3;
+  --positive-surface: #203023;
+  --negative: #ffb0a6;
+  --negative-surface: #382422;
+  --warning: #e9cea1;
+  --warning-surface: #322c20;
+  --putih: var(--paper);
+  --hitam: var(--olive);
+  --hitam-hover: var(--action-hover);
+  --teks-hitam: var(--ink);
+  --teks-gelap: var(--ink);
+  --teks-sedang: var(--muted);
+  --text-secondary: var(--muted);
+  --abu-teks: var(--muted);
+  --abu-muda: var(--surface);
+  --abu-ringan: var(--surface-raised);
+  --abu-border: var(--line);
+  --aksen: var(--olive);
+  --aksen-hover: var(--action-hover);
+  --aksen-muda: var(--surface-raised);
+  --aksen-muda2: var(--surface);
+  --merah: var(--negative);
+  --hijau: var(--positive);
+  --bintang: var(--warning);
+  --biru: var(--ink);
+}
+body { background: var(--paper); color: var(--ink); }
+::selection { background: var(--olive); color: var(--action-ink); }
+:focus-visible { outline-color: var(--olive); }
+input, select, textarea { color: var(--ink); accent-color: var(--olive); }
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
+select option { background: var(--surface); color: var(--ink); }
+input:autofill { color: var(--ink); background: var(--surface-raised); }
+input:-webkit-autofill { -webkit-text-fill-color: var(--ink); box-shadow: 0 0 0 1000px var(--surface-raised) inset; }
+.announcement, .account-page .announcement { background: var(--paper); color: var(--muted); }
+.store-header, .store-header-inner, .store-footer { background: var(--paper); color: var(--ink); }
+.store-subnav { background: var(--surface); color: var(--muted); }
+.store-subnav a:last-child, .account-page .sale-link { color: var(--ink); }
+.desktop-nav.mobile-open, .archive-home .desktop-nav.mobile-open { background: var(--surface); color: var(--ink); }
+.archive-home .store-header, .archive-home .store-header-inner { background: transparent; }
+.archive-home .wordmark, .archive-home .store-actions, .archive-home .mobile-menu { color: var(--on-photo); }
+.archive-home .campaign h1, .archive-home .campaign p { color: var(--on-photo); }
+.solid-link, .btn-checkout, .btn-lanjut-checkout, .btn-beli-sekarang,
+.btn-keranjang-cepat, .account-button.primary, .whatsapp-action,
+.review-submit, .promo-entry-controls button, .newsletter-edit button,
+.transaction-actions button.primary, .support-launcher {
+  background: var(--olive); color: var(--action-ink); border-color: var(--olive);
+}
+.solid-link:hover, .archive-home .campaign .solid-link:hover, .btn-checkout:hover,
+.btn-lanjut-checkout:hover, .btn-beli-sekarang:hover, .btn-keranjang-cepat:hover,
+.account-button.primary:hover, .whatsapp-action:hover, .review-submit:hover,
+.promo-entry-controls button:hover, .support-launcher:hover {
+  background: var(--action-hover); color: var(--action-ink);
+}
+.archive-home .campaign .solid-link { background: var(--olive); color: var(--action-ink); }
+.collection-tabs button { background: var(--surface-raised); color: var(--ink); }
+.collection-tabs button.selected { background: var(--olive); color: var(--action-ink); }
+.collection-tabs button:hover:not(.selected) { background: var(--surface-hover); }
+.kartu-produk-gambar, .kartu-produk:nth-child(3n + 2) .kartu-produk-gambar,
+.kartu-produk:nth-child(3n) .kartu-produk-gambar, .detail-galeri .galeri-utama { background: var(--photo-mat); }
+.kartu-label, .btn-wishlist { background: var(--surface); color: var(--ink); }
+.btn-wishlist.aktif { background: var(--olive); color: var(--action-ink); }
+.btn-keranjang-cepat:disabled, .whatsapp-action[aria-disabled="true"] { background: var(--surface-hover); color: var(--muted); }
+.product-photo-arrow { color: var(--ink); }
+.product-photo-arrow::before { background: var(--surface); }
+.editorial-card, .sneakers-edit, .apparel-edit { background-color: var(--surface); }
+.editorial-card h3, .editorial-card p { color: var(--ink); }
+.reseller-banner, .reseller-content { background: var(--surface); color: var(--ink); }
+.reseller-content h2 { max-width: none; font-size: clamp(32px, 3.4vw, 50px); }
+.reseller-content p { color: var(--muted); }
+.reseller-content .solid-link { background: var(--olive); color: var(--action-ink); }
+.newsletter-edit, .newsletter-edit form > div { background: var(--surface); color: var(--ink); }
+.newsletter-edit label, .newsletter-edit input { background: transparent; color: var(--ink); }
+.footer-top nav h3, .footer-bottom, .footer-top p { color: var(--muted); }
+.page-banner, .filter-kartu { background: var(--surface); color: var(--ink); }
+.page-banner p, .page-banner .breadcrumb, .page-banner .breadcrumb *,
+.breadcrumb, .breadcrumb a, .breadcrumb span, .toolbar-info { color: var(--muted) !important; }
+.filter-checkbox-item, .filter-range-nilai, .filter-range-nilai span,
+.detail-deskripsi-singkat, .tab-konten, .tab-btn, .tabel-spek td:last-child { color: var(--muted); }
+.tab-btn.aktif { color: var(--ink); border-color: var(--olive); }
+.product-options select, .form-input, .form-select, .form-textarea,
+.account-page input, .account-page select, .account-page textarea,
+.product-review-form textarea, .promo-entry input { background: var(--surface); color: var(--ink); border-color: var(--control); }
+.btn-tambah-keranjang-detail, .account-button.secondary, .review-secondary,
+.transaction-actions button.secondary { background: transparent; color: var(--ink); border-color: var(--control); }
+.btn-tambah-keranjang-detail:hover, .account-button.secondary:hover, .review-secondary:hover { background: var(--surface-raised); color: var(--ink); }
+.qty-input, .qty-btn, .keranjang-qty { color: var(--ink); background: var(--surface); border-color: var(--control); }
+.qty-btn:hover, .keranjang-qty button:hover { background: var(--surface-raised); }
+.keranjang-item, .checkout-kartu, .order-confirmation .konfirmasi-detail,
+.account-dialog, .store-dialog, .support-dialog { background: var(--surface); color: var(--ink); }
+.ringkasan-order, .customer-sidebar, .account-auth-layout, .account-card,
+.address-card, .customer-order-card, .account-empty, .account-security,
+.product-review-form, .transaction-panel { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.ringkasan-order .ringkasan-total { border-color: var(--line); }
+.account-card input, .account-page input[readonly] { background: var(--surface-raised); color: var(--ink); }
+.account-page input[readonly] { color: var(--muted); }
+.account-page small, .account-loading, .auth-help, .customer-page-heading p,
+.password-card p, .account-section-note, .account-section-heading p,
+.address-card > p, .account-empty p, .customer-greeting small,
+.account-receipt-row > span, .account-security > p, .recovery-description,
+.auth-tabs button:not(.selected), .payment-note, .payment-next-step .payment-note,
+.order-confirmation .konfirmasi-sub, .password-toggle { color: var(--muted); }
+.auth-tabs button.selected { color: var(--ink); border-color: var(--olive); }
+.customer-menu button.active, .customer-menu button:hover, .customer-menu a:hover,
+.customer-avatar, .customer-menu button > span { background: var(--surface-raised); color: var(--ink); }
+.account-badge, .account-message, .recovery-success, .review-success { color: var(--positive); }
+.account-badge, .account-message, .checkout-notice { background: var(--positive-surface); color: var(--positive); border-color: var(--line); }
+.account-message.error { background: var(--negative-surface); color: var(--negative); border-color: var(--negative); }
+.auth-text-action, .account-empty a, .support-inline, .transaction-panel [data-order-action="refresh"],
+.review-note a, .auth-methods dt, .auth-methods dd { color: var(--ink); }
+.customer-logout, .address-actions .delete, .account-error, .review-error,
+.promo-entry p.promo-error, #checkout-error, .transaction-panel .transaction-result { color: var(--negative); }
+.account-editorial { background-color: var(--surface); }
+.account-editorial h1, .account-editorial h2, .account-editorial p { color: var(--on-photo); }
+.buyer-reviews { color: var(--ink); }
+.product-rating-line, .review-note, .review-empty, .review-summary small,
+.buyer-review small, #review-privacy, .buyer-review-heading > span,
+.buyer-review-rating time { color: var(--muted); }
+.buyer-review, .support-payment-note { border-color: var(--line); }
+.rating-option { background: var(--surface-raised); color: var(--muted); }
+.rating-option.selected { background: var(--warning-surface); color: var(--warning); }
+.detail-harga-badge, .badge-diskon { background: var(--negative-surface); color: var(--negative); }
+.account-dialog::backdrop, .store-dialog::backdrop, .support-dialog::backdrop { background: #000a; }
+.toast { background: var(--ink); color: var(--action-ink); }
+@media(max-width:760px) {
+  .archive-home .store-header, .archive-home .store-header-inner { background: var(--paper); }
+  .archive-home .campaign { background-color: var(--paper); }
+}
+/* Roles also override the older page-scoped variables, never the photographs. */
+.cart-page, .checkout-page, #detail-wrapper { --abu-teks: var(--muted); --merah: var(--negative); }
+.archive-home .store-header-inner > .wordmark,
+.campaign-pagination, .campaign-counter, .campaign-counter span { color: var(--on-photo); }
+.page-banner .breadcrumb span, .page-banner .breadcrumb a { color: var(--muted) !important; }
+.account-page .skip-link, .skip-link { background: var(--olive); color: var(--action-ink); }
+.badge-keranjang { background: var(--olive); color: var(--action-ink); }
+.checkout-saved-address { background: var(--surface-raised); border-color: var(--line); }
+.editorial-card, .sneakers-edit, .apparel-edit { background: var(--photo-mat); }
+.editorial-card h3, .editorial-card p, .editorial-card .editorial-label { color: var(--action-ink); }
+.editorial-card > img, .kartu-produk-gambar img, .galeri-utama img, .wishlist-list img { mix-blend-mode: normal; }
+.round-arrow { background: var(--surface); color: var(--ink); }
+.store-actions .badge-keranjang { background: var(--olive); color: var(--action-ink); }

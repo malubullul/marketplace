@@ -1661,3 +1661,74 @@ th:nth-child(3) {
   #promos-page .table-wrap td:first-child, #promos-page .table-wrap td:last-child { grid-column: 1/-1; }
   #promos-page .table-wrap td[data-label]::before { content: attr(data-label); display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
 }
+
+/* Anredseller / Noir owner workspace: flat charcoal surfaces, ivory actions. */
+:root {
+  color-scheme: dark;
+  --paper: #101210;
+  --surface: #191c19;
+  --raised: #252925;
+  --ink: #efeee7;
+  --muted: #b8bcb2;
+  --line: #373f36;
+  --control: #778370;
+  --green: #e5e4d8;
+  --on-action: #131610;
+  --action-hover: #faf9ef;
+  --error: #ffb0a6;
+  --negative-bg: #382422;
+  --positive: #b2d7b3;
+  --positive-bg: #203023;
+  --warning: #e9cea1;
+  --warning-bg: #322c20;
+}
+body, .sidebar { background: var(--paper); color: var(--ink); }
+.admin-main, .login-panel, .login-content, .order-dialog, .editor-dialog,
+.editor-footer, .editor-header, .contacts-form, .site-settings-sheet { background: var(--surface); color: var(--ink); }
+.admin-main { border-color: var(--line); border-radius: 12px; }
+.sidebar .nav-button { color: var(--muted); }
+.sidebar .nav-button.active, .sidebar .nav-button:hover { background: var(--raised); color: var(--ink); }
+.nav-button span, .stats, .preview-card, .publish-note, .editor-note,
+.photo-item, .upload-zone, .site-photo-preview, .promo-preview { background: var(--raised); color: var(--ink); }
+.sidebar-label, .sidebar-bottom > span, .page-heading p,
+.login-content > small, .back-link, .table-note, .form-section small,
+.contact-setting p, .contact-setting small, .settings-save-row p,
+.site-other-social p, .site-focus-control, .settings-inline-note,
+.photo-count, .editor-footer > span, .site-photo-preview { color: var(--muted); }
+.button.primary { background: var(--green); border-color: var(--green); color: var(--on-action); }
+.button.primary:hover { background: var(--action-hover); color: var(--on-action); }
+.button.secondary, .row-actions button, .settings-text-link, .photo-actions button { color: var(--ink); background: transparent; border-color: var(--control); }
+.button.secondary:hover, .row-actions button:hover, .photo-actions button:hover { background: var(--raised); }
+input, select, textarea, .search-field, .order-status-select {
+  background: var(--paper); color: var(--ink); border-color: var(--control); accent-color: var(--green);
+}
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
+input[readonly], input:disabled, select:disabled { background: var(--raised); color: var(--muted); }
+select option { background: var(--surface); color: var(--ink); }
+input:-webkit-autofill { -webkit-text-fill-color: var(--ink); box-shadow: 0 0 0 1000px var(--raised) inset; }
+:focus-visible { outline-color: var(--green); }
+::selection { background: var(--green); color: var(--on-action); }
+.table-wrap, th, td, .form-section, .order-info > div, .order-items,
+.contact-setting + .contact-setting, .editor-aside, .size-stock-editor, .size-stock-row,
+.site-photo-setting, .site-other-social, .order-total { border-color: var(--line); }
+th, .order-meta, .order-info span, .order-item small { color: var(--muted); background: transparent; }
+.table-wrap tr, .table-wrap tbody tr:hover { background: transparent; }
+.badge { background: var(--raised); color: var(--muted); }
+.badge.published, .badge.new, .notice, .message:not(.error), .payment-confirmation {
+  background: var(--positive-bg); color: var(--positive); border-color: var(--line);
+}
+.badge.low { background: var(--warning-bg); color: var(--warning); }
+.notice code { color: var(--positive); }
+.error, .payment-result, #activity-error, .size-remove,
+.row-actions .delete-product, .photo-actions button[data-remove-photo] { color: var(--error); }
+.error-summary { background: var(--negative-bg); border-color: var(--error); }
+.cover-tag { background: var(--ink); color: var(--on-action); }
+.settings-text-link:disabled { color: var(--muted); }
+.login-editorial { color: var(--ink); }
+.login-editorial h1, .login-editorial p { color: #f5f4ed; }
+.order-dialog::backdrop, .editor-dialog::backdrop { background: #000a; backdrop-filter: none; }
+.table-wrap { background: var(--surface); }
+.editor-aside { background: var(--raised); }
+label > span { color: var(--error); }
+.editor-photos { background: var(--raised); border-color: var(--line); }
+.editor-photos h3 > span { color: var(--error); }

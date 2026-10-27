@@ -30,7 +30,7 @@ python3 .agents/skills/ui-ux-pro-max/scripts/search.py "keyboard tab navigation"
 
 ## Implementation decisions
 
-- Keep the dark campaign and warm ivory catalog. Use `--text-secondary` for readable catalog metadata and secondary prices.
+- Use the [black editorial theme](BLACK_THEME.md): near-black ground, charcoal panels, readable ivory text and inverted primary actions. Photos retain their original colours; light photo mats keep black clothing visible. `--text-secondary` provides readable metadata and secondary prices.
 - Prefer 44px web controls for comfortable touch use. WCAG's web minimum is 24 CSS px with applicable exceptions; do not confuse native pt/dp units with CSS pixels.
 - Keep small outline icons inside larger hit areas. On narrow screens, expose wishlist through the menu so the wordmark and header actions do not overlap.
 - Product names and prices remain readable in the two-column mobile grid. Do not shrink them to fit a single line.
@@ -50,13 +50,13 @@ Run `python3 tests/responsive_smoke.py` with Playwright and Chromium installed. 
 
 ## Customer accounts
 
-Keep account pages consistent with the cream/olive storefront rather than replacing the approved editorial direction with a generated generic ecommerce palette. The customer account page provides login/registration, profile, addresses, orders and wishlist. Use visible form labels, native autocomplete, minimum 44px controls, contextual errors and explicit loading feedback. Public catalog browsing remains anonymous; customer state and checkout require sign-in. Show order status as supplied by the backend, not as proof of payment. Never display another account's cached profile, cart or receipt after account switching or logout.
+Keep account pages consistent with the black/charcoal/ivory storefront, including inputs, readonly states, errors and recovery flows. The customer account page provides login/registration, profile, addresses, orders and wishlist. Use visible form labels, native autocomplete, minimum 44px controls, contextual errors and explicit loading feedback. Public catalog browsing remains anonymous; customer state and checkout require sign-in. Show order status as supplied by the backend, not as proof of payment. Never display another account's cached profile, cart or receipt after account switching or logout.
 
 ## Editorial polish with taste-skill
 
-The current visual layer is `css/editorial.css`, loaded after legacy styles on every public page. It shares locally hosted Switzer type, stone/olive tokens, clear product metadata and SVG wishlist controls. The existing Archive campaign and portrait phone framing remain. Mobile catalogue filters use a disclosure; without JavaScript the filters remain visible.
+The current visual layer is `css/editorial.css`, loaded after legacy styles on every public page. It shares locally hosted Switzer type, semantic black/charcoal/ivory tokens, clear product metadata and SVG wishlist controls. The existing Archive campaign and portrait phone framing remain. Mobile catalogue filters use a disclosure; without JavaScript the filters remain visible.
 
-The canonical admin stylesheet uses the same fonts, with a light frame, white work area and compact product rows. Font routes are limited to the three bundled WOFF2 files. Tooling under `.agents/` and generated inspection artifacts are excluded from the Vercel deployment.
+The canonical admin stylesheet uses the same fonts with a dark frame, charcoal work area, ivory actions and compact product rows. Font routes are limited to the three bundled WOFF2 files. Tooling under `.agents/` and generated inspection artifacts are excluded from the Vercel deployment.
 
 See [design direction, screenshot critique and verification](DESIGN_POLISH.md), [installed skill](../.agents/skills/design-taste-frontend/SKILL.md), and [asset provenance](../assets/SOURCES.md).
 

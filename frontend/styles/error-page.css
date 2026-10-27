@@ -24,20 +24,20 @@
 }
 
 :root {
-  color-scheme: light;
-  --background: #f5f6f3;
-  --foreground: #252a23;
-  --muted-foreground: #62665c;
-  --primary: #35402f;
-  --primary-foreground: #f5f6f3;
-  --secondary: #e8e9e2;
-  --secondary-foreground: #252a23;
-  --accent: #e8e9e2;
-  --accent-foreground: #252a23;
-  --destructive: #aa302c;
-  --destructive-foreground: #ffffff;
-  --input: #7a8372;
-  --ring: #35402f;
+  color-scheme: dark;
+  --background: #101210;
+  --foreground: #efeee7;
+  --muted-foreground: #b8bcb2;
+  --primary: #e5e4d8;
+  --primary-foreground: #131610;
+  --secondary: #252925;
+  --secondary-foreground: #efeee7;
+  --accent: #252925;
+  --accent-foreground: #efeee7;
+  --destructive: #ffb0a6;
+  --destructive-foreground: #131610;
+  --input: #778370;
+  --ring: #e5e4d8;
 }
 
 @theme inline {

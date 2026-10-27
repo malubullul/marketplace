@@ -1,6 +1,6 @@
 # Anredseller
 
-A fashion storefront with a separate owner dashboard, persistent product catalog, photo uploads and manual order management. The public design uses a full-screen fashion campaign, transparent navigation and an editorial serif wordmark.
+A fashion storefront with a separate owner dashboard, persistent product catalog, photo uploads and manual order management. The public design uses a full-screen fashion campaign, transparent navigation, an editorial serif wordmark and a [black/charcoal theme](docs/BLACK_THEME.md) with ivory actions across the storefront and owner portal.
 
 ## One store, separate owner and buyer accounts
 
