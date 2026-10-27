@@ -1,4 +1,4 @@
-const paymentLabels = {pending: "Menunggu transfer", reported: "Transfer dilaporkan · menunggu pemeriksaan", verified: "Pembayaran terverifikasi", unrecorded: "Riwayat verifikasi belum tercatat"};
+const paymentLabels = {pending: "Menunggu transfer", reported: "Transfer dilaporkan · menunggu pemeriksaan", verified: "Sudah dibayar", unrecorded: "Riwayat verifikasi belum tercatat"};
 function orderPaymentText(order) {
   if (order.status === "dibatalkan") return "Pesanan dibatalkan · pembayaran ditutup";
   return paymentLabels[order.payment?.status || (order.status === "baru" ? "pending" : "unrecorded")];

@@ -73,28 +73,37 @@ def main():
                 buyer.locator('[data-order-action=payment]').click();buyer.get_by_text('Transfer dilaporkan · menunggu pemeriksaan',exact=False).first.wait_for()
                 assert buyer.locator('[data-order-action=cancel]').count()==0
                 owner.set_viewport_size({'width':1440,'height':1000});owner.locator('[data-page=orders]').click();owner.locator('#refresh-orders').click()
-                owner.locator('[data-order="'+number+'"]').click();owner.locator('#payment-reference').fill('Fixture PRIVATE bank reference')
+                owner.locator('[data-order="'+number+'"]').click()
+                owner.get_by_text('Tambah catatan (opsional)',exact=True).click()
+                owner.locator('#payment-reference').fill('Fixture PRIVATE bank reference')
                 for width,height in [(320,568),(390,844),(768,1024),(1440,1000),(844,390)]:
                     owner.set_viewport_size({'width':width,'height':height});assert_layout(owner,'payment dialog '+str(width),checks)
                     owner.screenshot(path=str(shots/f'payment-{width}.png'))
-                owner.once('dialog',lambda dialog:dialog.accept());owner.locator('[data-payment-action=verify]').click()
-                owner.get_by_role('heading',name='Pembayaran terverifikasi',exact=True).wait_for()
+                owner.get_by_role('button',name='Tandai sudah dibayar',exact=True).click()
+                for width,height in [(320,568),(390,844),(768,1024),(1440,1000),(844,390)]:
+                    owner.set_viewport_size({'width':width,'height':height});assert_layout(owner,'payment confirmation '+str(width),checks)
+                    owner.locator('[data-payment-confirm]').scroll_into_view_if_needed()
+                    owner.screenshot(path=str(shots/f'confirmation-{width}.png'))
+                owner.get_by_role('button',name='Konfirmasi',exact=True).click()
+                owner.get_by_role('heading',name='Sudah dibayar',exact=True).wait_for()
+                record=owner.request.get(admin+'/api/admin/orders/'+number+'/history').json()['payment_record']
+                assert record['reference']=='Fixture PRIVATE bank reference' and record['verified_by'] and record['verified_at']
+
                 owner.locator('#close-order').click()
                 for status in ['diproses','dikirim','selesai']:
-                    if status=='diproses':owner.once('dialog',lambda dialog:dialog.accept())
                     owner.locator('[data-order-status="'+number+'"]').select_option(status)
                     owner.wait_for_function('(status)=>orders.some(order=>order.status===status)',arg=status)
                 receipt=buyer.request.get(base+'/api/customer/orders/'+number).json()['order']
                 assert receipt['status']=='selesai' and receipt['payment']['status']=='verified'
                 assert 'PRIVATE' not in json.dumps(receipt) and 'verified_by' not in json.dumps(receipt)
-                owner.locator('[data-page=activity]').click();owner.locator('#activity-list').get_by_text('Pembayaran diverifikasi',exact=True).wait_for()
+                owner.locator('[data-page=activity]').click();owner.locator('#activity-list').get_by_text('Pembayaran ditandai sudah dibayar',exact=True).wait_for()
                 assert_layout(owner,'activity',checks);owner.screenshot(path=str(shots/'activity.png'),full_page=True)
                 first=owner.request.get(admin+'/api/admin/activity?limit=1').json()
                 second=owner.request.get(admin+'/api/admin/activity?limit=1&cursor='+first['next_cursor']).json()
                 assert len(first['events'])==1 and first['events'][0]['id']!=second['events'][0]['id']
                 buyer.goto(base+'/akun.html#orders',wait_until='networkidle')
                 buyer.locator('[data-customer-order="'+number+'"]').click()
-                buyer.get_by_text('Pembayaran terverifikasi',exact=True).wait_for()
+                buyer.get_by_text('Sudah dibayar',exact=True).wait_for()
                 assert buyer.locator('[data-order-action=cancel]').count()==0
                 buyer.locator('#close-customer-order').click()
                 buyer.evaluate("id=>customerRequest('/cart',{method:'POST',body:{action:'add',id,jumlah:1}})",product['id'])

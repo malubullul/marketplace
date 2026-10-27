@@ -5,8 +5,8 @@ Perubahan ini memisahkan status pembayaran dari pemenuhan pesanan, menambahkan p
 ## Pemilik: memeriksa pembayaran dan pesanan
 
 1. Buka **Pesanan masuk → Lihat rincian**. Pembeli dapat menekan **Sudah transfer**, tetapi laporan itu belum menyatakan pembayaran lunas.
-2. Cocokkan nominal dan referensi dengan mutasi rekening. Isi **Referensi pemeriksaan (hanya admin)** lalu tekan **Verifikasi pembayaran**. Identitas pemilik, waktu, dan referensi pemeriksaan disimpan oleh server; referensi dan identitas pemeriksa tidak dikirim ke pembeli.
-3. Setelah pembayaran terverifikasi, status hanya dapat maju **Baru → Diproses → Dikirim → Selesai**. Pembeli melihat status pembayaran dan pemenuhan secara terpisah. Rating tetap mensyaratkan pesanan selesai.
+2. Cek uang masuk dan nominalnya di mutasi rekening. Tekan **Tandai sudah dibayar**, periksa nomor pesanan dan total pada panel, lalu tekan **Konfirmasi**. Tombol **Batal** menutup panel tanpa mengubah pembayaran. Tidak wajib mengisi referensi: **Tambah catatan (opsional)** hanya dipakai bila diperlukan, maksimal 160 karakter. Identitas admin dan waktu konfirmasi selalu dicatat otomatis oleh server; catatan serta identitas admin hanya terlihat di area pemilik.
+3. Setelah pembayaran berstatus **Sudah dibayar**, pesanan baru ditandai **siap diproses**. Pada daftar Pesanan masuk, status hanya dapat maju **Baru → Diproses → Dikirim → Selesai**. Pembeli melihat status pembayaran dan pemenuhan secara terpisah. Menandai pembayaran tidak langsung menyatakan barang sudah dikirim atau selesai. Rating tetap mensyaratkan pesanan selesai.
 4. **Tolak laporan transfer** mengembalikan pembayaran ke menunggu transfer dan memberikan jendela pembayaran penuh yang baru. Gunakan hanya sesudah pemeriksaan. **Tahan pembatalan otomatis** melindungi pesanan selama pemeriksaan; melepas penahanan juga memberikan jendela baru.
 
 Pesanan yang sudah dibayar, dilaporkan transfer, ditahan, dikirim, atau selesai tidak dapat dibatalkan melalui pembatalan biasa. Refund/retur memerlukan penanganan CS dan termasuk tahap 02; jangan mengubah catatan pembayaran hanya untuk mengembalikan stok. Pembeli hanya dapat membatalkan pesanan miliknya yang masih baru, menunggu transfer, dan tidak ditahan. Perubahan dari tab lama ditolak: muat ulang rincian sebelum mencoba lagi.
@@ -64,3 +64,5 @@ Hasil pemeriksaan 27 Oktober 2026:
 - Screenshot desktop dan HP diperiksa; menu admin dapat digulir pada layar pendek, tombol transaksi memiliki area sentuh minimal 44px, dan tombol CS tidak menutupi formulir akun. Pemeriksaan sintaks Python/JavaScript serta whitespace diff lulus.
 
 Hasil ini berasal dari lingkungan sementara. Pengiriman email sungguhan, pemasangan scheduler, migrasi Supabase pengguna, dan uji transaksi produksi belum dilakukan.
+
+Penyederhanaan konfirmasi manual: 101 pemeriksaan backend transaksi/admin/promo/rating/pemulihan lulus pada SQLite dan PostgreSQL. Browser alur transaksi lulus pada kedua database dengan 22 pemeriksaan layout per database; regresi WhatsApp lulus, termasuk Batal, konfirmasi lewat keyboard tanpa referensi, serta kelanjutan ke Diproses. Referensi kosong/pendek diterima, nilai yang tidak valid ditolak, identitas/waktu selalu dari server, dan pengulangan konfirmasi tidak menggandakan aktivitas. Tidak diperlukan migrasi database tambahan untuk perubahan ini.

@@ -78,7 +78,7 @@ class OrderOperations:
                 elif {'baru': 'diproses', 'diproses': 'dikirim', 'dikirim': 'selesai'}.get(order['status']) != state:
                     raise ValueError('Ikuti urutan baru → diproses → dikirim → selesai. Pesanan final tidak dapat diubah.')
                 elif order['payment']['status'] != 'verified':
-                    raise ValueError('Verifikasi pembayaran terlebih dahulu sebelum melanjutkan pesanan.')
+                    raise ValueError('Tandai pembayaran sebagai sudah dibayar sebelum melanjutkan pesanan.')
                 else:
                     order['status'] = state
                 return 'order.status'
@@ -95,8 +95,8 @@ class OrderOperations:
                 if action == 'verify':
                     if order['payment']['status'] == 'verified': return None
                     reference = data.get('reference', '')
-                    if not isinstance(reference, str) or not 3 <= len(reference.strip()) <= 160 or any(ord(c) < 32 for c in reference):
-                        raise ValueError('Isi referensi pemeriksaan pembayaran, 3–160 karakter.')
+                    if not isinstance(reference, str) or len(reference) > 160 or any(ord(c) < 32 for c in reference):
+                        raise ValueError('Catatan pembayaran opsional, maksimal 160 karakter tanpa karakter kontrol.')
                     order['payment'].update(status='verified', verified_at=int(time.time()))
                     order['payment_hold'] = False
                     self.save_metadata('payment-private:' + order['nomor'], {'reference': reference.strip(), 'verified_by': g.owner['id'], 'verified_at': order['payment']['verified_at']})

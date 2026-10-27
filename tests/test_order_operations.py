@@ -55,6 +55,40 @@ class OrderOperationTests(unittest.TestCase):
         self.assertEqual(self.current_product(product['id'])['stok'],3)
         advance(self.client,self.headers,order['nomor'],'selesai')
 
+    def test_paid_without_reference_automatically_records_owner_and_time_once(self):
+        order=self.order(self.product()).json['order'];path='/api/admin/orders/'+order['nomor']
+        started=int(time.time())
+        result=self.client.post(path+'/payment',json={'action':'verify','version':order['version'],
+                               'verified_by':-999,'verified_at':0},headers=self.headers)
+        self.assertEqual(result.status_code,200,result.json)
+        paid=result.json['order']
+        self.assertEqual(paid['payment']['status'],'verified')
+        self.assertEqual(paid['status'],'baru')
+        history=self.client.get(path+'/history').json
+        record=history['payment_record'];event=next(e for e in history['events'] if e['action']=='payment.verify')
+        self.assertEqual(record['reference'],'')
+        self.assertEqual(record['verified_by'],event['actor']['id'])
+        self.assertNotEqual(record['verified_by'],-999)
+        self.assertGreaterEqual(record['verified_at'],started)
+        self.assertEqual(self.client.post(path+'/payment',json={'action':'verify','version':paid['version']},headers=self.headers).status_code,200)
+        self.assertEqual(sum(e['action']=='payment.verify' for e in self.client.get(path+'/history').json['events']),1)
+        self.assertEqual(self.client.get(path+'/history').json['payment_record'],record)
+        self.assertNotIn('verified_by',json.dumps(self.current(order)))
+        self.assertEqual(self.client.patch(path,json={'status':'diproses','version':paid['version']},headers=self.headers).status_code,200)
+
+    def test_optional_payment_note_accepts_blank_and_short_text_but_rejects_bad_values(self):
+        order=self.order(self.product()).json['order']
+        for reference in [None,True,4,[],{},'x'*161,'bad\nline','\t']:
+            response=self.payment(order,reference=reference)
+            self.assertEqual(response.status_code,409,response.json)
+            self.assertEqual(self.current(order)['payment']['status'],'pending')
+        for reference in ['','   ','1']:
+            if reference: order=self.order(self.product()).json['order']
+            result=self.payment(order,reference=reference)
+            self.assertEqual(result.status_code,200,result.json)
+            record=self.client.get('/api/admin/orders/'+order['nomor']+'/history').json['payment_record']
+            self.assertEqual(record['reference'],reference.strip())
+
     def test_cancel_is_owned_csrf_protected_once_and_stale_safe(self):
         product = self.product(); order = self.order(product).json['order']; path = '/api/customer/orders/'+order['nomor']+'/cancel'
         self.assertEqual(self.app.test_client().post(path,json={}).status_code,401)

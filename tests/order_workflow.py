@@ -2,7 +2,7 @@
 def advance(client, headers, number, target):
     order = next(o for o in client.get('/api/admin/orders').json['orders'] if o['nomor'] == number)
     if target not in {'baru', 'dibatalkan'} and order['payment']['status'] != 'verified':
-        response = client.post('/api/admin/orders/'+number+'/payment', json={'action':'verify','reference':'Fixture verified transfer','version':order['version']}, headers=headers)
+        response = client.post('/api/admin/orders/'+number+'/payment', json={'action':'verify','version':order['version']}, headers=headers)
         assert response.status_code == 200, response.json
         order = response.json['order']
     path = ['baru','diproses','dikirim','selesai']

@@ -130,20 +130,22 @@ finally:cleanup()
                 assert urlsplit(buyer.locator('#support-whatsapp-link').get_attribute('href')).path == '/6282345678901'
                 buyer.keyboard.press('Escape')
 
-                # Admin explicitly confirms payment; dismissing the prompt leaves the order pending.
+                # Cancel leaves the order pending; keyboard confirmation needs no reference.
                 owner.locator('[data-page=orders]').click(); owner.locator('#refresh-orders').click()
                 status = owner.locator('[data-order-status="'+order['nomor']+'"]')
                 status.wait_for()
                 owner.locator('[data-order="'+order['nomor']+'"]').click()
-                owner.locator('#payment-reference').fill('Fixture transfer bank')
-                owner.once('dialog', lambda dialog:dialog.dismiss()); owner.locator('[data-payment-action=verify]').click()
+                assert owner.locator('#payment-reference').is_hidden()
+                owner.get_by_role('button',name='Tandai sudah dibayar',exact=True).click()
+                owner.get_by_role('button',name='Batal',exact=True).click()
                 assert buyer_context.request.get(base+'/api/customer/orders/'+order['nomor']).json()['order']['payment']['status']=='pending'
-                owner.once('dialog', lambda dialog:dialog.accept()); owner.locator('[data-payment-action=verify]').click()
-                owner.locator('#order-details').get_by_role('heading',name='Pembayaran terverifikasi',exact=True).wait_for()
+                assert owner.locator('[data-payment-action=verify]').evaluate('(element)=>element===document.activeElement')
+                owner.keyboard.press('Enter');owner.keyboard.press('Tab')
+                assert owner.locator('[data-payment-confirm]').evaluate('(element)=>element===document.activeElement')
+                owner.keyboard.press('Enter')
+                owner.locator('#order-details').get_by_role('heading',name='Sudah dibayar',exact=True).wait_for()
                 owner.locator('#close-order').click()
-                owner.once('dialog', lambda dialog:dialog.dismiss()); status.select_option('diproses')
-                assert buyer_context.request.get(base+'/api/customer/orders/'+order['nomor']).json()['order']['status'] == 'baru'
-                owner.once('dialog', lambda dialog:dialog.accept()); status.select_option('diproses')
+                status.select_option('diproses')
                 owner.wait_for_function("() => [...document.querySelectorAll('[data-order-status]')].some(e => e.value === 'diproses' && !e.disabled)")
                 buyer.reload(wait_until='networkidle')
                 assert not buyer.locator('#payment-next-step').is_visible()

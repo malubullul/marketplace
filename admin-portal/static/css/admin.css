@@ -12,6 +12,15 @@
 .payment-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 16px; }
 .payment-controls label, .payment-controls input { flex-basis: 100%; }
 .payment-controls button { white-space: normal; min-height: 44px; }
+.payment-note-fields { flex-basis: 100%; }
+.payment-note-fields summary { cursor: pointer; min-height: 44px; padding: 10px 0; text-decoration: underline; text-underline-offset: 3px; }
+.payment-note-fields label { display: block; margin: 8px 0; }
+.payment-note-fields input { width: 100%; }
+.payment-note-fields small { display: block; color: var(--muted); margin-top: 8px; }
+.payment-confirmation { padding: 20px; margin: 20px 0; background: #e8ecdf; border: 1px solid #c5cfb9; }
+.payment-confirmation h4 { font-size: 18px; margin: 0 0 12px; }
+.payment-confirmation-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.payment-confirmation-actions button { min-height: 44px; white-space: normal; }
 .payment-result, #activity-error { color: var(--error); }
 .audit-entry { display: grid; gap: 4px; border-bottom: 1px solid var(--line); padding: 16px 0; overflow-wrap: anywhere; }
 .audit-entry time, .audit-entry small { color: var(--muted); }

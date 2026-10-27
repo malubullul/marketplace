@@ -11,7 +11,7 @@ Sumber: audit yang diberikan pemilik pada 27 Oktober 2026. Pemilik memilih **sel
 
 ## Keputusan yang sudah diterapkan pada tahap 01
 
-- WhatsApp tetap menjadi jalur pembayaran dan CS. Laporan transfer pembeli belum berarti uang diterima; pemilik harus mencocokkan mutasi rekening dan mencatat referensinya.
+- WhatsApp tetap menjadi jalur pembayaran dan CS. Laporan transfer pembeli belum berarti uang diterima; pemilik mencocokkan mutasi rekening lalu memilih **Tandai sudah dibayar → Konfirmasi**. Referensi opsional; identitas admin dan waktu dicatat otomatis.
 - Pesanan tidak boleh melompat dari baru ke selesai. Pesanan yang dikirim atau sudah dibayar tidak boleh dibatalkan melalui jalur pembatalan biasa.
 - Batas waktu nonaktif secara default; admin memilih 1–168 jam dan ketentuan diperlihatkan sebelum checkout. Pesanan lama tanpa batas waktu tetap tidak memiliki batas waktu.
 - Transfer yang dilaporkan atau sedang ditahan untuk diperiksa terlindung dari kedaluwarsa otomatis. Dua permintaan yang bersamaan tidak boleh mengembalikan stok dua kali.
