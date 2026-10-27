@@ -6,7 +6,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build:ui": "npm run typecheck && node scripts/build-error-page.mjs",
-    "check:ui": "npm run typecheck && node scripts/build-error-page.mjs --check"
+    "check:ui": "npm run typecheck && node scripts/build-error-page.mjs --check",
+    "playwright": "playwright"
   },
   "engines": {
     "node": ">=22"
@@ -21,6 +22,7 @@
     "tailwind-merge": "3.7.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "@tailwindcss/cli": "4.3.3",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",

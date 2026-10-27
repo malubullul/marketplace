@@ -67,6 +67,16 @@ Vercel stores data in Supabase PostgreSQL and photos in private Supabase Storage
 
 Backend tests cover owner/customer authorization, CSRF, session revocation, account isolation, cross-device state, address ownership, order ownership, legacy-order privacy, draft/public visibility, CRUD, uploads, persistence, validation, server prices, variants, stock, duplicate submission, conflicts and cancellations.
 
+Microsoft Playwright's Node test runner is pinned in `devDependencies` (`@playwright/test`). Install it on a fresh checkout and access its CLI with:
+
+```sh
+npm ci
+npm run playwright -- --version
+npm run playwright -- install chromium
+```
+
+The existing browser suites below use the separate **Python** Playwright package; installing the Node package does not install the Python bindings. This cloud workspace already has Python Playwright and `/usr/bin/chromium`, which the suites use. The Node package was also checked against that system Chromium. New JavaScript/TypeScript suites can use `@playwright/test`; the existing suites remain the project's browser checks.
+
 With Python Playwright and Chromium installed, run:
 
 ```sh
