@@ -588,10 +588,15 @@ def create_app(config=None):
                 product["stok"] -= quantity
                 db().execute("UPDATE products SET document=?,updated_at=? WHERE id=?", (json.dumps(product), time.time_ns(), product_id))
             subtotal = sum(line["harga"] * line["jumlah"] for line in items)
-            promo = promos.evaluate(coupon,customer_id,subtotal)
+            try:
+                promo = promos.evaluate(coupon,customer_id,subtotal)
+            except ValueError as error:
+                db().rollback()
+                return jsonify(error=str(error), code='promo_unavailable'), 409
             discount = promo['discount'] if promo else 0
             if 'expected_discount' in data and (type(data['expected_discount']) is not int or data['expected_discount'] != discount):
-                raise ValueError('Diskon promo berubah. Terapkan ulang kode promo untuk memeriksa total terbaru sebelum membuat pesanan.')
+                db().rollback()
+                return jsonify(error='Diskon promo berubah. Terapkan ulang kode promo untuk memeriksa total terbaru sebelum membuat pesanan.', code='promo_changed'), 409
             shipping = 0 if subtotal >= 200000 else 15000
             order_id = "ANR-" + secrets.token_hex(6).upper()
             order = dict(customer, nomor=order_id, tanggal=time.strftime("%Y-%m-%d"), created_at=int(time.time()), items=items, subtotal=subtotal, diskon=discount, ongkir=shipping, total=subtotal-discount+shipping, kurir="Dikonfirmasi oleh toko", metode="whatsapp", status="baru", catatan=str(data.get("catatan", ""))[:1000])

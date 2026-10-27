@@ -70,6 +70,28 @@ class PromoTests(unittest.TestCase):
         self.promo(partner='Private partner')
         self.assertNotIn('Private partner',self.public.get('/api/store/content').text)
 
+    def test_checkout_without_promo_needs_no_configured_or_available_code(self):
+        product=self.product(stok=6)
+        for changes in [{},{'coupon':'','expected_discount':0},{'coupon':'   ','expected_discount':0}]:
+            result=self.order(product,**changes)
+            self.assertEqual(result.status_code,201,result.json)
+            self.assertEqual(result.json['order']['diskon'],0)
+            self.assertNotIn('promo',result.json['order'])
+        self.promo(active=False)
+        self.assertEqual(self.order(product,coupon='',expected_discount=0).status_code,201)
+
+    def test_withdrawn_promo_allows_same_checkout_key_retry_without_promo(self):
+        self.promo(active=False)
+        product=self.product();key=secrets.token_hex(16)
+        rejected=self.order(product,key=key,coupon='PARTNER10',expected_discount=29900)
+        self.assertEqual(rejected.status_code,409)
+        self.assertEqual(rejected.json['code'],'promo_unavailable')
+        self.assertEqual(self.current_product(product['id'])['stok'],4)
+        retry=self.order(product,key=key,coupon='',expected_discount=0)
+        self.assertEqual(retry.status_code,201,retry.json)
+        self.assertEqual(retry.json['order']['diskon'],0)
+        self.assertEqual(self.order(product,key=key,coupon='',expected_discount=0).status_code,200)
+        self.assertEqual(self.current_product(product['id'])['stok'],3)
     def test_normalization_duplicate_codes_and_stale_edits(self):
         promo = self.promo(code='  partner10  ')
         self.assertEqual(promo['code'],'PARTNER10')
@@ -231,6 +253,7 @@ class PromoTests(unittest.TestCase):
         result=self.order(product,coupon='PARTNER10',expected_discount=quote['discount'])
         self.assertEqual(result.status_code,409)
         self.assertIn('Diskon promo berubah',result.json['error'])
+        self.assertEqual(result.json['code'],'promo_changed')
         self.assertEqual(self.current_product(product['id'])['stok'],4)
         self.assertEqual(self.state()[0]['used'],0)
         latest=self.preview().json['quote']

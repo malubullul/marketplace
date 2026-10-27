@@ -71,9 +71,10 @@ def run():
                 for width,height in VIEWS:
                     shop.set_viewport_size({'width':width,'height':height});assert_layout(shop,f'promo checkout {width}',checks)
                     shop.screenshot(path=str(shots/f'checkout-{width}.png'),full_page=True)
-                # Invalid/replaced codes never silently submit a higher undiscounted total.
+                # Invalid/replaced codes return to the visible undiscounted total.
                 shop.locator('#promo-input').fill('MISSING');shop.locator('#promo-apply').click();shop.locator('#promo-message.promo-error').wait_for()
-                shop.locator('#btn-pesan').click();assert 'Kode promo belum valid' in shop.locator('#checkout-error').inner_text()
+                assert shop.evaluate("sessionStorage.getItem('checkout_kupon')") is None
+                assert shop.locator('#checkout-error').inner_text()==''
                 shop.locator('#promo-remove').click();assert shop.locator('#co-diskon-row').is_hidden();assert shop.locator('#co-total').inner_text()=='Rp 299.999'
                 shop.locator('#promo-input').fill('PARTNER15');shop.locator('#promo-apply').click();shop.wait_for_function('() => !promoChecking && promoDiscount() === 40000')
                 shop.locator('#btn-pesan').click();shop.wait_for_url('**/konfirmasi.html?order=*');shop.locator('#payment-whatsapp-link[href]').wait_for()

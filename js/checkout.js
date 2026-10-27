@@ -123,11 +123,6 @@ async function prosesCheckout() {
   }
   const errorEl = document.getElementById("checkout-error");
   errorEl.textContent = "";
-  if (!promoReadyForCheckout()) {
-    errorEl.textContent = "Kode promo belum valid. Tunggu pemeriksaan selesai, terapkan ulang, atau hapus kode promo.";
-    errorEl.focus();
-    return;
-  }
   if (katalogMode !== "server") {
     errorEl.textContent =
       "Pemesanan memerlukan server Anredseller. Pratinjau statis tidak dapat mengirim pesanan.";
@@ -136,6 +131,7 @@ async function prosesCheckout() {
   const btn = document.getElementById("btn-pesan");
   btn.disabled = true;
   btn.textContent = "Mengirim pesanan…";
+  const promo = promoForCheckout();
   let key = sessionStorage.getItem("checkout_request_key");
   if (!key) {
     key = crypto.randomUUID
@@ -165,8 +161,7 @@ async function prosesCheckout() {
       warna: item.warna || "",
     })),
     payment_terms: checkoutTerms,
-    coupon: sessionStorage.getItem("checkout_kupon") || "",
-    expected_discount: promoDiscount(),
+    ...promo,
     catatan: val("catatan"),
     address_id: document.getElementById("checkout-address-select").value
       ? Number(document.getElementById("checkout-address-select").value)
@@ -190,6 +185,10 @@ async function prosesCheckout() {
       location.href = buyerLoginUrl("checkout.html");
       return;
     }
+    if (!response.ok && ["promo_unavailable", "promo_changed"].includes(data.code)) {
+      clearPromo();
+      throw new Error(data.error + " Total diperbarui tanpa promo. Periksa total, lalu tekan Buat pesanan untuk melanjutkan.");
+    }
     if (!response.ok)
       throw new Error(data.error || "Pesanan belum terkirim. Coba lagi.");
     sessionStorage.setItem("pesanan_terakhir", data.order.nomor);
@@ -199,6 +198,7 @@ async function prosesCheckout() {
     location.href =
       "konfirmasi.html?order=" + encodeURIComponent(data.order.nomor);
   } catch (error) {
+    finishPromoCheckout();
     errorEl.textContent = error.message;
     errorEl.focus();
     btn.disabled = false;
