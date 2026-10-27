@@ -1,9 +1,9 @@
 /* Anredseller editorial layer. Shared by the catalogue and customer journey. */
-.transaction-panel { margin: 24px 0; padding: 20px; border: 1px solid #c6cdbd; background: #eeefe9; color: #252a23; overflow-wrap: anywhere; }
+.transaction-panel { margin: 24px 0; padding: 20px; border: 1px solid #c6cdbd; background: #eeefe9; color: #252a23; overflow-wrap: anywhere; } /* taste-skill-ignore: real transaction controls or a form input retain their borders. */
 .transaction-panel h3 { font-size: 18px; margin: 0 0 12px; }
 .transaction-panel p { margin: 10px 0; font-size: 15px; }
 .transaction-actions { display: flex; flex-wrap: wrap; gap: 12px; }
-.transaction-actions button { min-height: 44px; white-space: normal; padding: 12px 16px; border: 1px solid #7b8674; cursor: pointer; font: inherit; }
+.transaction-actions button { min-height: 44px; white-space: normal; padding: 12px 16px; border: 1px solid #7b8674; cursor: pointer; font: inherit; } /* taste-skill-ignore: real transaction controls or a form input retain their borders. */
 .transaction-actions button.primary { background: var(--olive); color: white; border-color: var(--olive); }
 .transaction-actions button.secondary { background: transparent; color: #252a23; }
 .transaction-actions button:disabled { opacity: .6; cursor: wait; }
@@ -1417,7 +1417,7 @@ p {
 .support-dialog > p { font-size: 15px; margin: 16px 0; }
 .support-dialog .payment-step-label { display: block; max-width: calc(100% - 28px); }
 .support-close { position: absolute; right: 8px; top: 8px; min-width: 44px; min-height: 44px; font: 400 28px/1 var(--font-text); cursor: pointer; background: none; border: 0; color: var(--ink); }
-.support-payment-note { font-size: 14px; padding-top: 20px; margin-top: 24px; border-top: 1px solid #cbd0c4; }
+.support-payment-note { font-size: 14px; padding-top: 20px; margin-top: 24px; border-top: 0; }
 .support-payment-note a { display: block; margin-top: 6px; text-decoration: underline; text-underline-offset: 3px; }
 .store-footer { padding-bottom: 84px; }
 @media (max-width: 600px) {
@@ -1540,7 +1540,7 @@ p {
 .rating-option:focus-within { outline: 2px solid #414c36; outline-offset: 2px; }
 .review-comment-label { display: block; }
 .review-comment-label span { font-weight: 400; }
-.product-review-form textarea { display: block; width: 100%; resize: vertical; border: 1px solid #a1a695; border-radius: 0; background: #f5f6f2; font: inherit; font-size: 16px; padding: 12px; line-height: 1.5; }
+.product-review-form textarea { display: block; width: 100%; resize: vertical; border: 1px solid #a1a695; border-radius: 0; background: #f5f6f2; font: inherit; font-size: 16px; padding: 12px; line-height: 1.5; } /* taste-skill-ignore: real transaction controls or a form input retain their borders. */
 #review-privacy { display: block; color: #62665c; font-size: 12px; line-height: 1.6; margin: 10px 0; }
 .review-submit, .review-secondary { min-height: 44px; padding: 12px 18px; font: inherit; font-size: 14px; border: 1px solid #414c36; border-radius: 0; cursor: pointer; }
 .review-submit { background: #414c36; color: #fff; }
@@ -1550,7 +1550,7 @@ p {
 .review-success { color: #35452b; line-height: 1.6; font-size: 14px; margin: 12px 0; }
 .detail-harga-badge { background: #a33f35; }
 .review-error:empty, .review-success:empty { display: none; }
-.buyer-review { padding: 22px 0; border-top: 1px solid #d4d7cc; }
+.buyer-review { padding: 22px 0; border-top: 0; }
 .buyer-review-heading, .buyer-review-rating { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
 .buyer-review-heading strong { font-weight: 500; font-size: 14px; }
 .buyer-review-heading > span, .buyer-review-rating time { font-size: 12px; color: #62665c; }
@@ -1586,19 +1586,19 @@ p {
 /* Anredseller / Noir. Photographs carry the colour; the interface stays neutral. */
 :root {
   color-scheme: dark;
-  --paper: #101210;
-  --surface: #191c19;
-  --surface-raised: #252925;
-  --surface-hover: #30362f;
+  --paper: #101010;
+  --surface: #191919;
+  --surface-raised: #242424;
+  --surface-hover: #303030;
   --ink: #efeee7;
-  --muted: #b8bcb2;
+  --muted: #b8b8b2;
   --stone: var(--surface);
-  --line: #373f36;
-  --control: #778370;
+  --line: #383838;
+  --control: #808080;
   --olive: #e5e4d8;
   --action-ink: #131610;
   --action-hover: #faf9ef;
-  --on-photo: #f5f4ed;
+  --on-photo: #f5f4ed; /* taste-skill-ignore: foreground over photographs, not a cream background. */
   --photo-mat: #e6e7e0;
   --positive: #b2d7b3;
   --positive-surface: #203023;
@@ -1633,7 +1633,7 @@ input, select, textarea { color: var(--ink); accent-color: var(--olive); }
 input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
 select option { background: var(--surface); color: var(--ink); }
 input:autofill { color: var(--ink); background: var(--surface-raised); }
-input:-webkit-autofill { -webkit-text-fill-color: var(--ink); box-shadow: 0 0 0 1000px var(--surface-raised) inset; }
+input:-webkit-autofill { -webkit-text-fill-color: var(--ink); box-shadow: 0 0 0 1000px var(--surface-raised) inset; } /* taste-skill-ignore: Chrome autofill background correction, not a resting shadow. */
 .announcement, .account-page .announcement { background: var(--paper); color: var(--muted); }
 .store-header, .store-header-inner, .store-footer { background: var(--paper); color: var(--ink); }
 .store-subnav { background: var(--surface); color: var(--muted); }
@@ -1736,8 +1736,76 @@ input:-webkit-autofill { -webkit-text-fill-color: var(--ink); box-shadow: 0 0 0 
 .account-page .skip-link, .skip-link { background: var(--olive); color: var(--action-ink); }
 .badge-keranjang { background: var(--olive); color: var(--action-ink); }
 .checkout-saved-address { background: var(--surface-raised); border-color: var(--line); }
-.editorial-card, .sneakers-edit, .apparel-edit { background: var(--photo-mat); }
-.editorial-card h3, .editorial-card p, .editorial-card .editorial-label { color: var(--action-ink); }
+.editorial-card, .sneakers-edit, .apparel-edit { background: var(--surface-raised); }
+.editorial-card h3 { color: var(--ink); }
+.editorial-card p { color: var(--muted); }
 .editorial-card > img, .kartu-produk-gambar img, .galeri-utama img, .wishlist-list img { mix-blend-mode: normal; }
 .round-arrow { background: var(--surface); color: var(--ink); }
 .store-actions .badge-keranjang { background: var(--olive); color: var(--action-ink); }
+
+/* A quieter catalogue: photos above, controls below, compact category entries. */
+.collection-tabs { gap: 4px; }
+.collection-tabs button { background: transparent; color: var(--muted); padding-inline: 16px; }
+.collection-tabs button.selected { background: var(--surface-raised); color: var(--ink); }
+.collection-tabs button:hover:not(.selected) { background: var(--surface); color: var(--ink); }
+.edit-section > .section-topline h2 { font-size: clamp(34px, 3.6vw, 52px); line-height: 1.08; }
+.home-products { gap: 48px 28px; }
+.kartu-produk-gambar,
+.kartu-produk:nth-child(3n + 2) .kartu-produk-gambar,
+.kartu-produk:nth-child(3n) .kartu-produk-gambar { background: var(--surface-raised); aspect-ratio: var(--product-frame, 1); }
+.kartu-produk-gambar img { padding: 0; object-fit: contain; }
+.kartu-produk:hover .kartu-produk-gambar img { transform: none; }
+.kartu-produk-gambar .product-gallery[aria-roledescription="carousel"] .product-photo-link { height: calc(100% - 44px); }
+.kartu-produk-gambar .product-photo-arrow { top: auto; bottom: 0; width: 44px; height: 44px; transform: none; background: var(--surface-raised); }
+.kartu-produk-gambar .product-photo-arrow::before { inset: 0; background: transparent; }
+.kartu-produk-gambar .product-photo-arrow:hover::before { background: var(--surface-hover); }
+.kartu-produk-gambar .product-photo-previous { left: 0; }
+.kartu-produk-gambar .product-photo-next { right: 0; }
+.kartu-produk-gambar .product-photo-counter-card { bottom: 0; height: 44px; padding: 12px 0; background: transparent; color: var(--muted); }
+.kartu-produk-info { padding-top: 20px; }
+.kartu-produk-info .btn-keranjang-cepat { position: static; width: 100%; margin-top: 18px; transform: none; opacity: 1; background: var(--surface); color: var(--ink); justify-content: space-between; padding: 12px 16px; font-weight: 400; }
+.kartu-produk-info .btn-keranjang-cepat:hover { background: var(--surface-raised); }
+.kartu-produk-info .btn-keranjang-cepat:disabled { color: var(--muted); cursor: not-allowed; }
+.btn-wishlist { opacity: 1; box-shadow: none; } /* taste-skill-ignore: remove inherited shadow. */
+.btn-wishlist:hover { background: var(--surface-hover); color: var(--ink); }
+.btn-wishlist.aktif, .btn-wishlist.aktif:hover { background: var(--olive); color: var(--action-ink); }
+.category-editorial { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 72px; align-items: start; background: var(--surface); }
+.category-editorial > .section-topline { display: block; margin: 0; }
+.category-editorial .category-note { display: block; margin-top: 24px; font-size: 16px; max-width: none; }
+.category-editorial .editorial-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; margin: 0; }
+.category-editorial .editorial-card { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 28px; align-items: center; min-height: 160px; padding: 24px; margin: 0; }
+.category-editorial .editorial-card > img { position: static; width: 112px; height: 112px; transform: none; object-fit: contain; }
+.category-editorial .editorial-card:hover > img { transform: none; }
+.category-editorial .editorial-card > div { min-width: 0; gap: 0 20px; }
+.category-editorial .editorial-card h3 { font-size: clamp(26px, 2.5vw, 36px); line-height: 1.1; letter-spacing: -.035em; }
+.category-editorial .editorial-card p { margin-top: 10px; font-size: 14px; max-width: 28ch; }
+.category-editorial .round-arrow { background: transparent; border-radius: 0; }
+.category-editorial .editorial-card:hover { background: var(--surface-hover); }
+.category-editorial .editorial-card:has(> img[hidden]) { grid-template-columns: minmax(0, 1fr); }
+.support-launcher:not(.support-docked) { width: 48px; height: 48px; padding: 13px; justify-content: center; }
+.support-launcher:not(.support-docked) > span { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 1100px) {
+  .category-editorial { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  .category-editorial > .section-topline { display: flex; align-items: flex-end; }
+  .category-editorial .category-note { margin: 0; }
+  .category-editorial .editorial-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .category-editorial .editorial-card { grid-template-columns: 88px minmax(0, 1fr); padding: 20px; gap: 20px; }
+  .category-editorial .editorial-card > img { width: 88px; height: 112px; }
+  .category-editorial .editorial-card > div { column-gap: 8px; }
+}
+@media (max-width: 760px) {
+  .kartu-produk { --product-frame: 4/5; }
+  .home-products, .grid-produk-3 { gap: 36px 14px; }
+  .collection-tabs { gap: 4px; }
+  .collection-tabs button { padding-inline: 8px; font-size: 12px; }
+  .kartu-produk-info { padding-top: 14px; }
+  .kartu-produk-info .btn-keranjang-cepat { margin-top: 14px; padding: 10px 12px; }
+  .category-editorial { gap: 28px; }
+  .category-editorial > .section-topline { display: block; }
+  .category-editorial .category-note { margin-top: 20px; }
+  .category-editorial .editorial-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .category-editorial .editorial-card { min-height: 140px; grid-template-columns: 80px minmax(0, 1fr); gap: 18px; padding: 18px; }
+  .category-editorial .editorial-card > img { width: 80px; height: 100px; }
+  .category-editorial .editorial-card h3 { font-size: 28px; }
+  .category-editorial .editorial-card p { font-size: 13px; max-width: 20ch; }
+}

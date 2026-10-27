@@ -47,7 +47,7 @@
           >
         </div>
         <div class="campaign-pagination" data-ui hidden>
-          <span class="campaign-counter" aria-hidden="true"><span id="campaign-current">01</span><span class="campaign-counter-separator">/</span><span id="campaign-total">{{ "%02d"|format(content.campaigns|length) }}</span></span>
+          <span class="campaign-counter" aria-hidden="true"><span id="campaign-current">01</span><span class="campaign-counter-separator">/</span><span id="campaign-total">{{ "%02d"|format(content.campaigns|length) }}</span></span><!-- taste-skill-ignore: actual carousel position and photo count, not decorative numbering. -->
           <div class="campaign-selectors" role="group" aria-label="Pilih foto kampanye">
             <button type="button" data-campaign="0" aria-label="Lihat kampanye The Archive" aria-current="true"></button>
             <button type="button" data-campaign="1" aria-label="Lihat kampanye After Hours"></button>
@@ -111,7 +111,7 @@
             >Pilihan dari katalog</span
           >
         </div>
-        <div class="home-products" id="grid-trending" data-ui></div>
+        <div class="home-products" id="grid-trending"></div>
         <noscript
           ><p>
             <a href="produk.html">Buka katalog untuk melihat koleksi.</a>
@@ -121,15 +121,14 @@
       <section class="edit-section category-editorial">
         <div class="section-topline">
           <div>
-            <h2>Temukan gayamu.</h2>
+            <h2>Belanja per kategori.</h2>
           </div>
-          <span class="category-note">Jelajahi kategori sesuai kebutuhanmu.</span>
+          <p class="category-note">Langsung ke pilihanmu.</p>
         </div>
         <div class="editorial-grid">
           <a
             class="editorial-card sneakers-edit"
             href="produk.html?kategori=sneakers"
-            ><span class="editorial-label">Pilihan sneakers</span
             ><img
               {% if content.images.category_sneakers.src %}src="{{ content.images.category_sneakers.src }}"{% else %}hidden{% endif %}
               style="object-position: {{ content.images.category_sneakers.position }}% center"
@@ -138,8 +137,8 @@
               height="512"
               loading="lazy" />
             <div>
-              <h3>Sneakers favorit.</h3>
-              <p>Pilih sneakers untuk melengkapi gaya harianmu.</p>
+              <h3>Sneakers</h3>
+              <p>Pasangan untuk setiap langkah.</p>
               <span class="round-arrow"
                 ><svg
                   class="arrow-icon"
@@ -154,7 +153,6 @@
           ><a
             class="editorial-card apparel-edit"
             href="produk.html?kategori=apparel"
-            ><span class="editorial-label">Pilihan pakaian</span
             ><img
               {% if content.images.category_apparel.src %}src="{{ content.images.category_apparel.src }}"{% else %}hidden{% endif %}
               style="object-position: {{ content.images.category_apparel.position }}% center"
@@ -163,8 +161,8 @@
               height="512"
               loading="lazy" />
             <div>
-              <h3>Gaya sehari-hari.</h3>
-              <p>Temukan pakaian yang mudah dipadukan dengan gayamu.</p>
+              <h3>Apparel</h3>
+              <p>Atasan dan bawahan untuk harimu.</p>
               <span class="round-arrow"
                 ><svg
                   class="arrow-icon"

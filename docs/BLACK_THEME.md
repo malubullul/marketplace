@@ -1,5 +1,7 @@
 # Anredseller: tema hitam editorial
 
+Penyempurnaan berikutnya mengganti permukaan toko publik menjadi hitam netral serta menyusun ulang katalog/kategori. Lihat [perbaikan katalog](CATALOGUE_REFINEMENT.md) untuk keputusan dan pengujian terbaru; tabel di bawah mencatat versi hitam pertama.
+
 Permintaan pemilik, 28 Oktober 2026: ganti tema menjadi hitam dengan desain yang tetap matang. Perubahan mencakup toko publik, akun, checkout, rincian pesanan, portal admin dan halaman React 404. Tema ini menjadi tampilan utama, termasuk ketika perangkat memakai mode terang.
 
 Menggunakan [Taste Skill](../.agents/skills/design-taste-frontend/SKILL.md) dan [UI/UX Pro Max](../.agents/skills/ui-ux-pro-max/SKILL.md). Hasil pencarian `dark mode oled contrast` dipakai untuk hierarki permukaan, `color-scheme: dark`, fokus dan kontras. Saran neon/glow dari dataset tidak dipakai karena tidak sesuai arah fashion Anredseller. Pencarian `luxury fashion monochrome` menguatkan penggunaan tipografi besar dan antarmuka monokrom.
