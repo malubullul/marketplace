@@ -128,7 +128,7 @@ function renderProducts() {
   $("product-rows").innerHTML = list
     .map(
       (p) =>
-        `<tr><td><div class="product-identity"><img src="${esc(p.gambar)}" alt="${esc(p.nama)}"><div><strong>${esc(p.nama)}</strong><small>${categoryNames[p.kategori] || esc(p.kategori)}${p.demo ? " · Contoh" : ""}</small></div></div></td><td data-label="Harga jual">${money(p.harga)}</td><td data-label="Total stok"><span class="${p.stok < 5 ? "badge low" : ""}">${p.stok} pcs</span></td><td data-label="Status"><span class="badge ${p.published ? "published" : ""}">${p.published ? "Terbit" : "Draf"}</span></td><td><div class="row-actions"><button data-edit="${p.id}" aria-label="Edit ${esc(p.nama)}">Edit</button><button class="delete-product" data-delete="${p.id}" aria-label="Hapus ${esc(p.nama)}">Hapus</button></div></td></tr>`,
+        `<tr><td><div class="product-identity"><img src="${esc(p.gambar)}" alt="${esc(p.nama)}"><div><strong>${esc(p.nama)}</strong><small>${categoryNames[p.kategori] || esc(p.kategori)}${p.demo ? " · Contoh" : ""}</small></div></div></td><td data-label="Harga jual">${money(p.harga)}</td><td data-label="Total stok"><span class="${p.stok < 5 ? "badge low" : ""}">${p.stok} pcs</span>${p.stokUkuran ? `<small class="stock-breakdown">${p.stokUkuran.map(row => `${esc(row.ukuran)}: ${row.stok}`).join(" · ")}</small>` : ""}</td><td data-label="Status"><span class="badge ${p.published ? "published" : ""}">${p.published ? "Terbit" : "Draf"}</span></td><td><div class="row-actions"><button data-edit="${p.id}" aria-label="Edit ${esc(p.nama)}">Edit</button><button class="delete-product" data-delete="${p.id}" aria-label="Hapus ${esc(p.nama)}">Hapus</button></div></td></tr>`,
     )
     .join("");
   $("products-empty").hidden = list.length > 0;
@@ -229,6 +229,7 @@ function openEditor(product = null) {
     $("product-recommended").checked = product.rekomendasi;
   }
   $("upload-status").textContent = "";
+  initializeSizeStock(product);
   renderPhotos();
   dirty = false;
   $("product-dialog").showModal();
@@ -339,6 +340,11 @@ $("product-form").addEventListener("submit", async (event) => {
     published: event.submitter?.value === "publish",
   };
   if (editing) product.version = editing.version;
+  if ($("size-stock-enabled").checked) {
+    if (!sizeStockRows.length) { productError("Tambahkan minimal satu ukuran dan stoknya."); return; }
+    product.stokUkuran = sizeStockRows.map(row => ({...row}));
+    product.ukuran = sizeStockRows.map(row => row.ukuran);
+  }
   setSaving(true);
   try {
     await api("/api/admin/products" + (editing ? "/" + editing.id : ""), {
@@ -862,3 +868,57 @@ function renderPaymentManagement(order) {
     } finally { saving = false; }
   });
 }
+
+let sizeStockRows = [];
+function initializeSizeStock(product) {
+  sizeStockRows = (product?.stokUkuran || []).map(row => ({...row}));
+  $("size-stock-enabled").checked = Array.isArray(product?.stokUkuran);
+  $("size-stock-enabled").disabled = Array.isArray(product?.stokUkuran);
+  $("legacy-stock-note").textContent = product && !product.stokUkuran && product.ukuran?.length
+    ? `Stok lama ${product.stok} pcs masih gabungan (${product.ukuran.join(", ")}). Aktifkan stok per ukuran dan bagi total ${product.stok} pcs terlebih dahulu. Setelah disimpan, stok bisa ditambah per ukuran.` : "";
+  $("custom-stock-size").hidden = true;
+  $("new-stock-size").value = "S";
+  $("size-stock-message").textContent = "";
+  renderSizeStock();
+}
+function updateSizeStockTotal() {
+  if ($("size-stock-enabled").checked) $("product-stock").value = sizeStockRows.reduce((sum,row) => sum + (Number(row.stok)||0),0);
+}
+function renderSizeStock() {
+  const enabled = $("size-stock-enabled").checked;
+  $("size-stock-fields").hidden = !enabled;
+  $("product-stock").readOnly = enabled;
+  $("stock-total-hint").textContent = enabled ? "Total otomatis dari stok tersedia semua ukuran." : "Stok tersedia gabungan. Aktifkan stok per ukuran untuk memisahkan persediaan.";
+  $("size-stock-rows").innerHTML = sizeStockRows.map((row,i) => `<article class="size-stock-row"><strong>${esc(row.ukuran)}</strong><label>Stok tersedia<input type="number" min="0" max="1000000" step="1" required data-size-stock="${i}" aria-label="Stok ${esc(row.ukuran)}" value="${row.stok}" ${enabled ? "" : "disabled"} /></label><label>Tambah (pcs)<input type="number" min="1" max="1000000" step="1" data-size-add="${i}" aria-label="Tambah stok ${esc(row.ukuran)}" placeholder="0" /></label><button type="button" class="button secondary" data-size-restock="${i}">Tambah</button><button type="button" class="size-remove" data-size-remove="${i}" aria-label="Hapus ukuran ${esc(row.ukuran)}">Hapus</button></article>`).join("") || "<p>Belum ada ukuran. Pilih ukuran lalu tekan Tambah ukuran.</p>";
+  updateSizeStockTotal();
+}
+$("size-stock-enabled").addEventListener("change", () => {
+  if ($("size-stock-enabled").checked && !sizeStockRows.length && editing?.ukuran?.length) {
+    const common = /^(?:XXS|XS|S|M|L|XL|XXL|2XL|3XL|4XL)(?:\s+(?:XXS|XS|S|M|L|XL|XXL|2XL|3XL|4XL))+$/i;
+    const names = editing.ukuran.flatMap(value => common.test(value.trim()) ? value.trim().split(/\s+/) : [value]);
+    sizeStockRows = [...new Set(names.map(value => value.trim().toUpperCase()))].map(ukuran => ({ukuran,stok:0}));
+  }
+  renderSizeStock(); dirty = true;
+});
+$("new-stock-size").addEventListener("change", () => { $("custom-stock-size").hidden = $("new-stock-size").value !== "custom"; });
+$("add-stock-size").addEventListener("click", () => {
+  const name = ($("new-stock-size").value === "custom" ? $("custom-stock-size").value : $("new-stock-size").value).trim().toUpperCase();
+  if (!name || name.length > 30 || /[,;]/.test(name)) { $("size-stock-message").textContent = "Isi satu ukuran yang valid."; return; }
+  if (sizeStockRows.some(row => row.ukuran === name)) { $("size-stock-message").textContent = "Ukuran sudah ada. Tambah stok pada baris ukuran tersebut."; return; }
+  if (sizeStockRows.length >= 20) { $("size-stock-message").textContent = "Maksimal 20 ukuran."; return; }
+  sizeStockRows.push({ukuran:name,stok:0}); $("size-stock-message").textContent = ""; renderSizeStock(); dirty = true;
+  $("size-stock-rows").querySelector(`[data-size-stock="${sizeStockRows.length-1}"]`).focus();
+});
+$("size-stock-rows").addEventListener("input", event => {
+  if (event.target.matches("[data-size-stock]")) { sizeStockRows[Number(event.target.dataset.sizeStock)].stok = event.target.value === "" ? null : Number(event.target.value); updateSizeStockTotal(); }
+});
+$("size-stock-rows").addEventListener("click", event => {
+  const remove = event.target.closest("[data-size-remove]");
+  const restock = event.target.closest("[data-size-restock]");
+  if (remove) { sizeStockRows.splice(Number(remove.dataset.sizeRemove),1); renderSizeStock(); dirty = true; }
+  if (restock) {
+    const i = Number(restock.dataset.sizeRestock), input = $("size-stock-rows").querySelector(`[data-size-add="${i}"]`), count = Number(input.value);
+    if (!Number.isInteger(count) || count < 1 || count + sizeStockRows[i].stok > 1000000) { $("size-stock-message").textContent = "Isi jumlah tambahan stok yang valid."; return; }
+    sizeStockRows[i].stok += count; $("size-stock-message").textContent = `${count} pcs ditambahkan ke ukuran ${sizeStockRows[i].ukuran}. Simpan produk untuk menerapkan.`; renderSizeStock(); dirty = true;
+  }
+});

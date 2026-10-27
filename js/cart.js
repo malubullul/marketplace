@@ -124,6 +124,7 @@ function isInWishlist(id) {
 function cartLineKey(id, size = "", color = "") {
   return `${id}:${encodeURIComponent(size).replace(/'/g, "%27")}:${encodeURIComponent(color).replace(/'/g, "%27")}`;
 }
+function stockGroupKey(item) { return item.stock_key || String(item.id); }
 async function mutateShopping(path, body) {
   if (!(await requireBuyer())) return false;
   const job = shoppingQueue

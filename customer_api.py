@@ -4,6 +4,7 @@ import hashlib
 import json
 import re
 import secrets
+import inventory
 from database import INTEGRITY_ERRORS
 import time
 from urllib.parse import quote
@@ -141,8 +142,8 @@ class CustomerAPI:
         for stored in state['cart']:
             row=self.db().execute('SELECT document FROM products WHERE id=? AND published=1',(stored['id'],)).fetchone()
             product=json.loads(row['document']) if row else None
-            valid=bool(product and product['stok']>0 and stored['ukuran'] in (product.get('ukuran') or ['']) and stored['warna'] in (product.get('warna') or ['']))
-            lines.append(dict(stored,nama=product['nama'] if product else 'Produk tidak tersedia',harga=product['harga'] if product else stored['harga'],gambar=product['gambar'] if product else stored['gambar'],stok=product['stok'] if valid else 0,available=valid))
+            stock=inventory.available(product,stored['ukuran'],stored['warna']);valid=stock>0
+            lines.append(dict(stored,nama=product['nama'] if product else 'Produk tidak tersedia',harga=product['harga'] if product else stored['harga'],gambar=product['gambar'] if product else stored['gambar'],stok=stock,available=valid,stock_key=inventory.stock_key(stored['id'],product,stored['ukuran']) if product else str(stored['id'])))
         return {'cart':lines,'wishlist':state['wishlist'],'revision':revision,'customer_id':customer_id}
 
     def consume_cart(self,customer_id,items):
@@ -309,8 +310,8 @@ class CustomerAPI:
                     else:
                         row=db().execute('SELECT document FROM products WHERE id=? AND published=1',(line['id'],)).fetchone()
                         product=json.loads(row['document']) if row else None
-                        other=sum(item['jumlah'] for item in state['cart'] if item['id']==line['id'] and item['key']!=key)
-                        if not product or other+quantity>product['stok']:raise ValueError('Stok tidak mencukupi. Kurangi jumlah atau hapus item.')
+                        other=sum(item['jumlah'] for item in state['cart'] if item['id']==line['id'] and item['key']!=key and product and inventory.bucket(product,item['ukuran'])==inventory.bucket(product,line['ukuran']))
+                        if not product or other+quantity>inventory.available(product,line['ukuran'],line['warna']):raise ValueError('Stok ukuran ini tidak mencukupi. Kurangi jumlah atau hapus item.')
                         line['jumlah']=quantity
                 elif action=='add':
                     product_id=data.get('id');quantity=data.get('jumlah',1);size=data.get('ukuran','');color=data.get('warna','')
@@ -318,8 +319,8 @@ class CustomerAPI:
                     row=db().execute('SELECT document FROM products WHERE id=? AND published=1',(product_id,)).fetchone();product=json.loads(row['document']) if row else None
                     if not product:raise ValueError('Produk tidak tersedia.')
                     if not isinstance(size,str) or not isinstance(color,str) or size not in (product.get('ukuran') or ['']) or color not in (product.get('warna') or ['']):raise ValueError('Pilih ukuran dan warna yang tersedia.')
-                    total=sum(line['jumlah'] for line in state['cart'] if line['id']==product_id)
-                    if total+quantity>product['stok']:raise ValueError('Stok produk tidak mencukupi.')
+                    total=sum(line['jumlah'] for line in state['cart'] if line['id']==product_id and inventory.bucket(product,line['ukuran'])==inventory.bucket(product,size))
+                    if total+quantity>inventory.available(product,size,color):raise ValueError('Stok ukuran ini tidak mencukupi.')
                     key=cart_key(product_id,size,color);line=next((line for line in state['cart'] if line['key']==key),None)
                     if line:line['jumlah']+=quantity
                     else:

@@ -104,9 +104,10 @@ function renderDetail(p) {
       <div class="detail-divider"></div>
 
       <div class="product-options">
-        ${p.ukuran?.length ? `<label for="pilihan-ukuran">Ukuran<select id="pilihan-ukuran" required><option value="">Pilih ukuran</option>${p.ukuran.map((value) => `<option value="${h(value)}">${h(value)}</option>`).join("")}</select></label>` : ""}
+        ${p.ukuran?.length ? `<label for="pilihan-ukuran">Ukuran<select id="pilihan-ukuran" required><option value="">Pilih ukuran</option>${p.ukuran.map((value) => { const stock = p.stokUkuran?.find(row => row.ukuran === value)?.stok; return `<option value="${h(value)}" ${stock === 0 ? "disabled" : ""}>${h(value)}${stock === undefined ? "" : stock ? ` — ${stock} tersedia` : " — habis"}</option>`; }).join("")}</select></label>` : ""}
         ${p.warna?.length ? `<label for="pilihan-warna">Warna<select id="pilihan-warna" required><option value="">Pilih warna</option>${p.warna.map((value) => `<option value="${h(value)}">${h(value)}</option>`).join("")}</select></label>` : ""}
       </div>
+      <p id="size-stock-availability" role="status" aria-live="polite"></p>
       <!-- JUMLAH -->
       <div class="detail-label">Jumlah:</div>
       <div class="detail-qty">
@@ -162,6 +163,21 @@ function renderDetail(p) {
       </div>
     </div>
   `;
+  document.getElementById("pilihan-ukuran")?.addEventListener("change", updateSizeAvailability);
+  updateSizeAvailability();
+}
+
+function selectedSizeStock() {
+  if (!produkAktif?.stokUkuran) return produkAktif?.stok || 0;
+  return produkAktif.stokUkuran.find(row => row.ukuran === document.getElementById("pilihan-ukuran")?.value)?.stok || 0;
+}
+function updateSizeAvailability() {
+  if (!produkAktif?.stokUkuran) return;
+  const size = document.getElementById("pilihan-ukuran").value, stock = selectedSizeStock();
+  document.getElementById("size-stock-availability").textContent = size ? `Ukuran ${size}: ${stock} pcs tersedia.` : "Pilih ukuran untuk melihat stok yang tersedia.";
+  for (const id of ["btn-beli","btn-tambah","qty-input","qty-kurang","qty-tambah"]) document.getElementById(id).disabled = stock === 0;
+  document.getElementById("qty-input").max = stock;
+  setJumlah(jumlahDipilih);
 }
 
 // ── Jumlah ─────────────────────────────────────────────────
@@ -172,14 +188,14 @@ function setJumlah(val) {
   if (!produkAktif) return;
   jumlahDipilih = Math.max(
     1,
-    Math.min(Number.isFinite(val) ? val : 1, produkAktif.stok),
+    Math.min(Number.isFinite(val) ? Math.floor(val) : 1, selectedSizeStock()),
   );
   document.getElementById("qty-input").value = jumlahDipilih;
 }
 
 // ── Aksi ───────────────────────────────────────────────────
 async function tambahKeranjang() {
-  if (!produkAktif || produkAktif.stok === 0) return;
+  if (!produkAktif || selectedSizeStock() === 0) return;
   return tambahKeKeranjang(
     produkAktif.id,
     jumlahDipilih,

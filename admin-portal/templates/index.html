@@ -363,23 +363,27 @@
                 step="1"
                 value="0"
                 required
-              /><small>Total persediaan gabungan semua ukuran dan warna.</small>
-              <div class="form-row">
-                <div>
-                  <label for="product-sizes">Pilihan ukuran</label
-                  ><input
-                    id="product-sizes"
-                    maxlength="600"
-                    placeholder="S, M, L, XL"
-                  /><small>Pisahkan dengan koma.</small>
+              /><small id="stock-total-hint">Stok tersedia. Aktifkan stok per ukuran untuk produk dengan beberapa ukuran.</small>
+              <section class="size-stock-editor" aria-labelledby="size-stock-title">
+                <h3 id="size-stock-title">Ukuran & stok</h3>
+                <label class="transaction-check"><input id="size-stock-enabled" type="checkbox" /> Kelola stok per ukuran</label>
+                <p id="legacy-stock-note"></p>
+                <div id="size-stock-fields" hidden>
+                  <p>Pilih satu ukuran per baris. Total stok dihitung otomatis. Stok dicadangkan saat checkout dan kembali ke ukuran yang sama jika pesanan dibatalkan.</p>
+                  <div class="size-stock-add"><label for="new-stock-size">Pilih ukuran</label><select id="new-stock-size"><option value="S">S</option><option>M</option><option>L</option><option>XL</option><option>XS</option><option>XXL</option><option>3XL</option><option>ALL SIZE</option><option value="custom">Ukuran lain…</option></select><input id="custom-stock-size" maxlength="30" placeholder="Misalnya 40 atau 40.5" aria-label="Ukuran lainnya" hidden /><button type="button" class="button secondary" id="add-stock-size">Tambah ukuran</button></div>
+                  <p id="size-stock-message" role="status"></p>
+                  <div id="size-stock-rows"></div>
                 </div>
+              </section>
+              <div class="form-row">
+                <input id="product-sizes" type="hidden" />
                 <div>
                   <label for="product-colors">Pilihan warna</label
                   ><input
                     id="product-colors"
                     maxlength="600"
                     placeholder="Cokelat, Hitam"
-                  /><small>Pisahkan dengan koma.</small>
+                  /><small>Pisahkan dengan koma. Persediaan dihitung per ukuran, gabungan seluruh warna.</small>
                 </div>
               </div>
             </section>

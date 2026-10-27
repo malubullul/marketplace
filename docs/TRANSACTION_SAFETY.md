@@ -45,7 +45,7 @@ Jika flag `1` aktif tetapi migrasi/pengirim belum siap, pendaftaran baru dan che
 
 **Admin → Riwayat aktivitas** mencatat login/logout pemilik, perubahan produk, foto, promo, kontak, konten, ketentuan pembayaran, pesanan dan pembayaran sejak fitur dipasang. Riwayat per pesanan tersedia pada rincian. Data menggunakan tabel `metadata` privat yang sudah ada; tidak memerlukan migrasi tambahan selain email. Pagination memakai cursor, bukan daftar semua aktivitas sekaligus. Kredensial, token, isi formulir, dan alamat pembeli tidak dimasukkan ke aktivitas.
 
-Log membantu penelusuran operasional tetapi belum merupakan arsip tahan manipulasi oleh administrator database. Backup/retensi, MFA pemilik, pemantauan, laporan keuangan, stok varian, resi, ongkir aktual, retur/refund, dan notifikasi email status masih tercantum dalam [roadmap](ROADMAP.md).
+Log membantu penelusuran operasional tetapi belum merupakan arsip tahan manipulasi oleh administrator database. Backup/retensi, MFA pemilik, pemantauan, laporan keuangan, stok per kombinasi ukuran/warna, resi, ongkir aktual, retur/refund, dan notifikasi email status masih tercantum dalam [roadmap](ROADMAP.md).
 
 ## Pengujian lokal
 

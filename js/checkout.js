@@ -39,7 +39,7 @@ function renderRingkasanCheckout() {
              style="width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--abu-muda)">
         <div style="flex:1;min-width:0">
           <div style="font-size:13px;font-weight:600;color:var(--teks-hitam);overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${h(item.nama)}</div>
-          <div style="font-size:12px;color:var(--abu-teks)">x${item.jumlah}</div>
+          <div style="font-size:12px;color:var(--abu-teks)">${h([item.ukuran,item.warna].filter(Boolean).join(" / "))} · x${item.jumlah}</div>
         </div>
         <div style="font-size:13px;font-weight:700;color:var(--teks-hitam);white-space:nowrap">${formatHarga(item.harga * item.jumlah)}</div>
       </div>

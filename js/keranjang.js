@@ -63,7 +63,7 @@ function renderKeranjang() {
       <!-- Nama -->
       <div class="cart-product-info">
         <a href="detail.html?id=${item.id}" class="keranjang-nama">${h(item.nama)}</a>
-        <div class="cart-variant">${h([item.ukuran, item.warna].filter(Boolean).join(" / "))}</div><div style="font-size:11px;color:var(--abu-teks);margin-top:4px">Stok: ${item.stok}</div>
+        <div class="cart-variant">${h([item.ukuran, item.warna].filter(Boolean).join(" / "))}</div><div style="font-size:11px;color:var(--abu-teks);margin-top:4px">Stok${item.ukuran ? " ukuran "+h(item.ukuran) : ""}: ${item.stok}</div>
       </div>
       <!-- Harga Satuan -->
       <div class="keranjang-harga">${formatHarga(item.harga)}</div>
@@ -97,9 +97,9 @@ function renderKeranjang() {
 
   const totals = {};
   for (const item of keranjang)
-    totals[item.id] = (totals[item.id] || 0) + item.jumlah;
+    totals[stockGroupKey(item)] = (totals[stockGroupKey(item)] || 0) + item.jumlah;
   document.getElementById("btn-checkout").disabled = keranjang.some(
-    (item) => !item.available || totals[item.id] > item.stok,
+    (item) => !item.available || totals[stockGroupKey(item)] > item.stok,
   );
   updateRingkasan();
 }

@@ -98,3 +98,7 @@ Dashboard menyediakan menu **Tampilan toko** untuk sembilan foto publik (slider,
 ## Pembayaran dan keamanan transaksi
 
 Pada rincian pesanan, cocokkan uang masuk dengan mutasi rekening lalu pilih **Tandai sudah dibayar → Konfirmasi**. Referensi/catatan boleh dikosongkan; identitas admin dan waktu dicatat otomatis. Bagian **Tambah catatan (opsional)** tersedia bila diperlukan dan hanya terlihat admin. Sesudah itu status maju secara berurutan: Baru → Diproses → Dikirim → Selesai. Menu **Keamanan transaksi** mengatur batas pembayaran opsional untuk pesanan baru dan menampilkan kesiapan email; **Riwayat aktivitas** menampilkan catatan perubahan. Baca [panduan transaksi](../docs/TRANSACTION_SAFETY.md), termasuk aturan pembatalan/penahanan dan aktivasi email pada project toko. Portal tidak menyimpan salinan database atau key Resend.
+
+## Stok ukuran
+
+Pada editor produk, aktifkan **Kelola stok per ukuran**, pilih S/M/L/XL atau ukuran khusus, lalu isi stok masing-masing. Untuk restok ukuran yang sama, isi **Tambah (pcs) → Tambah**, kemudian simpan produk. Total dihitung otomatis; ukuran baru bisa ditambahkan pada produk yang sama. Produk lama perlu pembagian total stok sebelum restok per ukuran. Baca [panduan ukuran dan stok](../docs/SIZE_STOCK.md), termasuk perlindungan pesanan aktif, keranjang, pembatalan dan stok yang dicadangkan.

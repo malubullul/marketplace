@@ -69,7 +69,7 @@ Login ke dashboard → **Tambah produk** → isi nama, deskripsi, kategori, harg
 
 Foto pertama menjadi sampul. Foto dapat dipilih dari perangkat, diurutkan dengan **Jadikan sampul**, dan dihapus dari formulir. Format unggahan JPG/PNG/WebP, maksimal 4 MB/foto dan 8 foto/produk. Server memvalidasi gambar, menghapus metadata lewat konversi WebP, dan membatasi ukuran hasil. Batas gambar sumber 25 megapiksel.
 
-Stok adalah total persediaan gabungan semua pilihan ukuran dan warna, bukan stok terpisah per varian. Admin mendapat peringatan jika stok/produk sudah berubah sejak editor dibuka.
+Aktifkan **Kelola stok per ukuran** untuk mencatat S/M/L/XL atau ukuran khusus satu per satu. Stok tiap ukuran dapat ditambah pada produk yang sama dan total dihitung otomatis. Warna masih berbagi stok dalam ukuran yang sama. Produk lama perlu pembagian stok secara eksplisit; lihat [panduan stok ukuran](SIZE_STOCK.md). Admin mendapat peringatan jika stok/produk sudah berubah sejak editor dibuka.
 
 ## Alur pengunjung dan pesanan
 
@@ -85,7 +85,7 @@ Harga, diskon, ongkir, dan ketersediaan diperiksa kembali di server. Stok dicada
 
 Dashboard **Pesanan masuk** memisahkan pembayaran dan pemenuhan. Pemilik memverifikasi pembayaran dari mutasi rekening, lalu mengikuti urutan Baru → Diproses → Dikirim → Selesai. Pembatalan biasa hanya untuk pesanan belum dibayar dan belum dilaporkan transfer/ditahan/dikirim; stok kembali satu kali. Pesanan final tidak dapat diaktifkan kembali. Batas pembayaran opsional diatur pada **Keamanan transaksi**; lihat [panduan transaksi](TRANSACTION_SAFETY.md).
 
-Pembayaran masih dikonfirmasi manual dengan pelanggan. Tidak ada pemotongan uang, integrasi kurir, atau pelacakan otomatis. Verifikasi pembayaran dicatat pemilik setelah pemeriksaan, bukan berasal dari bank. Email tersedia untuk pemulihan/verifikasi akun setelah Resend siap; notifikasi status belum tersedia. Belum ada harga reseller bertingkat, stok per varian, atau refund otomatis.
+Pembayaran masih dikonfirmasi manual dengan pelanggan. Tidak ada pemotongan uang, integrasi kurir, atau pelacakan otomatis. Verifikasi pembayaran dicatat pemilik setelah pemeriksaan, bukan berasal dari bank. Email tersedia untuk pemulihan/verifikasi akun setelah Resend siap; notifikasi status belum tersedia. Belum ada harga reseller bertingkat, stok per kombinasi ukuran/warna, atau refund otomatis.
 
 ## Data dan pencadangan
 

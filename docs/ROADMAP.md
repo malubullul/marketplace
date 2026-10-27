@@ -5,7 +5,7 @@ Sumber: audit yang diberikan pemilik pada 27 Oktober 2026. Pemilik memilih **sel
 | Tahap | Ruang lingkup | Status |
 | --- | --- | --- |
 | 01 — Amankan transaksi | Email-first signup/verifikasi akun lama, status pembayaran privat, urutan status pesanan, pembatalan mandiri, batas pembayaran opsional, audit log | Implementasi dan pengujian lokal selesai; aktivasi email memerlukan migrasi 005 dan Resend di hosting |
-| 02 — Stok dan pengiriman | SKU dan stok ukuran/warna, data supplier/harga modal privat, ketersediaan/pre-order, kurir/layanan/resi, ongkir berdasarkan tujuan, retur/refund terstruktur | Belum diimplementasikan |
+| 02 — Stok dan pengiriman | SKU dan stok ukuran/warna, data supplier/harga modal privat, ketersediaan/pre-order, kurir/layanan/resi, ongkir berdasarkan tujuan, retur/refund terstruktur | Stok per ukuran, restok dan pembatalan ukuran sudah diimplementasikan; SKU, kombinasi warna, supplier dan pengiriman/retur belum |
 | 03 — Operasional toko | Notifikasi, kebijakan toko yang disetujui pemilik, laporan penjualan/margin, MFA admin, backup dan latihan restore, monitoring, penguatan CSP | Belum diimplementasikan |
 | 04 — Pemasaran dan pengalaman belanja | Metadata produk dari server, Open Graph/canonical/sitemap/structured data, filter varian dan pencarian/pagination server, analitik, kemudahan belanja pengunjung | Belum diimplementasikan |
 
@@ -22,7 +22,7 @@ Petunjuk pemilik dan aktivasi: [Keamanan transaksi](TRANSACTION_SAFETY.md).
 
 ## Urutan pekerjaan berikutnya
 
-Tahap 02 perlu dimulai dengan model varian dan migrasi yang mempertahankan stok/pesanan lama, lalu editor admin, pemilihan varian di toko, dan penguncian checkout/pembatalan. Informasi supplier dan harga modal wajib dipisahkan dari respons publik. Pengiriman manual dengan nomor resi dapat dikerjakan sebelum integrasi tarif kurir; layanan ongkir otomatis memerlukan provider dan kredensial dari pemilik. Refund perlu catatan pemeriksaan yang terpisah dari pengembalian stok.
+Tahap 02 sudah memiliki [stok per ukuran](SIZE_STOCK.md), editor/restok, pilihan ukuran di toko, dan penguncian checkout/pembatalan dengan kompatibilitas stok lama. Berikutnya adalah SKU dan stok per kombinasi ukuran/warna, supplier dan pengiriman. Informasi supplier dan harga modal wajib dipisahkan dari respons publik. Pengiriman manual dengan nomor resi dapat dikerjakan sebelum integrasi tarif kurir; layanan ongkir otomatis memerlukan provider dan kredensial dari pemilik. Refund perlu catatan pemeriksaan yang terpisah dari pengembalian stok.
 
 Tahap 03 tidak boleh menerbitkan kebijakan retur, jaminan, identitas badan usaha, atau angka keuntungan yang belum disetujui/tersedia. Monitoring dan email operasional harus menghindari data pribadi serta punya pengaturan pengiriman yang jelas. Backup baru dinyatakan teruji setelah berhasil direstore ke database terpisah.
 

@@ -123,8 +123,8 @@ class PromoCodes:
                     raise ValueError('Perbarui keranjang sebelum memakai promo.')
                 quantities = {}
                 for item in cart:
-                    quantities[item['id']] = quantities.get(item['id'],0)+item['jumlah']
-                if any(quantities[item['id']]>item['stok'] for item in cart):
+                    quantities[item['stock_key']] = quantities.get(item['stock_key'],0)+item['jumlah']
+                if any(quantities[item['stock_key']]>item['stok'] for item in cart):
                     raise ValueError('Stok tidak mencukupi. Perbarui keranjang.')
                 subtotal = sum(item['harga']*item['jumlah'] for item in cart)
                 promo = self.evaluate(code,g.customer['id'],subtotal)

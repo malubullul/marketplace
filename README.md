@@ -34,7 +34,7 @@ Opening HTML directly or running `python -m http.server` provides a static examp
 - Fashion-first, responsive public storefront with categories, search, filtering and sorting.
 - Five-photo editorial [homepage campaign](docs/CAMPAIGN_SLIDER.md) with arrows, touch swipe, keyboard navigation and reduced-motion support.
 - Owner login, server-revoked sessions, password hashing, CSRF protection and login throttling.
-- Product editor: name, description, category, brand, price/discount, total stock, sizes, colors, materials/care and up to eight images.
+- Product editor: name, description, category, brand, price/discount, [stock per size](docs/SIZE_STOCK.md), colors, materials/care and up to eight images. Restock or add sizes on the same product; total stock is calculated automatically.
 - Shared [product photo galleries](docs/PRODUCT_GALLERY.md): upload four photos at once, choose the cover, then browse with arrows/swipe on cards and arrows/thumbnails on product details.
 - Validated image uploads, WebP conversion and a private Supabase bucket; local disk is available for development.
 - Draft/published visibility, stale-edit conflict detection, PostgreSQL support and local SQLite support.
@@ -55,7 +55,7 @@ Opening HTML directly or running `python -m http.server` provides a static examp
 
 ## Operational limits
 
-Payments and shipping are not automated. Recovery emails require a verified Resend sender and server configuration. Orders await the owner's manual confirmation. Stock is total per product, not separate stock for each variant. Mandatory email verification requires explicit activation after sender/schema setup; it is off by default for rollout compatibility. Variant stock, reseller pricing tiers, shipping integration, refunds, and MFA remain on the [staged audit roadmap](docs/ROADMAP.md). Initial example products and photography must be replaced or unpublished before launch; see [asset sources](assets/SOURCES.md).
+Payments and shipping are not automated. Recovery emails require a verified Resend sender and server configuration. Orders await the owner's manual confirmation. Stock can be tracked per size; colors share stock within that size. Legacy products retain pooled stock until the owner allocates it explicitly. Mandatory email verification requires explicit activation after sender/schema setup; it is off by default for rollout compatibility. Stock per size/color combination, reseller pricing tiers, shipping integration, refunds, and MFA remain on the [staged audit roadmap](docs/ROADMAP.md). Initial example products and photography must be replaced or unpublished before launch; see [asset sources](assets/SOURCES.md).
 
 Vercel stores data in Supabase PostgreSQL and photos in private Supabase Storage; session signing uses a stable environment secret. Apply [database](migrations/001_supabase.sql), [ratings/recovery](migrations/004_reviews_recovery.sql), [email verification](migrations/005_email_verification.sql) and [bucket](migrations/002_supabase_storage.sql) migrations before connecting the production projects. The application does not create cloud tables or seed demonstration products during cold starts. PostgreSQL serializes application transactions using one advisory lock per schema, suitable for a small store rather than high marketplace traffic. SQLite deployments require one store instance and a persistent disk.
 

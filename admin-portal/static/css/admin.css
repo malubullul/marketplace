@@ -9,6 +9,18 @@
 }
 .payment-management { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 24px; overflow-wrap: anywhere; }
 .payment-management h3 { font-size: 18px; }
+.size-stock-editor { margin: 24px 0; padding: 20px; border: 1px solid var(--line); }
+.size-stock-add { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 20px 0; }
+.size-stock-add label { flex-basis: 100%; margin: 0; }
+.size-stock-add select, .size-stock-add input { flex: 1 1 120px; width: 120px; }
+.size-stock-row { display: grid; grid-template-columns: minmax(40px,1fr) 90px 90px auto auto; gap: 10px; align-items: end; padding: 16px 0; border-top: 1px solid var(--line); }
+.size-stock-row strong { align-self: center; overflow-wrap: anywhere; }
+.size-stock-row label { font-size: 12px; margin: 0; }
+.size-stock-row input { width: 100%; margin-top: 8px; }
+.size-stock-row button, .size-stock-add button { min-height: 44px; }
+.size-remove { color: var(--error); text-decoration: underline; }
+.stock-breakdown { display: block; max-width: 240px; margin-top: 8px; color: var(--muted); overflow-wrap: anywhere; }
+@media(max-width:600px) { .size-stock-editor { padding: 16px; } .size-stock-row { grid-template-columns: repeat(2,minmax(0,1fr)); } .size-stock-row strong { grid-column: 1/-1; } .size-stock-row button { width: 100%; } }
 .payment-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 16px; }
 .payment-controls label, .payment-controls input { flex-basis: 100%; }
 .payment-controls button { white-space: normal; min-height: 44px; }

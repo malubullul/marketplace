@@ -2,6 +2,7 @@
 import json
 import secrets
 import time
+import inventory
 from flask import g, jsonify, request
 
 
@@ -189,7 +190,7 @@ class OrderOperations:
         for line in order['items']:
             row = self.db().execute('SELECT document FROM products WHERE id=?', (line['id'],)).fetchone()
             if not row: continue  # Historical deleted products must never be recreated.
-            product = json.loads(row['document']); product['stok'] += line['jumlah']
+            product = json.loads(row['document']); inventory.adjust(product, line['ukuran'], line['jumlah'])
             self.db().execute('UPDATE products SET document=?,updated_at=? WHERE id=?', (json.dumps(product), time.time_ns(), line['id']))
         order.update(status='dibatalkan', cancellation_reason=reason)
 

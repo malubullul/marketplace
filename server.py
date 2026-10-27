@@ -29,6 +29,7 @@ from promo_codes import PromoCodes, normalize_code
 from audit_log import AuditLog
 from order_operations import OrderOperations
 from email_verification import EmailVerification
+import inventory
 
 ROOT = Path(__file__).resolve().parent
 ADMIN_ROOT = ROOT / 'admin-portal'
@@ -412,7 +413,8 @@ def create_app(config=None):
             if not isinstance(value, list) or len(value) > 20 or any(not isinstance(v, str) or not v.strip() or len(v.strip()) > 30 for v in value):
                 raise ValueError(f"Pilihan {key} tidak valid.")
             return list(dict.fromkeys(v.strip() for v in value))
-        return dict(
+        rows = inventory.validate_stock(data, previous)
+        result = dict(
             nama=text("nama", required=True), kategori=category, harga=price, hargaAsli=old_price,
             stok=number("stok", 0, 1_000_000), deskripsi=text("deskripsi", 10000, True), brand=text("brand", 80),
             label=text("label", 40), ukuran=options("ukuran"), warna=options("warna"),
@@ -423,6 +425,9 @@ def create_app(config=None):
             spesifikasi={"Bahan": text("bahan", 120), "Perawatan": text("perawatan", 500)},
             bahan=text("bahan", 120), perawatan=text("perawatan", 500),
         )
+        if rows is not None:
+            result.update(stokUkuran=rows, ukuran=[r['ukuran'] for r in rows], stok=sum(r['stok'] for r in rows))
+        return result
 
     @app.post("/api/admin/products")
     @owner_required
@@ -451,6 +456,7 @@ def create_app(config=None):
             return fail("Produk atau stok telah berubah. Muat ulang daftar produk sebelum menyimpan.", 409)
         try:
             product = validated_product(data, json.loads(row["document"]))
+            inventory.validate_edit(db(), product_id, json.loads(row['document']), product)
         except ValueError as error:
             db().rollback()
             return fail(str(error))
@@ -578,14 +584,15 @@ def create_app(config=None):
                     raise ValueError("Pilih ukuran dan warna yang tersedia.")
                 if not isinstance(size, str) or not isinstance(color, str) or len(size)>30 or len(color)>30:
                     raise ValueError("Pilihan produk tidak valid.")
-                quantities[product_id] += quantity
+                quantities[(product_id, inventory.bucket(product, size))] += quantity
                 source[product_id] = product
-                items.append(dict(id=product_id, nama=product["nama"], gambar=product["gambar"], harga=product["harga"], jumlah=quantity, ukuran=size, warna=color))
-            for product_id, quantity in quantities.items():
+                items.append(dict(id=product_id, nama=product["nama"], gambar=product["gambar"], harga=product["harga"], jumlah=quantity, ukuran=size, warna=color, stock_mode='size' if product.get('stokUkuran') is not None else 'total'))
+            for (product_id, size), quantity in quantities.items():
                 product = source[product_id]
-                if product["stok"] < quantity:
+                stock = next((r['stok'] for r in product.get('stokUkuran', []) if r['ukuran'] == size), 0) if product.get('stokUkuran') is not None else product['stok']
+                if stock < quantity:
                     raise ValueError(f"Stok {product['nama']} tidak mencukupi. Perbarui keranjang.")
-                product["stok"] -= quantity
+                inventory.adjust(product, size, -quantity)
                 db().execute("UPDATE products SET document=?,updated_at=? WHERE id=?", (json.dumps(product), time.time_ns(), product_id))
             subtotal = sum(line["harga"] * line["jumlah"] for line in items)
             try:
@@ -612,7 +619,8 @@ def create_app(config=None):
             db().execute("INSERT INTO orders(id,document,status,idempotency_key,created_at,customer_id) VALUES(?,?,?,?,?,?)", (order_id, json.dumps(order), "baru", order_key, int(time.time()), customer_id))
             operations.record_created(order, customer_id)
             if reviews.ready():
-                for product_id, quantity in quantities.items():
+                for product_id in source:
+                    quantity = sum(line['jumlah'] for line in items if line['id'] == product_id)
                     db().execute('INSERT INTO order_items(order_id,product_id,quantity) VALUES(?,?,?)', (order_id, product_id, quantity))
             customers.consume_cart(customer_id,items)
             db().commit()

@@ -61,7 +61,11 @@ finally:cleanup()
                     assert admin_context.request.get(admin_base+'produk.html').status==404
                 owner.locator('#login-email').fill('owner@example.test');owner.locator('#login-password').fill(password);owner.locator('#login-button').click();owner.locator('#dashboard').wait_for(state='visible')
                 owner.locator('#add-product').click()
-                for field,value in {'product-name':'Jaket Suede Uji','product-description':'Jaket nyaman <b>suede</b> dengan detail premium.','product-brand':'Anredseller','product-price':'299000','product-stock':'4','product-sizes':'S, M','product-colors':'Hitam, Cokelat','product-material':'Suede sintetis'}.items():owner.locator('#'+field).fill(value)
+                for field,value in {'product-name':'Jaket Suede Uji','product-description':'Jaket nyaman <b>suede</b> dengan detail premium.','product-brand':'Anredseller','product-price':'299000','product-stock':'4','product-colors':'Hitam, Cokelat','product-material':'Suede sintetis'}.items():owner.locator('#'+field).fill(value)
+                owner.locator('#size-stock-enabled').check()
+                for size in ['S','M']:
+                    owner.locator('#new-stock-size').select_option(size);owner.locator('#add-stock-size').click()
+                    owner.get_by_label('Stok '+size,exact=True).fill('2')
                 owner.locator('#product-photos').set_input_files(str(ROOT/'assets/shirt.png'))
                 owner.get_by_text('Foto berhasil diunggah.',exact=True).wait_for()
                 owner.get_by_role('button',name='Simpan draf',exact=True).click();owner.locator('#product-dialog').wait_for(state='hidden')
@@ -72,7 +76,7 @@ finally:cleanup()
                 assert shopper.locator('#grid-produk-list img').evaluate('(e)=>e.complete&&e.naturalWidth>0')
                 shopper.locator('#grid-produk-list .kartu-produk-nama').click();shopper.wait_for_url('**/detail.html?id=*');shopper.locator('#pilihan-ukuran').wait_for()
                 assert '<b>suede</b>' in shopper.locator('#tab-deskripsi').inner_text();assert shopper.locator('#tab-deskripsi b').count()==0
-                shopper.locator('#btn-tambah').click();assert shopper.evaluate('getKeranjang().length')==0
+                assert shopper.locator('#btn-tambah').is_disabled();assert shopper.evaluate('getKeranjang().length')==0
                 shopper.locator('#pilihan-ukuran').select_option('S');shopper.locator('#pilihan-warna').select_option('Hitam');shopper.locator('#btn-tambah').click()
                 shopper.wait_for_url('**/akun.html?next=*');shopper.locator('#show-register').click()
                 for field,value in {'buyer-register-name':'Pembeli Uji','buyer-register-phone':'081234567890','buyer-register-email':'buyer@example.test','buyer-register-password':buyer_password,'buyer-register-confirm':buyer_password}.items():shopper.locator('#'+field).fill(value)
