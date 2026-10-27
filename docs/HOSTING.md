@@ -79,13 +79,13 @@ Katalog tetap dapat dibuka tanpa login. Menyimpan wishlist/keranjang dan checkou
 
 Pembeli hanya dapat membaca pesanannya sendiri. Pengelola toko dapat membaca seluruh pesanan dari dashboard admin. Pesanan lama yang dibuat sebelum fitur akun tidak otomatis ditautkan hanya karena alamat email sama. Migrasi database menambahkan kepemilikan akun tanpa menghapus data lama.
 
-Keluar akun mencabut sesi perangkat tersebut. Mengganti kata sandi memerlukan kata sandi saat ini dan mencabut sesi di perangkat lain. Password disimpan sebagai hash; tidak ada kata sandi pelanggan bawaan. Verifikasi email, pemulihan kata sandi lewat email, dan SMS OTP belum tersedia. Akun menggunakan email dan kata sandi.
+Keluar akun mencabut sesi perangkat tersebut. Mengganti kata sandi memerlukan kata sandi saat ini dan mencabut sesi di perangkat lain. Password disimpan sebagai hash; tidak ada kata sandi pelanggan bawaan. Pemulihan kata sandi dan verifikasi email memakai Resend dengan domain pengirim terverifikasi. Lihat [aktivasi verifikasi email](TRANSACTION_SAFETY.md). Akun menggunakan email dan kata sandi; SMS OTP belum tersedia.
 
 Harga, diskon, ongkir, dan ketersediaan diperiksa kembali di server. Stok dicadangkan ketika pesanan tercatat. Pengiriman ulang permintaan yang sama tidak membuat pesanan ganda. Rincian pesanan dapat dibaca kembali melalui akun pembeli yang bersangkutan dan dashboard pemilik.
 
-Dashboard **Pesanan masuk** menampilkan rincian pesanan dan status Baru/Diproses/Dikirim/Selesai/Dibatalkan. Membatalkan pesanan mengembalikan stok satu kali. Pesanan selesai atau dibatalkan tidak dapat diaktifkan kembali.
+Dashboard **Pesanan masuk** memisahkan pembayaran dan pemenuhan. Pemilik memverifikasi pembayaran dari mutasi rekening, lalu mengikuti urutan Baru → Diproses → Dikirim → Selesai. Pembatalan biasa hanya untuk pesanan belum dibayar dan belum dilaporkan transfer/ditahan/dikirim; stok kembali satu kali. Pesanan final tidak dapat diaktifkan kembali. Batas pembayaran opsional diatur pada **Keamanan transaksi**; lihat [panduan transaksi](TRANSACTION_SAFETY.md).
 
-Pembayaran masih dikonfirmasi manual dengan pelanggan. Tidak ada pemotongan uang, pengiriman email, integrasi kurir, atau pelacakan otomatis. Mengubah status tidak membuktikan pembayaran berhasil. Belum ada harga reseller bertingkat, stok per varian, atau refund otomatis.
+Pembayaran masih dikonfirmasi manual dengan pelanggan. Tidak ada pemotongan uang, integrasi kurir, atau pelacakan otomatis. Verifikasi pembayaran dicatat pemilik setelah pemeriksaan, bukan berasal dari bank. Email tersedia untuk pemulihan/verifikasi akun setelah Resend siap; notifikasi status belum tersedia. Belum ada harga reseller bertingkat, stok per varian, atau refund otomatis.
 
 ## Data dan pencadangan
 

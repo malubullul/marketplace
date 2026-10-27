@@ -1,3 +1,4 @@
+from order_workflow import advance
 import importlib.util
 import io
 from pathlib import Path
@@ -134,8 +135,7 @@ class AdminPortalTests(unittest.TestCase):
         number = response.json['order']['nomor']
         headers = self.login()
         self.assertEqual(self.client.get('/api/admin/orders').json['orders'][0]['nomor'], number)
-        response = self.client.patch('/api/admin/orders/'+number, json={'status':'diproses'}, headers=headers)
-        self.assertEqual(response.status_code, 200, response.json)
+        advance(self.client,headers,number,'diproses')
         self.assertEqual(self.public.get('/api/customer/orders/'+number).json['order']['status'], 'diproses')
 
     def test_missing_configuration_invalid_origins_and_secure_cookie(self):

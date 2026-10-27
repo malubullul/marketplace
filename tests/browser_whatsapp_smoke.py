@@ -134,6 +134,13 @@ finally:cleanup()
                 owner.locator('[data-page=orders]').click(); owner.locator('#refresh-orders').click()
                 status = owner.locator('[data-order-status="'+order['nomor']+'"]')
                 status.wait_for()
+                owner.locator('[data-order="'+order['nomor']+'"]').click()
+                owner.locator('#payment-reference').fill('Fixture transfer bank')
+                owner.once('dialog', lambda dialog:dialog.dismiss()); owner.locator('[data-payment-action=verify]').click()
+                assert buyer_context.request.get(base+'/api/customer/orders/'+order['nomor']).json()['order']['payment']['status']=='pending'
+                owner.once('dialog', lambda dialog:dialog.accept()); owner.locator('[data-payment-action=verify]').click()
+                owner.locator('#order-details').get_by_role('heading',name='Pembayaran terverifikasi',exact=True).wait_for()
+                owner.locator('#close-order').click()
                 owner.once('dialog', lambda dialog:dialog.dismiss()); status.select_option('diproses')
                 assert buyer_context.request.get(base+'/api/customer/orders/'+order['nomor']).json()['order']['status'] == 'baru'
                 owner.once('dialog', lambda dialog:dialog.accept()); status.select_option('diproses')

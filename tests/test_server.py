@@ -147,8 +147,9 @@ class StoreTests(unittest.TestCase):
         product = self.product()
         order = self.order(product,quantity=2).json['order']
         for _ in range(2):
-            result = self.client.patch('/api/admin/orders/'+order['nomor'],json={'status':'dibatalkan'},headers=self.headers)
+            result = self.client.patch('/api/admin/orders/'+order['nomor'],json={'status':'dibatalkan','version':order['version']},headers=self.headers)
             self.assertEqual(result.status_code,200)
+            order=result.json['order']
         self.assertEqual(self.current_product(product['id'])['stok'],4)
         self.assertEqual(self.client.patch('/api/admin/orders/'+order['nomor'],json={'status':'baru'},headers=self.headers).status_code,409)
 

@@ -97,12 +97,14 @@ class PromoCodes:
                 return fail('Promo telah diubah di tempat lain. Muat ulang daftar sebelum menyimpan.',409)
             promo['version'] = str(time.time_ns())
             db().execute('INSERT INTO metadata(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value', (key,json.dumps(promo)))
+            app.audit_log.record('promo.saved', 'promo', promo['code'])
             db().commit()
             return jsonify(promo=promo), 200 if previous else 201
 
         @app.post('/api/customer/promo')
         @customers.required
         def preview_promo():
+            app.extensions['order_operations'].sweep_expired()
             # Separate, persisted budget: normal cart edits must not exhaust login limits.
             now = int(now_seconds())
             key = 'promo-preview:'+str(g.customer['id'])

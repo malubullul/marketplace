@@ -45,7 +45,8 @@ Opening HTML directly or running `python -m http.server` provides a static examp
 - Authenticated checkout and order history scoped to the buyer account; account identity is checked by the server.
 - Separate admin and customer sessions; signing into one role does not grant the other role.
 - Server-validated orders, authoritative prices, stock reservation and idempotent order submission.
-- Owner order view, status changes and one-time stock restoration on cancellation.
+- [Transaction safety](docs/TRANSACTION_SAFETY.md): private manual payment verification, sequential fulfillment, buyer cancellation, opt-in payment deadlines, one-time stock restoration, and owner activity history.
+- Email-first signup and legacy email verification, with hashed single-use tokens and session revocation. Enable after migration 005 and Resend setup.
 - WhatsApp payment handoff with order reference and server-calculated total; separate customer-service chat and owner-editable contact numbers. See [WhatsApp guide](docs/WHATSAPP.md).
 - Owner-managed campaign/category/banner/account photos and optional social links in the footer. See [content management](docs/STORE_CONTENT.md).
 - Owner-managed [promo codes](docs/PROMO_CODES.md) for partner collaborations: percentage/fixed discounts, minimum spend, caps, dates, total/account limits, order attribution and server-verified checkout totals. Uses existing database tables; no additional migration.
@@ -54,9 +55,9 @@ Opening HTML directly or running `python -m http.server` provides a static examp
 
 ## Operational limits
 
-Payments and shipping are not automated. Recovery emails require a verified Resend sender and server configuration. Orders await the owner's manual confirmation. Stock is total per product, not separate stock for each variant. Customer accounts are implemented; email verification at registration and reseller pricing tiers are not implemented. Initial example products and photography must be replaced or unpublished before launch; see [asset sources](assets/SOURCES.md).
+Payments and shipping are not automated. Recovery emails require a verified Resend sender and server configuration. Orders await the owner's manual confirmation. Stock is total per product, not separate stock for each variant. Mandatory email verification requires explicit activation after sender/schema setup; it is off by default for rollout compatibility. Variant stock, reseller pricing tiers, shipping integration, refunds, and MFA remain on the [staged audit roadmap](docs/ROADMAP.md). Initial example products and photography must be replaced or unpublished before launch; see [asset sources](assets/SOURCES.md).
 
-Vercel stores data in Supabase PostgreSQL and photos in private Supabase Storage; session signing uses a stable environment secret. Apply [database](migrations/001_supabase.sql), [ratings/recovery](migrations/004_reviews_recovery.sql) and [bucket](migrations/002_supabase_storage.sql) migrations before connecting the production projects. The application does not create cloud tables or seed demonstration products during cold starts. PostgreSQL serializes application transactions using one advisory lock per schema, suitable for a small store rather than high marketplace traffic. SQLite deployments require one store instance and a persistent disk.
+Vercel stores data in Supabase PostgreSQL and photos in private Supabase Storage; session signing uses a stable environment secret. Apply [database](migrations/001_supabase.sql), [ratings/recovery](migrations/004_reviews_recovery.sql), [email verification](migrations/005_email_verification.sql) and [bucket](migrations/002_supabase_storage.sql) migrations before connecting the production projects. The application does not create cloud tables or seed demonstration products during cold starts. PostgreSQL serializes application transactions using one advisory lock per schema, suitable for a small store rather than high marketplace traffic. SQLite deployments require one store instance and a persistent disk.
 
 ## Validation
 
@@ -73,6 +74,7 @@ python3 tests/browser_smoke.py
 python3 tests/responsive_smoke.py
 ANREDSELLER_TEST_ADMIN_PORTAL=1 python3 tests/browser_smoke.py
 python3 tests/browser_promos_smoke.py
+python3 tests/browser_transaction_safety_smoke.py
 ```
 
 This starts a temporary store with disposable test credentials and data, uses separate owner/visitor browser contexts, and exercises photo upload → draft → publish → public product → customer registration → saved address → cross-device cart/wishlist → authenticated checkout → private customer history → owner order → unpublish → logout. It does not create an account in the development or production database.

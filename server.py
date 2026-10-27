@@ -26,6 +26,9 @@ from database import PostgresDatabase, PostgresError
 from storage import LocalStorage, SupabaseStorage, StorageError
 from store_content import CAMPAIGNS, StoreContent, default_content, public_content
 from promo_codes import PromoCodes, normalize_code
+from audit_log import AuditLog
+from order_operations import OrderOperations
+from email_verification import EmailVerification
 
 ROOT = Path(__file__).resolve().parent
 ADMIN_ROOT = ROOT / 'admin-portal'
@@ -80,8 +83,17 @@ def create_app(config=None):
         PUBLIC_URL=os.environ.get('ANREDSELLER_PUBLIC_URL', ''),
         RESEND_API_KEY=os.environ.get('RESEND_API_KEY', ''),
         EMAIL_FROM=os.environ.get('ANREDSELLER_EMAIL_FROM', ''),
+        EMAIL_VERIFICATION_REQUIRED=os.environ.get('ANREDSELLER_REQUIRE_VERIFIED_EMAIL', '0'),
+        CRON_SECRET=os.environ.get('CRON_SECRET', ''),
     )
     app.config.update(config or {})
+    policy = app.config['EMAIL_VERIFICATION_REQUIRED']
+    if type(policy) is str and policy in {'0', '1'}:
+        app.config['EMAIL_VERIFICATION_REQUIRED'] = policy == '1'
+    elif type(policy) is not bool:
+        raise ValueError('ANREDSELLER_REQUIRE_VERIFIED_EMAIL harus 0 atau 1.')
+    if app.config['CRON_SECRET'] and len(app.config['CRON_SECRET']) < 32:
+        raise ValueError('CRON_SECRET harus minimal 32 karakter.')
     if app.config['ADMIN_GATEWAY_KEY'] and len(app.config['ADMIN_GATEWAY_KEY']) < 32:
         raise ValueError('ADMIN_GATEWAY_KEY harus minimal 32 karakter.')
     if app.config['ADMIN_PORTAL_URL']:
@@ -172,6 +184,7 @@ def create_app(config=None):
     customers = CustomerAPI(app, db, fail, body)
     reviews = ProductReviews(app, db, customers, fail, body)
     PasswordRecovery(app, db, customers, fail, body)
+    verification = EmailVerification(app, db, customers, fail, body)
 
     def authenticated_owner():
         sid = session.get("sid", "")
@@ -185,9 +198,12 @@ def create_app(config=None):
                 return fail("Silakan login sebagai pemilik toko.", 401)
             if request.method != "GET" and not secrets.compare_digest(request.headers.get("X-CSRF-Token", ""), token()):
                 return fail("Sesi formulir tidak valid. Muat ulang halaman.", 403)
+            g.owner = owner
             return func(*args, **kwargs)
         return wrapped
 
+    audit = AuditLog(app, db, owner_required, fail)
+    operations = OrderOperations(app, db, customers, owner_required, fail, body)
     promos = PromoCodes(app, db, customers, owner_required, fail, body)
 
     @app.before_request
@@ -284,6 +300,7 @@ def create_app(config=None):
         session["sid"] = secrets.token_urlsafe(32)
         db().execute("DELETE FROM owner_sessions WHERE expires_at<?", (now,))
         db().execute("INSERT INTO owner_sessions VALUES(?,?,?)", (hashlib.sha256(session["sid"].encode()).hexdigest(), owner["id"], now+8*3600))
+        audit.record('owner.login', 'owner', owner['id'], actor={'type': 'owner', 'id': owner['id']})
         db().commit()
         session.permanent = True
         return jsonify(authenticated=True, email=owner["email"], csrf=token())
@@ -292,6 +309,7 @@ def create_app(config=None):
     @owner_required
     def logout():
         db().execute("DELETE FROM owner_sessions WHERE token=?", (hashlib.sha256(session.get("sid", "").encode()).hexdigest(),))
+        audit.record('owner.logout', 'owner', g.owner['id'])
         db().commit()
         session.pop("sid", None)
         session.pop("csrf", None)
@@ -306,6 +324,7 @@ def create_app(config=None):
 
     @app.get("/api/products")
     def public_products():
+        operations.sweep_expired()
         return jsonify(products=products(), mode="server")
 
     @app.get("/api/admin/products")
@@ -352,6 +371,7 @@ def create_app(config=None):
                 return fail('Nomor WhatsApp harus memiliki 8–15 digit termasuk kode negara.')
             normalized[key] = number
         db().execute("INSERT INTO metadata(key,value) VALUES('store_contacts',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (json.dumps(normalized),))
+        audit.record('contacts.updated', 'settings', 'contacts')
         db().commit()
         return jsonify(contacts=normalized)
 
@@ -413,6 +433,7 @@ def create_app(config=None):
             return fail(str(error))
         version = time.time_ns()
         cursor = db().execute("INSERT INTO products(document,published,updated_at) VALUES(?,?,?)", (json.dumps(product), product["published"], version))
+        audit.record('product.created', 'product', cursor.lastrowid)
         db().commit()
         return jsonify(product=dict(product, id=cursor.lastrowid, version=str(version))), 201
 
@@ -435,13 +456,20 @@ def create_app(config=None):
             return fail(str(error))
         version = time.time_ns()
         db().execute("UPDATE products SET document=?,published=?,updated_at=? WHERE id=?", (json.dumps(product), product["published"], version, product_id))
+        audit.record('product.updated', 'product', product_id)
         db().commit()
         return jsonify(product=dict(product, id=product_id, version=str(version), **reviews.metrics().get(product_id, dict(rating=0, ulasan=0, terjual=0))))
 
     @app.delete("/api/admin/products/<int:product_id>")
     @owner_required
     def delete_product(product_id):
+        db().execute('BEGIN IMMEDIATE')
+        pending = db().execute("SELECT document FROM orders WHERE status IN ('baru','diproses','dikirim')").fetchall()
+        if any(any(line['id'] == product_id for line in json.loads(row['document'])['items']) for row in pending):
+            db().rollback()
+            return fail('Produk masih memiliki pesanan aktif. Jadikan draft jika ingin menyembunyikannya.', 409)
         deleted = db().execute("DELETE FROM products WHERE id=?", (product_id,)).rowcount
+        if deleted: audit.record('product.deleted', 'product', product_id)
         db().commit()
         if not deleted:
             return fail("Produk tidak ditemukan.", 404)
@@ -473,6 +501,8 @@ def create_app(config=None):
                 photos.put(name, output.getvalue())
         except (UnidentifiedImageError, OSError, ValueError, Image.DecompressionBombError):
             return fail("Foto tidak valid. Gunakan JPG, PNG, atau WebP maksimal 25 megapiksel.")
+        audit.record('photo.uploaded', 'photo', name)
+        db().commit()
         return jsonify(url="/uploads/" + name), 201
 
     @app.post("/api/orders")
@@ -486,9 +516,13 @@ def create_app(config=None):
         if not re.fullmatch(r"[a-zA-Z0-9-]{16,80}", key):
             return fail("Identitas permintaan tidak valid. Muat ulang checkout.")
         order_key = hashlib.sha256(f"{customer_id}:{key}".encode()).hexdigest()
+        operations.sweep_expired()
         existing = db().execute("SELECT document FROM orders WHERE idempotency_key=? AND customer_id=?", (order_key,customer_id)).fetchone()
         if existing:
-            return jsonify(order=json.loads(existing["document"]),state=customers.resolved_state(customer_id))
+            return jsonify(order=operations.decorate(json.loads(existing["document"])),state=customers.resolved_state(customer_id))
+        verification_error = verification.checkout_error(g.customer)
+        if verification_error is not None:
+            return verification_error
         customer = data.get("customer", {})
         if not isinstance(customer, dict):
             return fail("Lengkapi data penerima.")
@@ -523,7 +557,7 @@ def create_app(config=None):
             existing = db().execute("SELECT document FROM orders WHERE idempotency_key=? AND customer_id=?", (order_key,customer_id)).fetchone()
             if existing:
                 db().rollback()
-                return jsonify(order=json.loads(existing["document"]),state=customers.resolved_state(customer_id))
+                return jsonify(order=operations.decorate(json.loads(existing["document"])),state=customers.resolved_state(customer_id))
             quantities = Counter()
             items = []
             source = {}
@@ -540,7 +574,7 @@ def create_app(config=None):
                 if line.get("harga") != product["harga"]:
                     raise ValueError("Harga produk berubah. Buka keranjang untuk melihat harga terbaru.")
                 size, color = line.get("ukuran", ""), line.get("warna", "")
-                if (product.get("ukuran") and size not in product["ukuran"]) or (product.get("warna") and color not in product["warna"]):
+                if size not in (product.get("ukuran") or ['']) or color not in (product.get("warna") or ['']):
                     raise ValueError("Pilih ukuran dan warna yang tersedia.")
                 if not isinstance(size, str) or not isinstance(color, str) or len(size)>30 or len(color)>30:
                     raise ValueError("Pilihan produk tidak valid.")
@@ -561,11 +595,17 @@ def create_app(config=None):
             shipping = 0 if subtotal >= 200000 else 15000
             order_id = "ANR-" + secrets.token_hex(6).upper()
             order = dict(customer, nomor=order_id, tanggal=time.strftime("%Y-%m-%d"), created_at=int(time.time()), items=items, subtotal=subtotal, diskon=discount, ongkir=shipping, total=subtotal-discount+shipping, kurir="Dikonfirmasi oleh toko", metode="whatsapp", status="baru", catatan=str(data.get("catatan", ""))[:1000])
+            terms = operations.settings()
+            expected_terms = {k: terms[k] for k in ('deadline_enabled', 'payment_hours')}
+            if (terms['deadline_enabled'] or 'payment_terms' in data) and data.get('payment_terms') != expected_terms:
+                raise ValueError('Batas pembayaran berubah. Muat ulang checkout untuk memeriksa ketentuan terbaru.')
+            operations.initialize_order(order)
             if promo:
                 order['promo'] = promo
             if data.get("save_address") is True and address_id is None:
                 customers.save_address(customer_id, dict(customer,label="Alamat checkout"))
             db().execute("INSERT INTO orders(id,document,status,idempotency_key,created_at,customer_id) VALUES(?,?,?,?,?,?)", (order_id, json.dumps(order), "baru", order_key, int(time.time()), customer_id))
+            operations.record_created(order, customer_id)
             if reviews.ready():
                 for product_id, quantity in quantities.items():
                     db().execute('INSERT INTO order_items(order_id,product_id,quantity) VALUES(?,?,?)', (order_id, product_id, quantity))
@@ -579,34 +619,8 @@ def create_app(config=None):
     @app.get("/api/admin/orders")
     @owner_required
     def orders():
-        return jsonify(orders=[dict(json.loads(row["document"]),status=row["status"]) for row in db().execute("SELECT * FROM orders ORDER BY created_at DESC, id DESC").fetchall()])
-
-    @app.patch("/api/admin/orders/<order_id>")
-    @owner_required
-    def update_order(order_id):
-        state = body().get("status")
-        if state not in ORDER_STATES:
-            return fail("Status pesanan tidak valid.")
-        db().execute("BEGIN IMMEDIATE")
-        row = db().execute("SELECT * FROM orders WHERE id=?", (order_id,)).fetchone()
-        if not row:
-            db().rollback()
-            return fail("Pesanan tidak ditemukan.", 404)
-        if row["status"] in {"dibatalkan", "selesai"} and state != row["status"]:
-            db().rollback()
-            return fail("Pesanan yang sudah selesai atau dibatalkan tidak dapat diaktifkan kembali.", 409)
-        order = json.loads(row["document"])
-        if state == "dibatalkan" and row["status"] != "dibatalkan":
-            for line in order["items"]:
-                product_row = db().execute("SELECT document FROM products WHERE id=?", (line["id"],)).fetchone()
-                if product_row:
-                    product = json.loads(product_row["document"])
-                    product["stok"] += line["jumlah"]
-                    db().execute("UPDATE products SET document=?,updated_at=? WHERE id=?", (json.dumps(product), time.time_ns(), line["id"]))
-        order["status"] = state
-        db().execute("UPDATE orders SET status=?,document=? WHERE id=?", (state,json.dumps(order),order_id))
-        db().commit()
-        return jsonify(order=order)
+        operations.sweep_expired()
+        return jsonify(orders=[operations.decorate(dict(json.loads(row["document"]),status=row["status"])) for row in db().execute("SELECT * FROM orders ORDER BY created_at DESC, id DESC").fetchall()])
 
     @app.get("/uploads/<filename>")
     def uploaded_file(filename):

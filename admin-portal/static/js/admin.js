@@ -82,7 +82,7 @@ async function openDashboard(email) {
   $("login-view").hidden = true;
   $("dashboard").hidden = false;
   await refresh();
-  showPage(["products", "orders", "settings", "appearance", "socials", "promos"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "products");
+  showPage(["products", "orders", "settings", "appearance", "socials", "promos", "transactions", "activity"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "products");
 }
 async function refresh() {
   try {
@@ -137,9 +137,7 @@ function renderOrders() {
   $("order-rows").innerHTML = orders
     .map(
       (order) =>
-        `<tr><td><strong>${esc(order.nomor)}</strong><div class="order-meta">${new Date(order.created_at * 1000).toLocaleString("id-ID")}</div></td><td data-label="Pelanggan">${esc(order.nama_penerima || order.nama)}<div class="order-meta">${order.items.reduce((sum, line) => sum + line.jumlah, 0)} item</div></td><td data-label="Total">${money(order.total)}</td><td data-label="Status"><select class="order-status-select" data-order-status="${esc(order.nomor)}" aria-label="Status ${esc(order.nomor)}" ${["dibatalkan", "selesai"].includes(order.status) ? "disabled" : ""}>${Object.entries(
-          statusNames,
-        )
+        `<tr><td><strong>${esc(order.nomor)}</strong><div class="order-meta">${new Date(order.created_at * 1000).toLocaleString("id-ID")}</div></td><td data-label="Pelanggan">${esc(order.nama_penerima || order.nama)}<div class="order-meta">${order.items.reduce((sum, line) => sum + line.jumlah, 0)} item</div></td><td data-label="Total">${money(order.total)}<div class="order-meta">${esc(ownerPaymentLabel(order))}</div></td><td data-label="Status"><select class="order-status-select" data-order-status="${esc(order.nomor)}" aria-label="Status ${esc(order.nomor)}" ${["dibatalkan", "selesai"].includes(order.status) ? "disabled" : ""}>${Object.entries(statusNames).filter(([state]) => allowedOrderStates(order).includes(state))
           .map(
             ([key, label]) =>
               `<option value="${key}" ${order.status === key ? "selected" : ""}>${label}</option>`,
@@ -168,10 +166,14 @@ function showPage(name) {
   $("appearance-page").hidden = name !== "appearance";
   $("socials-page").hidden = name !== "socials";
   $("promos-page").hidden = name !== "promos";
+  $("transactions-page").hidden = name !== "transactions";
+  $("activity-page").hidden = name !== "activity";
+  if (name === "transactions") loadTransactionSettings();
+  if (name === "activity") loadActivity(true);
   if (name === "promos") loadPromos();
   if (["appearance", "socials"].includes(name) && !siteContentState) loadSiteSettings();
   $("page-breadcrumb").textContent =
-    {products: "KOLEKSI", orders: "PESANAN", settings: "KONTAK WHATSAPP", appearance: "TAMPILAN TOKO", socials: "MEDIA SOSIAL", promos: "KODE PROMO"}[name];
+    {products: "KOLEKSI", orders: "PESANAN", settings: "KONTAK WHATSAPP", appearance: "TAMPILAN TOKO", socials: "MEDIA SOSIAL", promos: "KODE PROMO", transactions: "KEAMANAN TRANSAKSI", activity: "RIWAYAT AKTIVITAS"}[name];
   document
     .querySelectorAll("[data-page]")
     .forEach((button) =>
@@ -476,13 +478,14 @@ document.addEventListener("change", async (event) => {
   try {
     await api("/api/admin/orders/" + order.nomor, {
       method: "PATCH",
-      body: { status: value },
+      body: { status: value, version: order.version },
     });
     message("Status pesanan diperbarui.");
     await refresh();
   } catch (error) {
     select.value = order.status;
     message(error.message, true);
+    await refresh();
   } finally {
     select.disabled = ["selesai", "dibatalkan"].includes(order.status);
   }
@@ -490,7 +493,8 @@ document.addEventListener("change", async (event) => {
 function openOrder(order) {
   $("order-details").innerHTML =
     `<span class="eyebrow">RINCIAN PESANAN</span><h2 id="order-title">${esc(order.nomor)}</h2><span class="badge new">${statusNames[order.status]}</span><div class="order-info"><div><span>Penerima</span><strong>${esc(order.nama_penerima || order.nama)}</strong></div><div><span>Email / Nomor HP</span><strong>${esc(order.email)} / ${esc(order.nohp)}</strong></div><div><span>Alamat pengiriman</span><strong>${esc(order.alamat)}, ${esc(order.kota)}, ${esc(order.provinsi)} ${esc(order.kodepos)}</strong></div><div><span>Catatan pelanggan</span><strong>${esc(order.catatan) || "Tidak ada catatan"}</strong></div><div><span>Pembayaran</span><strong>Transfer dibantu lewat WhatsApp pembayaran</strong></div>${order.promo ? `<div><span>Kode promo / Partner</span><strong>${esc(order.promo.code)}${order.promo.partner ? " / " + esc(order.promo.partner) : ""}</strong></div>` : ""}</div><div class="order-items">${order.items.map((item) => `<div class="order-item"><img src="${esc(item.gambar)}" alt="${esc(item.nama)}"><div><strong>${esc(item.nama)}</strong><small>${esc([item.ukuran, item.warna].filter(Boolean).join(" / "))} · ${item.jumlah} pcs</small></div><span>${money(item.harga * item.jumlah)}</span></div>`).join("")}</div><div class="order-info"><div><span>Subtotal / Ongkir / Diskon</span><strong>${money(order.subtotal)} / ${money(order.ongkir)} / −${money(order.diskon)}</strong></div></div><div class="order-total">Total ${money(order.total)}</div>`;
-  $("order-dialog").showModal();
+  renderPaymentManagement(order);
+  if (!$("order-dialog").open) $("order-dialog").showModal();
 }
 async function initializePortal() {
   try {
@@ -743,3 +747,70 @@ $("promo-form").addEventListener("submit", async event => {
     $("save-promo").textContent = "Simpan kode promo";
   }
 });
+
+const ownerPaymentLabels = {pending:"Menunggu transfer",reported:"Transfer dilaporkan",verified:"Pembayaran terverifikasi",unrecorded:"Riwayat pembayaran belum tercatat"};
+function ownerPaymentLabel(order) { return ownerPaymentLabels[order.payment?.status || (order.status === "baru" ? "pending" : "unrecorded")]; }
+function allowedOrderStates(order) {
+  const result = [order.status];
+  if (order.payment?.status === "verified") { const next = {baru:"diproses",diproses:"dikirim",dikirim:"selesai"}[order.status]; if (next) result.push(next); }
+  if (["baru","diproses"].includes(order.status) && order.payment?.status === "pending" && !order.payment_hold) result.push("dibatalkan");
+  return result;
+}
+let transactionSettings = null, activityCursor = null, activityLoading = false;
+async function loadTransactionSettings() {
+  $("save-transaction-settings").disabled = true;
+  try {
+    const data = await api("/api/admin/transaction-settings"); transactionSettings = data.settings;
+    $("deadline-enabled").checked = transactionSettings.deadline_enabled; $("payment-hours").value = transactionSettings.payment_hours;
+    $("email-verification-readiness").textContent = `Email wajib diverifikasi: ${data.email_verification.required ? "ya" : "belum aktif"}. Pengiriman verifikasi: ${data.email_verification.available ? "siap" : "belum siap"}. Aktivasi memerlukan migrasi 005, domain email terverifikasi, dan pengaturan hosting. Akun lama tidak dianggap terverifikasi otomatis.`;
+    $("save-transaction-settings").disabled = false;
+  } catch(error) { $("transaction-settings-result").textContent = error.message; }
+}
+$("transaction-settings-form").addEventListener("submit", async event => {
+  event.preventDefault(); if (!transactionSettings) return;
+  $("save-transaction-settings").disabled = true;
+  try {
+    const result = await api("/api/admin/transaction-settings", {method:"PUT", body:{version:transactionSettings.version,deadline_enabled:$("deadline-enabled").checked,payment_hours:Number($("payment-hours").value)}});
+    transactionSettings = result.settings; $("transaction-settings-result").textContent = "Ketentuan tersimpan dan berlaku untuk pesanan baru.";
+  } catch(error) { $("transaction-settings-result").textContent = error.message; await loadTransactionSettings(); }
+  finally { $("save-transaction-settings").disabled = false; }
+});
+function auditMarkup(events) {
+  const actions = {"owner.login":"Pemilik masuk", "owner.logout":"Pemilik keluar", "product.created":"Produk ditambahkan", "product.updated":"Produk diperbarui", "product.deleted":"Produk dihapus", "photo.uploaded":"Foto diunggah", "contacts.updated":"Kontak diperbarui", "promo.saved":"Kode promo disimpan", "content.updated":"Konten toko diperbarui", "transaction.settings":"Ketentuan pembayaran diperbarui", "order.created":"Pesanan dibuat", "order.status":"Status pesanan diperbarui", "order.cancelled":"Pesanan dibatalkan pembeli", "order.expired":"Pesanan melewati batas pembayaran", "payment.reported":"Transfer dilaporkan pembeli", "payment.verify":"Pembayaran diverifikasi", "payment.reject":"Laporan transfer ditolak", "payment.hold":"Pembatalan otomatis ditahan", "payment.release":"Penahanan dilepas"};
+  const actors = {owner:"Pemilik",customer:"Pembeli",system:"Sistem"};
+  const resources = {owner:"Pemilik",product:"Produk",photo:"Foto",settings:"Pengaturan",promo:"Promo",order:"Pesanan"};
+  return events.map(event => `<article class="audit-entry"><time>${esc(new Date(event.at*1000).toLocaleString("id-ID"))}</time><strong>${esc(actions[event.action] || event.action)}</strong><span>${esc(resources[event.resource] || event.resource)} · ${esc(event.resource_id)}</span><small>${esc(actors[event.actor.type] || event.actor.type)}${event.actor.id ? " #"+esc(event.actor.id) : ""}${event.details.to ? " · "+esc(event.details.to) : ""}</small></article>`).join("") || "<p>Belum ada aktivitas yang tercatat.</p>";
+}
+async function loadActivity(reset=false) {
+  if (activityLoading) return; activityLoading = true; $("more-activity").disabled = true;
+  try {
+    if (reset) activityCursor = null;
+    const data = await api("/api/admin/activity?limit=30"+(activityCursor ? "&cursor="+encodeURIComponent(activityCursor) : ""));
+    if (reset) $("activity-list").innerHTML = "";
+    $("activity-list").insertAdjacentHTML("beforeend", auditMarkup(data.events)); activityCursor = data.next_cursor;
+    $("more-activity").hidden = !activityCursor; $("activity-error").textContent = "";
+  } catch(error) { $("activity-error").textContent = error.message; }
+  finally { activityLoading = false; $("more-activity").disabled = false; }
+}
+$("refresh-activity").addEventListener("click", () => loadActivity(true));
+$("more-activity").addEventListener("click", () => loadActivity());
+function renderPaymentManagement(order) {
+  const section = document.createElement("section"); section.className = "payment-management";
+  const status = order.payment?.status;
+  section.innerHTML = `<h3>${esc(ownerPaymentLabel(order))}</h3>${order.payment_deadline ? `<p>Batas pembayaran: ${esc(new Date(order.payment_deadline*1000).toLocaleString("id-ID"))}</p>` : ""}${order.payment_hold || status === "reported" ? "<p>Pembatalan otomatis ditahan selama pemeriksaan.</p>" : ""}<p>Periksa mutasi rekening sebelum memverifikasi. Laporan transfer pelanggan belum membuktikan pembayaran.</p><div class="payment-controls">${order.status !== "dibatalkan" && status !== "verified" ? '<label for="payment-reference">Referensi pemeriksaan (hanya admin)</label><input id="payment-reference" maxlength="160" placeholder="Referensi transaksi yang sudah diperiksa" /><button type="button" class="button primary" data-payment-action="verify">Verifikasi pembayaran</button>' : ""}${order.status === "baru" && status !== "verified" ? `${status === "reported" ? '<button type="button" class="button secondary" data-payment-action="reject">Tolak laporan transfer</button>' : ""}<button type="button" class="button secondary" data-payment-action="${order.payment_hold ? "release" : "hold"}">${order.payment_hold ? "Lepas penahanan" : "Tahan pembatalan otomatis"}</button>` : ""}</div><p class="payment-result" role="status"></p><h3>Riwayat pesanan</h3><div class="order-audit" role="status">Memuat riwayat…</div>`;
+  $("order-details").append(section);
+  api("/api/admin/orders/"+order.nomor+"/history").then(data => {
+    if (!section.isConnected) return;
+    section.querySelector(".order-audit").innerHTML = `${data.payment_record.reference ? `<p>Referensi verifikasi: ${esc(data.payment_record.reference)}</p>` : ""}`+auditMarkup(data.events);
+  }).catch(error => section.querySelector(".order-audit").textContent = error.message);
+  section.addEventListener("click", async event => {
+    const button = event.target.closest("[data-payment-action]"); if (!button) return;
+    const action = button.dataset.paymentAction;
+    if (!confirm(action === "verify" ? "Pembayaran sudah cocok dengan mutasi rekening? Catat sebagai terverifikasi?" : "Terapkan tindakan ini pada pembayaran pesanan?")) return;
+    section.querySelectorAll("button").forEach(control => control.disabled = true);
+    try {
+      const result = await api("/api/admin/orders/"+order.nomor+"/payment", {method:"POST",body:{version:order.version,action,reference:section.querySelector("#payment-reference")?.value || ""}});
+      await refresh(); openOrder(result.order);
+    } catch(error) { section.querySelector(".payment-result").textContent = error.message+" Tutup dan buka ulang rincian untuk memuat kondisi terbaru."; section.querySelectorAll("button").forEach(control => control.disabled = false); await refresh(); }
+  });
+}

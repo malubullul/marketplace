@@ -94,3 +94,7 @@ Pengujian browser membuka toko dan portal pada origin berbeda, menjalankan ungga
 ## Tampilan toko dan media sosial
 
 Dashboard menyediakan menu **Tampilan toko** untuk sembilan foto publik (slider, kategori, banner dan halaman akun), **Media sosial** untuk tautan footer yang awalnya kosong, dan **Kontak WhatsApp** untuk dua nomor toko. Foto produk tetap di **Koleksi produk**. Setelah mengubah, simpan lalu muat ulang toko publik. Backend dan portal harus menggunakan commit terbaru; tidak memerlukan database, environment variable atau migrasi baru untuk pengaturan konten.
+
+## Pembayaran dan keamanan transaksi
+
+Pada rincian pesanan, cocokkan pembayaran dengan mutasi rekening lalu isi referensi privat dan pilih **Verifikasi pembayaran**. Sesudah itu status maju secara berurutan: Baru → Diproses → Dikirim → Selesai. Menu **Keamanan transaksi** mengatur batas pembayaran opsional untuk pesanan baru dan menampilkan kesiapan email; **Riwayat aktivitas** menampilkan catatan perubahan. Baca [panduan transaksi](../docs/TRANSACTION_SAFETY.md), termasuk aturan pembatalan/penahanan dan aktivasi email pada project toko. Portal tidak menyimpan salinan database atau key Resend.

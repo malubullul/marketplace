@@ -40,6 +40,14 @@ class RecoveryMailer:
                            'Jika email ini terdaftar di Anredseller, gunakan tautan berikut dalam 30 menit:\n'
                            + link + '\n\nTautan hanya dapat dipakai sekali. Setelah berhasil, semua perangkat akan keluar. '
                            'Jika kamu tidak meminta perubahan ini, abaikan email ini. Kata sandimu tetap sama.'}
+        self.deliver(payload)
+
+    def send_verification(self, email, token):
+        self.deliver({'from': self.sender, 'to': [email], 'subject': 'Verifikasi email Anredseller',
+                      'text': 'Untuk mengaktifkan atau memverifikasi akun Anredseller, buka tautan berikut dalam 30 menit dan tentukan kata sandi baru. Semua sesi lama akan keluar.\n\n'
+                      + self.origin + '/akun.html#verify=' + token + '\n\nJika kamu tidak meminta ini, abaikan email ini. Tautan hanya berlaku sekali.'})
+
+    def deliver(self, payload):
         request_ = Request('https://api.resend.com/emails', data=json.dumps(payload).encode(),
                            headers={'Authorization': 'Bearer ' + self.key, 'Content-Type': 'application/json',
                                     'User-Agent': 'Anredseller/1.0'}, method='POST')
@@ -129,6 +137,7 @@ class PasswordRecovery:
             if not row or row['customer_id'] is None:
                 db().rollback();return fail('Tautan tidak valid atau kedaluwarsa. Minta tautan baru.')
             db().execute('UPDATE customers SET password_hash=? WHERE id=?', (hashed, row['customer_id']))
+            app.extensions['email_verification'].mark_verified(row['customer_id'])
             db().execute('DELETE FROM password_resets WHERE customer_id=?', (row['customer_id'],))
             db().execute('DELETE FROM customer_sessions WHERE customer_id=?', (row['customer_id'],))
             db().commit()

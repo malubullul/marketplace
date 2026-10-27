@@ -78,7 +78,7 @@ class PostgresDatabase:
 
     def initialize(self):
         self.begin()
-        for filename in ('001_supabase.sql', '004_reviews_recovery.sql'):
+        for filename in ('001_supabase.sql', '004_reviews_recovery.sql', '005_email_verification.sql'):
             source = (Path(__file__).resolve().parent / 'migrations' / filename).read_text()
             self.connection.execute(source.replace('anredseller', self.schema), prepare=False)
         self.commit()

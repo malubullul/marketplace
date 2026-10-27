@@ -4,10 +4,12 @@ Konfigurasi utama untuk kebutuhan ini: repository `malubullul/marketplace`, bran
 
 ## 1. Siapkan database dan bucket
 
-Pada project Supabase yang sudah dibuat, buka **SQL Editor → New query**. Jalankan isi dua file berikut, satu per satu:
+Pada project Supabase yang sudah dibuat, buka **SQL Editor → New query**. Jalankan file berikut satu per satu (database yang sudah terpasang cukup menjalankan migrasi baru yang belum diterapkan):
 
 1. [`migrations/001_supabase.sql`](../migrations/001_supabase.sql): tabel aplikasi, sesi, alamat, produk dan pesanan.
 2. [`migrations/002_supabase_storage.sql`](../migrations/002_supabase_storage.sql): bucket privat `product-photos`.
+3. [`migrations/004_reviews_recovery.sql`](../migrations/004_reviews_recovery.sql): rating, item pesanan, dan pemulihan password.
+4. [`migrations/005_email_verification.sql`](../migrations/005_email_verification.sql): bukti kepemilikan email dan token verifikasi privat.
 
 Tabel berada pada schema **`anredseller`**, bukan `public`. Pilih schema tersebut ketika melihat tabel. Jangan menambahkannya ke daftar schema Data API yang diekspos. RLS aktif dan tidak ada kebijakan baca/tulis publik. Backend menggunakan koneksi PostgreSQL server; browser tidak mengakses tabel atau bucket secara langsung.
 
@@ -93,6 +95,8 @@ Masukkan email dan password pribadi pada terminal; password tidak tampil. Helper
 4. Produk terbit terlihat di toko. Katalog cloud awal memang kosong, tidak otomatis diisi produk demonstrasi.
 5. Daftar sebagai pembeli, simpan alamat, tambah keranjang, lalu checkout. Pesanan muncul pada akun pembeli dan admin. Pembeli lain tidak bisa membacanya.
 6. `/admin` pada toko mengarah ke domain admin. API admin langsung pada toko ditolak tanpa kunci gateway, sementara katalog dan akun pembeli tetap berfungsi.
+7. Di lingkungan uji, periksa laporan transfer → verifikasi pembayaran admin → Diproses → Dikirim → Selesai, serta pembatalan pesanan belum dibayar. Buka **Riwayat aktivitas**. Jangan menandai pembayaran produksi terverifikasi untuk sekadar mencoba tombol.
+8. Setelah migrasi 005 dan Resend siap, ikuti [aktivasi verifikasi email](TRANSACTION_SAFETY.md). Batas pembayaran pada **Keamanan transaksi** bersifat opsional dan tidak mengubah tenggat pesanan lama.
 
 Health check 503 biasanya berarti migrasi belum dijalankan, connection string salah, atau backend belum tersedia. Periksa Vercel logs secara pribadi; jangan menempelkan secret ke chat. Jika login admin gagal, periksa akun pemilik, kunci gateway identik, dua URL production, dan apakah backend terhalang Deployment Protection. Foto gagal: periksa bucket privat dan secret key baru pada project toko.
 
@@ -102,7 +106,7 @@ Pasang domain publik pada project toko dan subdomain/domain admin pada project a
 
 ## Batas dan pengujian
 
-Transaksi PostgreSQL aplikasi menggunakan satu advisory lock per schema untuk menjaga stok dan idempotensi di beberapa instance serverless. Ini cocok untuk toko awal dengan trafik ringan; bukan arsitektur marketplace besar. Aplikasi tidak menjalankan DDL atau menulis file sesi/produk di cold start PostgreSQL. Koneksi ditutup setelah setiap request. Pembayaran, email dan pengiriman masih manual.
+Transaksi PostgreSQL aplikasi menggunakan satu advisory lock per schema untuk menjaga stok dan idempotensi di beberapa instance serverless. Ini cocok untuk toko awal dengan trafik ringan; bukan arsitektur marketplace besar. Aplikasi tidak menjalankan DDL atau menulis file sesi/produk di cold start PostgreSQL. Koneksi ditutup setelah setiap request. Pembayaran dan pengiriman masih manual; pemeriksaan pembayaran dicatat pada rincian pesanan. Email pemulihan/verifikasi tersedia setelah Resend dikonfigurasi. Ikuti [aktivasi tahap 01](TRANSACTION_SAFETY.md) untuk mewajibkan verifikasi email dan mengatur batas pembayaran.
 
 ```sh
 .venv/bin/python -m unittest discover -s tests -v

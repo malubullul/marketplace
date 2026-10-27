@@ -12,7 +12,7 @@ Kelayakan diperiksa di server menggunakan pemilik pesanan dan produk yang benar-
 
 ## Migrasi database yang sudah berjalan
 
-Di **Supabase → SQL Editor**, jalankan isi [004_reviews_recovery.sql](../migrations/004_reviews_recovery.sql). Database baru memerlukan `001_supabase.sql` terlebih dahulu. Alternatif dengan environment lokal yang sudah terhubung: `python server.py init-db`, yang menjalankan kedua migrasi secara berurutan.
+Di **Supabase → SQL Editor**, jalankan isi [004_reviews_recovery.sql](../migrations/004_reviews_recovery.sql). Database baru memerlukan `001_supabase.sql` terlebih dahulu. Alternatif dengan environment lokal yang sudah terhubung: `python server.py init-db`, yang menjalankan migrasi 001, 004, dan 005 secara berurutan.
 
 Migrasi dapat diulang, tidak menghapus akun/produk/pesanan, dan mengisi `order_items` dari pesanan lama. Tabel `order_items`, `product_reviews`, dan `password_resets` berada di schema privat `anredseller`, memakai RLS dan tanpa hak akses Data API untuk `PUBLIC`, `anon`, atau `authenticated`. Semua akses melalui backend. Tidak diperlukan service-role key di browser.
 
@@ -50,7 +50,7 @@ Domain pengirim Resend yang belum diverifikasi hanya cocok untuk pengujian terba
 - Reset berhasil mencabut seluruh sesi pembeli itu dan semua tautan resetnya. Tidak otomatis login dan tidak memengaruhi akun lain atau sesi admin. Ganti password biasa juga membatalkan tautan reset yang masih tertunda.
 - Ini pemulihan **akun pembeli**. Akun pemilik tetap menggunakan prosedur CLI `reset-password` yang sudah ada. Google login tetap tidak diaktifkan.
 
-Mengisi email saat pendaftaran belum membuktikan kepemilikan email. Verifikasi email saat pendaftaran, MFA admin, dan otomatisasi pembayaran/pengiriman masih terpisah dari fitur ini.
+Mengisi email saja belum membuktikan kepemilikannya. [Tahap 01 keamanan transaksi](TRANSACTION_SAFETY.md) menambahkan pendaftaran melalui tautan email dan verifikasi akun lama; aktivasi memerlukan migrasi 005 dan flag hosting. Setelah migrasi 005 tersedia, reset kata sandi yang berhasil juga mencatat bukti kepemilikan email dan membatalkan tautan verifikasi tertunda. MFA admin dan otomatisasi pembayaran/pengiriman masih menjadi pekerjaan terpisah.
 
 ## Pengujian
 

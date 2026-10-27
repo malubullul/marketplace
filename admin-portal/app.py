@@ -21,6 +21,10 @@ API_ROUTES = [
     ('PUT', r'/api/admin/products/\d+'), ('DELETE', r'/api/admin/products/\d+'),
     ('POST', r'/api/admin/uploads'), ('GET', r'/api/admin/orders'),
     ('PATCH', r'/api/admin/orders/[A-Za-z0-9-]{1,80}'),
+    ('POST', r'/api/admin/orders/[A-Za-z0-9-]{1,80}/payment'),
+    ('GET', r'/api/admin/orders/[A-Za-z0-9-]{1,80}/history'),
+    ('GET', r'/api/admin/transaction-settings'), ('PUT', r'/api/admin/transaction-settings'),
+    ('GET', r'/api/admin/activity'),
     ('GET', r'/api/admin/contacts'), ('PUT', r'/api/admin/contacts'),
     ('GET', r'/api/admin/content'), ('PUT', r'/api/admin/content'),
     ('GET', r'/api/admin/promos'), ('POST', r'/api/admin/promos'),
@@ -143,6 +147,8 @@ def create_app(config=None):
             parsed = urlsplit(source)
             if parsed.scheme not in {'http', 'https'} or parsed.netloc.lower() != request.host.lower():
                 return jsonify(error='Asal permintaan tidak diizinkan.'), 403
+        if request.query_string:
+            target += '?' + request.query_string.decode('ascii', errors='strict')
         return proxy(target, request.method)
 
     @app.get('/css/admin.css')

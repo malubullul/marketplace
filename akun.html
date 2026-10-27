@@ -107,6 +107,7 @@
               role="alert"
               tabindex="-1"
             ></p>
+            <p id="buyer-register-success" class="recovery-success" role="status" hidden></p>
             <button class="account-button primary" type="submit">
               Buat akun pembeli
             </button>
@@ -132,6 +133,17 @@
             <p id="buyer-reset-success" class="recovery-success" role="status" hidden></p>
             <button class="account-button primary" type="submit">Simpan kata sandi baru</button>
             <button type="button" class="auth-text-action" data-auth-forgot>Minta tautan baru</button>
+            <button type="button" class="auth-text-action" data-auth-login>Kembali ke masuk</button>
+          </form>
+          <form id="buyer-verify-form" hidden>
+            <p>Tentukan kata sandi baru untuk membuktikan kepemilikan email. Semua sesi lama akun ini akan keluar. Nama dan nomor HP dipakai hanya untuk akun baru.</p>
+            <label for="verify-name">Nama lengkap (akun baru)</label><input id="verify-name" autocomplete="name" maxlength="150" />
+            <label for="verify-phone">Nomor HP (akun baru)</label><input id="verify-phone" type="tel" autocomplete="tel" maxlength="30" />
+            <label for="verify-password">Kata sandi baru</label><input id="verify-password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required />
+            <label for="verify-confirm">Ulangi kata sandi baru</label><input id="verify-confirm" type="password" autocomplete="new-password" minlength="12" maxlength="128" required />
+            <p id="buyer-verify-error" class="account-error" role="alert" tabindex="-1"></p>
+            <p id="buyer-verify-success" role="status"></p>
+            <button class="account-button primary" type="submit">Verifikasi & simpan kata sandi</button>
             <button type="button" class="auth-text-action" data-auth-login>Kembali ke masuk</button>
           </form>
           <p class="auth-help">
@@ -411,6 +423,7 @@
     <script src="js/cart.js"></script>
     <script src="js/app.js"></script>
     <script src="js/store.js"></script>
+    <script src="js/transaction-ui.js"></script>
     <script src="js/account.js"></script>
   </body>
 </html>

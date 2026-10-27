@@ -1,3 +1,4 @@
+from order_workflow import advance
 """Verified commerce metrics and adversarial password-recovery contracts."""
 import hashlib
 import json
@@ -55,8 +56,7 @@ class ReviewRecoveryTests(unittest.TestCase):
         return result.json['order']['nomor']
 
     def status(self, number, status):
-        result = self.owner.patch('/api/admin/orders/'+number, json={'status':status}, headers=self.oh)
-        self.assertEqual(result.status_code, 200, result.json)
+        advance(self.owner,self.oh,number,status)
 
     def metrics(self):
         return next(p for p in self.guest.get('/api/products').json['products'] if p['id']==self.pid)
@@ -101,7 +101,7 @@ class ReviewRecoveryTests(unittest.TestCase):
         number=self.order()
         for state in ['baru','diproses','dikirim']:
             self.status(number,state);self.assertEqual(self.review().status_code,403)
-        self.status(number,'dibatalkan');self.assertEqual(self.review().status_code,403)
+        self.status(self.order(),'dibatalkan');self.assertEqual(self.review().status_code,403)
         self.status(self.order(),'selesai')
         self.assertEqual(self.review().status_code,200)
         bob,bh=self.register('bob@example.test')

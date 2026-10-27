@@ -71,7 +71,12 @@ def run():
                     csrf=owner.request.get(base+'/api/session').json()['csrf']
                     auth=owner.request.post(base+'/api/login',data={'email':'owner@example.test','password':password},headers={'X-CSRF-Token':csrf})
                     owner_headers={'X-CSRF-Token':auth.json()['csrf']}
-                    assert owner.request.patch(base+'/api/admin/orders/'+number,data={'status':'selesai'},headers=owner_headers).status==200
+                    current=result.json()['order']
+                    verified=owner.request.post(base+'/api/admin/orders/'+number+'/payment',data={'version':current['version'],'action':'verify','reference':'Fixture transfer'},headers=owner_headers)
+                    assert verified.status==200;current=verified.json()['order']
+                    for status in ['diproses','dikirim','selesai']:
+                        changed=owner.request.patch(base+'/api/admin/orders/'+number,data={'status':status,'version':current['version']},headers=owner_headers)
+                        assert changed.status==200;current=changed.json()['order']
                     page.goto(base+'/akun.html#orders',wait_until='networkidle')
                     page.get_by_role('button',name='Lihat rincian',exact=True).click()
                     page.locator('.order-review-links a').wait_for(state='visible')

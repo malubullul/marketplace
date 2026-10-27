@@ -69,6 +69,8 @@ if TEST_URL:
     PostgresStoreContentTests = postgres_case('test_store_content', 'StoreContentTests')
     PostgresReviewRecoveryTests = postgres_case('test_reviews_recovery', 'ReviewRecoveryTests')
     PostgresPromoTests = postgres_case('test_promos', 'PromoTests')
+    PostgresOrderOperationTests = postgres_case('test_order_operations', 'OrderOperationTests')
+    PostgresEmailVerificationTests = postgres_case('test_email_verification', 'EmailVerificationTests')
 else:
     @unittest.skip('Set ANREDSELLER_TEST_DATABASE_URL to run real PostgreSQL contracts.')
     class PostgresNotConfigured(unittest.TestCase):

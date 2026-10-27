@@ -1,4 +1,15 @@
 /* Anredseller editorial layer. Shared by the catalogue and customer journey. */
+.transaction-panel { margin: 24px 0; padding: 20px; border: 1px solid #c6cdbd; background: #eeefe9; color: #252a23; overflow-wrap: anywhere; }
+.transaction-panel h3 { font-size: 18px; margin: 0 0 12px; }
+.transaction-panel p { margin: 10px 0; font-size: 15px; }
+.transaction-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.transaction-actions button { min-height: 44px; white-space: normal; padding: 12px 16px; border: 1px solid #7b8674; cursor: pointer; font: inherit; }
+.transaction-actions button.primary { background: var(--olive); color: white; border-color: var(--olive); }
+.transaction-actions button.secondary { background: transparent; color: #252a23; }
+.transaction-actions button:disabled { opacity: .6; cursor: wait; }
+.transaction-panel [data-order-action="refresh"] { min-height: 44px; padding: 10px 0; color: #384831; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.transaction-panel .transaction-result { color: #aa302c; }
+.transaction-panel a { text-decoration: underline; }
 @font-face {
   font-family: Switzer;
   src: url("../assets/fonts/switzer-latin-400-normal.woff2") format("woff2");
@@ -1399,7 +1410,7 @@ p {
 .order-confirmation .btn-kembali-belanja { display: inline-block; padding: 12px 0; background: none; color: var(--ink); font-weight: 400; text-decoration: underline; border-radius: 0; margin-left: 20px; }
 .order-history-link { display: inline-block; padding: 12px 0; text-decoration: underline; }
 .support-launcher { display: flex; align-items: center; gap: 8px; position: fixed; right: 24px; bottom: max(20px, env(safe-area-inset-bottom)); z-index: 90; min-height: 48px; padding: 12px 18px; background: var(--olive); border: 0; color: white; font: 500 14px/1.4 var(--font-text); cursor: pointer; }
-.order-confirmation .support-launcher, .checkout-page .support-launcher { display: none; }
+.order-confirmation .support-launcher, .checkout-page .support-launcher, .account-page .support-launcher:not(.support-docked) { display: none; }
 .support-dialog { position: fixed; inset: auto 24px 84px auto; margin: 0; padding: 32px; width: 380px; max-width: calc(100vw - 32px); max-height: calc(100dvh - 112px); overflow: auto; background: var(--paper); color: var(--ink); border: 0; border-radius: 0; }
 .support-dialog::backdrop { background: #12160f66; }
 .support-dialog h2 { font-size: 32px; line-height: 1.1; margin: 24px 0 16px; }

@@ -1,3 +1,4 @@
+from order_workflow import advance
 import json
 import secrets
 import tempfile
@@ -165,13 +166,13 @@ class PromoTests(unittest.TestCase):
         self.assertEqual(retried.json['order'],order)
         self.assertEqual(self.state()[0]['used'],1)
         for _ in range(2):
-            self.client.patch('/api/admin/orders/'+order['nomor'],json={'status':'dibatalkan'},headers=self.headers)
+            advance(self.client,self.headers,order['nomor'],'dibatalkan')
         self.assertEqual(self.state()[0]['used'],0)
         active=dict(updated.json['promo'],active=True)
         self.assertEqual(self.client.put('/api/admin/promos/PARTNER10',json=active,headers=self.headers).status_code,200)
         new_order=self.order(product,coupon='PARTNER10').json['order']
         self.assertEqual(new_order['promo']['partner'],'New partner')
-        self.client.patch('/api/admin/orders/'+new_order['nomor'],json={'status':'selesai'},headers=self.headers)
+        advance(self.client,self.headers,new_order['nomor'],'selesai')
         stat=self.state()[0]
         self.assertEqual((stat['used'],stat['completed'],stat['completed_sales'],stat['completed_discount']),(1,1,new_order['total'],new_order['diskon']))
         self.assertEqual(self.order(product,coupon='PARTNER10').status_code,409)

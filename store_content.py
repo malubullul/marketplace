@@ -151,6 +151,7 @@ class StoreContent:
             current[section]=validated
             current['version']=str(time.time_ns())
             db().execute("INSERT INTO metadata(key,value) VALUES('store_content',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",(json.dumps(current),))
+            app.audit_log.record('content.updated', 'settings', 'store-content', {'section': section})
             db().commit()
             return jsonify(content=current)
 

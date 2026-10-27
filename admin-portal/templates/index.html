@@ -66,6 +66,8 @@
           <button class="nav-button" data-page="promos">Kode promo</button>
           <button class="nav-button" data-page="socials">Media sosial</button>
           <button class="nav-button" data-page="settings">Kontak WhatsApp</button>
+          <button class="nav-button" data-page="transactions">Keamanan transaksi</button>
+          <button class="nav-button" data-page="activity">Riwayat aktivitas</button>
         </nav>
         <div class="sidebar-bottom">
           <a href="/" data-store-link target="_blank" rel="noopener"
@@ -193,6 +195,22 @@
           <div class="table-wrap"><table class="promo-table"><thead><tr><th>Kode / Partner</th><th>Diskon</th><th>Kuota terpakai</th><th>Pesanan selesai</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="promo-rows"></tbody></table><div id="promos-empty" class="empty" hidden><h2>Belum ada kode promo.</h2><p>Buat kode untuk partner atau promo tokomu. Belum ada diskon yang aktif otomatis.</p></div></div>
           <p class="table-note">Kuota terpakai termasuk pesanan menunggu pembayaran. Pesanan dibatalkan mengembalikan kuota. Nilai pesanan selesai mengikuti status yang dikonfirmasi toko; ini bukan perhitungan komisi partner.</p>
         </section>
+        <section id="transactions-page" hidden>
+          <div class="page-heading"><div><h1>Keamanan transaksi<span>.</span></h1><p>Atur waktu pembayaran dan tinjau kesiapan verifikasi email.</p></div></div>
+          <form id="transaction-settings-form" class="contacts-form">
+            <label class="transaction-check"><input type="checkbox" id="deadline-enabled" /> Aktifkan batas pembayaran untuk pesanan baru</label>
+            <label for="payment-hours">Waktu pembayaran (jam)</label><input type="number" id="payment-hours" min="1" max="168" required value="24" />
+            <p>Pesanan lama tidak diberi tenggat secara otomatis. Laporan transfer dan penahanan oleh admin menghentikan pembatalan otomatis selama pemeriksaan. Pastikan transfer diperiksa secara rutin.</p>
+            <p id="email-verification-readiness" class="notice" role="status"></p>
+            <p id="transaction-settings-result" role="status"></p>
+            <button type="submit" id="save-transaction-settings" class="button primary" disabled>Simpan ketentuan</button>
+          </form>
+        </section>
+        <section id="activity-page" hidden>
+          <div class="page-heading"><div><h1>Riwayat aktivitas<span>.</span></h1><p>Perubahan produk, pesanan, pembayaran, dan pengaturan dicatat untuk pemilik.</p></div><button type="button" class="button secondary" id="refresh-activity">Muat ulang</button></div>
+          <p id="activity-error" role="status"></p><div id="activity-list" class="audit-list"></div>
+          <button type="button" class="button secondary" id="more-activity" hidden>Muat aktivitas sebelumnya</button>
+        </section>
         <section id="settings-page" hidden>
           <div class="page-heading">
             <div>
@@ -215,7 +233,7 @@
               <input id="support-whatsapp" type="tel" inputmode="tel" maxlength="40" autocomplete="off" aria-describedby="support-number-hint" />
               <small id="support-number-hint">Nomor ini dipakai tombol Hubungi CS di toko publik. Pastikan kedua nomor sudah aktif di WhatsApp.</small>
             </div>
-            <p class="notice">Pesanan baru tetap menunggu pembayaran. Setelah transfer diperiksa, ubah status pesanan menjadi Diproses. Membuka WhatsApp tidak mengonfirmasi pembayaran.</p>
+            <p class="notice">Pesanan baru tetap menunggu pembayaran. Setelah transfer diperiksa, catat verifikasi pembayaran pada rincian pesanan, lalu ubah status menjadi Diproses. Membuka WhatsApp tidak mengonfirmasi pembayaran.</p>
             <p id="contacts-result" role="status" hidden></p>
             <button type="submit" class="button primary" id="save-contacts">Simpan kontak</button>
           </form>

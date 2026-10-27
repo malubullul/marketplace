@@ -20,14 +20,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
   document.getElementById("nomor-pesanan").textContent = order.nomor;
+  if (order.status === "dibatalkan") document.querySelector(".konfirmasi-judul").textContent = "Pesanan dibatalkan.";
   document.getElementById("konfirmasi-sub").textContent =
     `Terima kasih, ${order.nama}. Rincian pesananmu tersimpan di akun.`;
-  const statuses = {baru: "Menunggu pembayaran", diproses: "Diproses", dikirim: "Dikirim", selesai: "Selesai", dibatalkan: "Dibatalkan"};
-  document.getElementById("confirmation-status").textContent = statuses[order.status] || order.status;
-  document.getElementById("confirmation-status-note").textContent = order.status === "baru"
+  document.getElementById("confirmation-status").textContent = customerOrderStatus(order);
+  document.getElementById("confirmation-status-note").textContent = order.status === "baru" && order.payment?.status !== "verified"
     ? "Membuka WhatsApp atau mengirim bukti transfer belum mengubah status. Toko akan memeriksa pembayaranmu."
     : "Untuk pertanyaan mengenai pesanan ini, hubungi customer service.";
-  if (order.status === "baru") {
+  if (order.status === "baru" && order.payment?.status !== "verified") {
     document.getElementById("payment-next-step").hidden = false;
     const link = document.getElementById("payment-whatsapp-link");
     const contacts = await storeContactsReady;
@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       "Alamat pengiriman",
       [order.alamat, order.kota, order.provinsi, order.kodepos].join(", "),
     ],
-    ["Pembayaran", "Transfer melalui instruksi WhatsApp pembayaran"],
+    ["Pembayaran", orderPaymentText(order)],
     [
       "Tanggal pesanan",
       new Date(order.created_at * 1000).toLocaleString("id-ID"),
@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         `<div class="konfirmasi-detail-baris"><span>${h(label)}</span><span>${h(value)}</span></div>`,
     )
     .join("");
+  mountOrderSafety(document.getElementById("detail-pesanan"), order, () => location.reload());
   document.getElementById("grid-rekomendasi-konfirmasi").innerHTML =
     PRODUK.filter((p) => p.rekomendasi || p.trending)
       .slice(0, 4)

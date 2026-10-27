@@ -61,7 +61,7 @@ class CustomerAPI:
         return wrapped
 
     def profile(self, customer):
-        return {key:customer[key] for key in ['id','email','nama','nohp']}
+        return dict({key:customer[key] for key in ['id','email','nama','nohp']}, email_verified=self.app.extensions['email_verification'].verified(customer))
 
     def confirm_password(self, customer, password):
         if not isinstance(password, str) or not 1 <= len(password) <= 128:
@@ -161,13 +161,15 @@ class CustomerAPI:
         def customer_session():
             customer=self.current()
             recovery = app.extensions['password_recovery']
-            return jsonify(authenticated=bool(customer),customer=self.profile(customer) if customer else None,csrf=self.csrf(),password_recovery=app.extensions['recovery_mailer'].enabled and recovery.ready())
+            return jsonify(authenticated=bool(customer),customer=self.profile(customer) if customer else None,csrf=self.csrf(),password_recovery=app.extensions['recovery_mailer'].enabled and recovery.ready(),email_verification=app.extensions['email_verification'].availability())
 
         @app.post('/api/customer/register')
         def customer_register():
             if not self.require_csrf():return fail('Muat ulang halaman pendaftaran.',403)
             if not self.throttle('register'):return fail('Terlalu banyak percobaan pendaftaran. Coba lagi dalam 15 menit.',429)
             data=body()
+            if app.extensions['email_verification'].required:
+                return app.extensions['email_verification'].request_link(data.get('email'))
             try:
                 email=self.text(data,'email').lower()
                 name=self.text(data,'nama')
@@ -345,12 +347,14 @@ class CustomerAPI:
         @app.get('/api/customer/orders')
         @self.required
         def customer_orders():
+            app.extensions['order_operations'].sweep_expired()
             rows=db().execute('SELECT document,status FROM orders WHERE customer_id=? ORDER BY created_at DESC,id DESC',(g.customer['id'],)).fetchall()
-            return jsonify(orders=[dict(json.loads(row['document']),status=row['status']) for row in rows])
+            return jsonify(orders=[app.extensions['order_operations'].decorate(dict(json.loads(row['document']),status=row['status'])) for row in rows])
 
         @app.get('/api/customer/orders/<order_id>')
         @self.required
         def customer_order(order_id):
+            app.extensions['order_operations'].sweep_expired()
             row=db().execute('SELECT document,status FROM orders WHERE id=? AND customer_id=?',(order_id,g.customer['id'])).fetchone()
             if not row:return fail('Pesanan tidak ditemukan.',404)
-            return jsonify(order=dict(json.loads(row['document']),status=row['status']))
+            return jsonify(order=app.extensions['order_operations'].decorate(dict(json.loads(row['document']),status=row['status'])))

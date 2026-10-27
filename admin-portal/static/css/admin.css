@@ -7,6 +7,21 @@
   --error: #aa302c;
   --radius: 4px;
 }
+.payment-management { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 24px; overflow-wrap: anywhere; }
+.payment-management h3 { font-size: 18px; }
+.payment-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 16px; }
+.payment-controls label, .payment-controls input { flex-basis: 100%; }
+.payment-controls button { white-space: normal; min-height: 44px; }
+.payment-result, #activity-error { color: var(--error); }
+.audit-entry { display: grid; gap: 4px; border-bottom: 1px solid var(--line); padding: 16px 0; overflow-wrap: anywhere; }
+.audit-entry time, .audit-entry small { color: var(--muted); }
+.audit-list { max-width: 900px; }
+.transaction-check { display: flex; align-items: center; gap: 12px; }
+.transaction-check input { width: 24px; height: 24px; min-height: 24px; flex-shrink: 0; }
+@media (min-width: 761px) {
+  .sidebar { overflow-y: auto; overscroll-behavior-y: contain; }
+  .sidebar > * { flex-shrink: 0; }
+}
 * {
   box-sizing: border-box;
 }

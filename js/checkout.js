@@ -1,3 +1,4 @@
+let checkoutTerms = null;
 // ============================================================
 // CHECKOUT.JS — Logic Halaman Checkout
 // ============================================================
@@ -13,6 +14,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   renderRingkasanCheckout();
   await loadCheckoutAddresses();
+  try { const response = await fetch("/api/store/transaction-settings", {cache:"no-store"}); if (!response.ok) throw new Error(); checkoutTerms = (await response.json()).settings;
+    document.getElementById("transaction-terms").textContent = checkoutTerms.deadline_enabled ? `Bayar dalam ${checkoutTerms.payment_hours} jam setelah pesanan dibuat. Setelah transfer, laporkan melalui rincian pesanan agar pembatalan otomatis ditahan saat admin memeriksa.` : "Pembayaran dibantu melalui WhatsApp. Setelah transfer, laporkan melalui rincian pesanan untuk diperiksa admin.";
+  } catch { document.getElementById("transaction-terms").textContent = "Ketentuan pembayaran belum dapat dimuat. Muat ulang sebelum membuat pesanan."; }
+  if (buyerSession.email_verification?.required && !buyerSession.customer.email_verified) { document.getElementById("transaction-terms").innerHTML = 'Verifikasi email sebelum membuat pesanan. <a href="akun.html">Buka akun untuk verifikasi →</a>'; }
 });
 
 // ── Ringkasan Checkout ─────────────────────────────────────
@@ -109,6 +114,7 @@ function validasiForm() {
 
 // ── Proses Checkout ────────────────────────────────────────
 async function prosesCheckout() {
+  if (!checkoutTerms || (buyerSession.email_verification?.required && !buyerSession.customer?.email_verified)) { document.getElementById("checkout-error").textContent = !checkoutTerms ? "Muat ulang untuk memeriksa ketentuan pembayaran." : "Verifikasi email terlebih dahulu melalui halaman Akun."; return; }
   if (!(await requireBuyer())) return;
   if (!validasiForm()) {
     document.querySelector(".error")?.focus();
@@ -158,6 +164,7 @@ async function prosesCheckout() {
       ukuran: item.ukuran || "",
       warna: item.warna || "",
     })),
+    payment_terms: checkoutTerms,
     coupon: sessionStorage.getItem("checkout_kupon") || "",
     expected_discount: promoDiscount(),
     catatan: val("catatan"),
